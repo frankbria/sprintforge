@@ -85,7 +85,7 @@ docs: update API documentation for sync endpoints
 
 ## Bug Reports
 
-We use GitHub issues to track public bugs. Report a bug by [opening a new issue](https://github.com/your-org/sprintforge/issues/new).
+We use GitHub issues to track public bugs. Report a bug by [opening a new issue](https://github.com/frankbria/sprintforge/issues/new).
 
 **Great Bug Reports** tend to have:
 
@@ -147,8 +147,8 @@ frontend/
 
 - Join our [Discord community](https://discord.gg/sprintforge)
 - Check the [documentation](https://docs.sprintforge.com)
-- Search existing [GitHub issues](https://github.com/your-org/sprintforge/issues)
-- Start a [GitHub discussion](https://github.com/your-org/sprintforge/discussions)
+- Search existing [GitHub issues](https://github.com/frankbria/sprintforge/issues)
+- Start a [GitHub discussion](https://github.com/frankbria/sprintforge/discussions)
 
 ## Recognition
 

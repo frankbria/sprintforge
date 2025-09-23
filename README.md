@@ -83,7 +83,7 @@ sprintforge/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-org/sprintforge.git
+   git clone https://github.com/frankbria/sprintforge.git
    cd sprintforge
    ```
 
@@ -119,6 +119,7 @@ sprintforge/
    - Frontend: http://localhost:3000
    - Backend API: http://localhost:8000
    - API Docs: http://localhost:8000/docs
+   - Live Demo: https://SprintForge.app
 
 ### Docker Development
 
@@ -322,9 +323,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🛟 Support & Community
 
+- **Live Demo**: [SprintForge.app](https://SprintForge.app)
 - **Documentation**: [docs.sprintforge.com](https://docs.sprintforge.com)
-- **Issues**: [GitHub Issues](https://github.com/your-org/sprintforge/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/your-org/sprintforge/discussions)
+- **Issues**: [GitHub Issues](https://github.com/frankbria/sprintforge/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/frankbria/sprintforge/discussions)
 - **Discord**: [SprintForge Community](https://discord.gg/sprintforge)
 
 ## 🗺️ Roadmap
