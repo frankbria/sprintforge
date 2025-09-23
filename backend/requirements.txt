@@ -8,7 +8,7 @@ pydantic-settings==2.0.3
 sqlalchemy==2.0.23
 alembic==1.13.0
 asyncpg==0.29.0  # PostgreSQL async driver
-redis==5.0.1
+redis>=4.5.2,<5.0.0
 
 # Excel Processing
 openpyxl==3.1.2
