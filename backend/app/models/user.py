@@ -9,7 +9,12 @@ from sqlalchemy.dialects.postgresql import UUID as PGUUID, JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
-from app.database.connection import Base
+try:
+    from app.database.connection import Base
+except ImportError:
+    # For testing without database setup
+    from sqlalchemy.orm import declarative_base
+    Base = declarative_base()
 
 
 class User(Base):

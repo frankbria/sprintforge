@@ -93,35 +93,35 @@
 **Assignee**: Backend Developer
 
 #### Subtasks:
-- [ ] **JWT token validation** (3 hours)
+- [x] **JWT token validation** (3 hours)
   - Install and configure JWT validation
   - Create token verification middleware
   - Add token expiration handling
   - Test token validation
 
-- [ ] **User session management** (2 hours)
+- [x] **User session management** (2 hours)
   - Integrate with NextAuth.js sessions
   - Create user session endpoints
   - Add session refresh logic
   - Test session persistence
 
-- [ ] **API authentication middleware** (2 hours)
+- [x] **API authentication middleware** (2 hours)
   - Create authentication dependency
   - Add user context to API requests
   - Handle authentication errors
   - Test middleware functionality
 
-- [ ] **User profile endpoints** (1 hour)
+- [x] **User profile endpoints** (1 hour)
   - Create user profile API endpoints
   - Add user preference management
   - Include user activity tracking
   - Test profile API calls
 
 **Definition of Done:**
-- [ ] JWT tokens are validated correctly
-- [ ] User sessions persist across requests
-- [ ] API authentication works seamlessly
-- [ ] User profile endpoints are functional
+- [x] JWT tokens are validated correctly
+- [x] User sessions persist across requests
+- [x] API authentication works seamlessly
+- [x] User profile endpoints are functional
 
 ---
 
@@ -130,28 +130,28 @@
 **Assignee**: Backend Developer
 
 #### Subtasks:
-- [ ] **NextAuth.js database adapter** (1 hour)
+- [x] **NextAuth.js database adapter** (1 hour)
   - Configure NextAuth.js PostgreSQL adapter
   - Test database adapter functionality
   - Verify user data synchronization
   - Handle adapter errors
 
-- [ ] **User profile synchronization** (0.5 hours)
+- [x] **User profile synchronization** (0.5 hours)
   - Sync OAuth profile data to database
   - Update user information on login
   - Handle profile picture updates
   - Test data synchronization
 
-- [ ] **Session storage optimization** (0.5 hours)
+- [x] **Session storage optimization** (0.5 hours)
   - Optimize session storage strategy
   - Configure session cleanup
   - Monitor session performance
   - Test session scalability
 
 **Definition of Done:**
-- [ ] NextAuth.js integrates with PostgreSQL
-- [ ] User profiles sync automatically
-- [ ] Session storage is optimized
+- [x] NextAuth.js integrates with PostgreSQL
+- [x] User profiles sync automatically
+- [x] Session storage is optimized
 
 ---
 
