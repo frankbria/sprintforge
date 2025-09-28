@@ -1,0 +1,1 @@
+"""API endpoints tests package."""

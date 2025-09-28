@@ -15,6 +15,7 @@ from app.database.connection import (
     shutdown_database,
 )
 from app.core.security import RateLimitMiddleware, SecurityHeadersMiddleware
+from app.core.auth import AuthenticationMiddleware
 
 # Configure structured logging
 structlog.configure(
@@ -49,10 +50,13 @@ app = FastAPI(
 # 1. Security headers (closest to app)
 app.add_middleware(SecurityHeadersMiddleware)
 
-# 2. Rate limiting
+# 2. Authentication middleware
+app.add_middleware(AuthenticationMiddleware)
+
+# 3. Rate limiting
 app.add_middleware(RateLimitMiddleware, default_requests=100, default_window=60)
 
-# 3. CORS
+# 4. CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
@@ -61,7 +65,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 4. Trusted hosts (outermost)
+# 5. Trusted hosts (outermost)
 if settings.allowed_hosts:
     app.add_middleware(
         TrustedHostMiddleware,
