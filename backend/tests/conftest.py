@@ -12,10 +12,10 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from backend.app.main import app
-from backend.app.core.config import get_settings
-from backend.app.database.connection import get_database_session, Base
-from backend.app.models import User, Project, ProjectMembership
+from app.main import app
+from app.core.config import get_settings
+from app.database.connection import get_database_session, Base
+from app.models import User, Project, ProjectMembership
 
 
 # Test database URL
