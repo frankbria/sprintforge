@@ -74,12 +74,12 @@ describe('SignIn Page', () => {
     render(<SignIn />)
 
     await waitFor(() => {
-      expect(screen.getByText('Sign in to SprintForge')).toBeInTheDocument()
+      expect(screen.getByText('Welcome to SprintForge')).toBeInTheDocument()
     })
 
-    expect(screen.getByText('Choose your preferred authentication method')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /sign in with google/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /sign in with azure active directory/i })).toBeInTheDocument()
+    expect(screen.getByText('Choose your preferred authentication method to get started')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /continue with google/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /continue with azure active directory/i })).toBeInTheDocument()
   })
 
   it('should call signIn when Google button is clicked', async () => {
@@ -99,10 +99,10 @@ describe('SignIn Page', () => {
     render(<SignIn />)
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /sign in with google/i })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /continue with google/i })).toBeInTheDocument()
     })
 
-    fireEvent.click(screen.getByRole('button', { name: /sign in with google/i }))
+    fireEvent.click(screen.getByRole('button', { name: /continue with google/i }))
 
     expect(mockSignIn).toHaveBeenCalledWith('google', { callbackUrl: '/' })
   })
@@ -124,10 +124,10 @@ describe('SignIn Page', () => {
     render(<SignIn />)
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /sign in with azure active directory/i })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /continue with azure active directory/i })).toBeInTheDocument()
     })
 
-    fireEvent.click(screen.getByRole('button', { name: /sign in with azure active directory/i }))
+    fireEvent.click(screen.getByRole('button', { name: /continue with azure active directory/i }))
 
     expect(mockSignIn).toHaveBeenCalledWith('azure-ad', { callbackUrl: '/' })
   })
@@ -150,10 +150,10 @@ describe('SignIn Page', () => {
     render(<SignIn />)
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /sign in with google/i })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /continue with google/i })).toBeInTheDocument()
     })
 
-    fireEvent.click(screen.getByRole('button', { name: /sign in with google/i }))
+    fireEvent.click(screen.getByRole('button', { name: /continue with google/i }))
 
     await waitFor(() => {
       expect(consoleErrorSpy).toHaveBeenCalledWith('Sign-in error:', expect.any(Error))
@@ -164,12 +164,27 @@ describe('SignIn Page', () => {
 
   it('should display terms and privacy message', async () => {
     mockGetSession.mockResolvedValue(null)
-    mockGetProviders.mockResolvedValue({})
+    mockGetProviders.mockResolvedValue({
+      google: {
+        id: 'google',
+        name: 'Google',
+        type: 'oauth',
+        signinUrl: '/api/auth/signin/google',
+        callbackUrl: '/api/auth/callback/google',
+      },
+    })
 
     render(<SignIn />)
 
     await waitFor(() => {
-      expect(screen.getByText(/by signing in, you agree to our terms of service and privacy policy/i)).toBeInTheDocument()
+      // Check for the terms and privacy links which are always present
+      expect(screen.getByText('Terms of Service')).toBeInTheDocument()
+      expect(screen.getByText('Privacy Policy')).toBeInTheDocument()
+
+      // Check for partial text that should be present
+      expect(screen.getByText((content, element) => {
+        return content.includes('By signing in, you agree to our')
+      })).toBeInTheDocument()
     })
   })
 
@@ -188,7 +203,7 @@ describe('SignIn Page', () => {
     render(<SignIn />)
 
     await waitFor(() => {
-      const googleButton = screen.getByRole('button', { name: /sign in with google/i })
+      const googleButton = screen.getByRole('button', { name: /continue with google/i })
       expect(googleButton).toBeInTheDocument()
       // Check if SVG icon is present
       expect(googleButton.querySelector('svg')).toBeInTheDocument()
@@ -210,7 +225,7 @@ describe('SignIn Page', () => {
     render(<SignIn />)
 
     await waitFor(() => {
-      const azureButton = screen.getByRole('button', { name: /sign in with azure active directory/i })
+      const azureButton = screen.getByRole('button', { name: /continue with azure active directory/i })
       expect(azureButton).toBeInTheDocument()
       // Check if SVG icon is present
       expect(azureButton.querySelector('svg')).toBeInTheDocument()
