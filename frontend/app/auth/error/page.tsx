@@ -3,85 +3,192 @@
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Suspense } from "react"
+import { Button } from "../../../components/ui/Button"
+import { ErrorMessage } from "../../../components/ui/ErrorMessage"
+import { PageLoading } from "../../../components/ui/LoadingSpinner"
 
 const errorMessages = {
-  Signin: "Try signing in with a different account.",
-  OAuthSignin: "Try signing in with a different account.",
-  OAuthCallback: "Try signing in with a different account.",
-  OAuthCreateAccount: "Try signing in with a different account.",
-  EmailCreateAccount: "Try signing in with a different account.",
-  Callback: "Try signing in with a different account.",
-  OAuthAccountNotLinked: "To confirm your identity, sign in with the same account you used originally.",
-  EmailSignin: "The e-mail could not be sent.",
-  CredentialsSignin: "Sign in failed. Check the details you provided are correct.",
-  SessionRequired: "Please sign in to access this page.",
-  default: "Unable to sign in.",
+  Signin: {
+    title: "Sign-in Error",
+    message: "There was a problem signing you in. Please try with a different account.",
+    suggestion: "Try using a different authentication provider or check your account status."
+  },
+  OAuthSignin: {
+    title: "OAuth Provider Error",
+    message: "The authentication provider encountered an error.",
+    suggestion: "This is usually temporary. Please try again in a few moments."
+  },
+  OAuthCallback: {
+    title: "OAuth Callback Error",
+    message: "There was an error during the authentication callback.",
+    suggestion: "Please try signing in again. If the problem persists, clear your browser cache."
+  },
+  OAuthCreateAccount: {
+    title: "Account Creation Error",
+    message: "Unable to create your account with this provider.",
+    suggestion: "Try using a different authentication method or contact support."
+  },
+  EmailCreateAccount: {
+    title: "Email Account Error",
+    message: "Unable to create an account with this email address.",
+    suggestion: "The email might already be in use with a different provider."
+  },
+  Callback: {
+    title: "Authentication Callback Error",
+    message: "The authentication process could not be completed.",
+    suggestion: "Please try signing in again."
+  },
+  OAuthAccountNotLinked: {
+    title: "Account Not Linked",
+    message: "This account is not linked to your existing profile.",
+    suggestion: "To link accounts, sign in with your original authentication method first."
+  },
+  EmailSignin: {
+    title: "Email Authentication Error",
+    message: "The verification email could not be sent.",
+    suggestion: "Check your email address and try again."
+  },
+  CredentialsSignin: {
+    title: "Invalid Credentials",
+    message: "The credentials you provided are incorrect.",
+    suggestion: "Please check your username and password, then try again."
+  },
+  SessionRequired: {
+    title: "Authentication Required",
+    message: "You need to sign in to access this page.",
+    suggestion: "Please sign in with your account to continue."
+  },
+  default: {
+    title: "Authentication Error",
+    message: "An unexpected authentication error occurred.",
+    suggestion: "Please try again. If the problem persists, contact support."
+  }
 }
 
 function ErrorContent() {
   const searchParams = useSearchParams()
   const error = searchParams.get("error") as keyof typeof errorMessages
+  const errorInfo = errorMessages[error] || errorMessages.default
+
+  const handleRetry = () => {
+    window.location.href = "/auth/signin"
+  }
+
+  const handleContactSupport = () => {
+    // In a real app, this would open a support form or email
+    window.location.href = "mailto:support@sprintforge.com?subject=Authentication Error&body=" +
+      encodeURIComponent(`Error Code: ${error || "Unknown"}\nTime: ${new Date().toISOString()}\n\nPlease describe what you were trying to do when this error occurred:`)
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 via-white to-red-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-lg w-full">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="mx-auto h-16 w-16 flex items-center justify-center rounded-full bg-red-100 mb-6">
             <svg
-              className="h-6 w-6 text-red-600"
-              xmlns="http://www.w3.org/2000/svg"
+              className="h-8 w-8 text-red-600"
               fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="2"
               stroke="currentColor"
-              role="img"
-              aria-label="Warning icon"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
+                strokeWidth="2"
+                d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
           </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Authentication Error
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            {errorMessages[error] || errorMessages.default}
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            {errorInfo.title}
+          </h1>
+          <p className="text-gray-600 text-sm sm:text-base max-w-md mx-auto">
+            {errorInfo.message}
           </p>
         </div>
-        <div className="mt-8 space-y-6">
-          <div className="rounded-md bg-red-50 p-4">
-            <div className="flex">
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-red-800">
-                  Error Code: {error || "Unknown"}
-                </h3>
-                <div className="mt-2 text-sm text-red-700">
-                  <p>
-                    If this error persists, please contact support or try a different authentication method.
-                  </p>
-                </div>
-              </div>
+
+        {/* Error Details Card */}
+        <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-gray-100 mb-6">
+          <ErrorMessage
+            type="error"
+            title="What happened?"
+            message={errorInfo.suggestion}
+            showIcon={false}
+            className="border-0 bg-transparent p-0"
+          />
+
+          {error && (
+            <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+              <p className="text-sm text-gray-600">
+                <span className="font-medium">Error Code:</span> {error}
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                Reference this code when contacting support
+              </p>
             </div>
-          </div>
-          <div>
-            <Link
-              href="/auth/signin"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+          )}
+        </div>
+
+        {/* Action Buttons */}
+        <div className="space-y-4">
+          <Button
+            onClick={handleRetry}
+            fullWidth
+            size="lg"
+            className="bg-blue-600 hover:bg-blue-700 focus:ring-blue-500"
+          >
+            Try Signing In Again
+          </Button>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Button
+              onClick={handleContactSupport}
+              variant="ghost"
+              size="md"
+              fullWidth
+              className="text-gray-600 hover:text-gray-700"
             >
-              Try Again
+              Contact Support
+            </Button>
+
+            <Link href="/" className="block">
+              <Button
+                variant="ghost"
+                size="md"
+                fullWidth
+                className="text-gray-600 hover:text-gray-700"
+              >
+                Back to Home
+              </Button>
             </Link>
           </div>
-          <div className="text-center">
-            <Link
-              href="/"
-              className="font-medium text-gray-600 hover:text-gray-500"
-            >
-              ← Back to home
-            </Link>
+        </div>
+
+        {/* Help Section */}
+        <div className="mt-8 text-center">
+          <div className="bg-blue-50 rounded-lg p-4">
+            <h3 className="text-sm font-medium text-blue-900 mb-2">
+              Need help?
+            </h3>
+            <p className="text-xs text-blue-700 leading-relaxed">
+              If you continue experiencing issues, try:
+            </p>
+            <ul className="text-xs text-blue-700 mt-2 space-y-1">
+              <li>• Clearing your browser cache and cookies</li>
+              <li>• Trying a different browser or device</li>
+              <li>• Checking if your account is active</li>
+              <li>• Using a different authentication provider</li>
+            </ul>
           </div>
+        </div>
+
+        {/* Keyboard Navigation Help */}
+        <div className="mt-4 text-center">
+          <p className="text-xs text-gray-400">
+            Use Tab to navigate • Enter to select • Esc to go back
+          </p>
         </div>
       </div>
     </div>
@@ -90,11 +197,7 @@ function ErrorContent() {
 
 export default function AuthError() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
-      </div>
-    }>
+    <Suspense fallback={<PageLoading message="Loading error details..." />}>
       <ErrorContent />
     </Suspense>
   )
