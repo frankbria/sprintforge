@@ -3,10 +3,10 @@ import { ErrorMessage, InlineError } from '../../../components/ui/ErrorMessage'
 
 describe('ErrorMessage', () => {
   it('renders with default props', () => {
-    render(<ErrorMessage message="Something went wrong" />)
-    
+    const { container } = render(<ErrorMessage message="Something went wrong" />)
+
     expect(screen.getByText('Something went wrong')).toBeInTheDocument()
-    const errorContainer = screen.getByText('Something went wrong').closest('div')
+    const errorContainer = container.firstChild
     expect(errorContainer).toHaveClass('bg-red-50', 'border-red-200', 'text-red-800')
   })
 
@@ -18,29 +18,29 @@ describe('ErrorMessage', () => {
   })
 
   it('renders different types', () => {
-    const { rerender } = render(<ErrorMessage message="Error" type="error" />)
-    let container = screen.getByText('Error').closest('div')
-    expect(container).toHaveClass('bg-red-50', 'text-red-800')
+    const { container, rerender } = render(<ErrorMessage message="Error" type="error" />)
+    let errorContainer = container.firstChild
+    expect(errorContainer).toHaveClass('bg-red-50', 'text-red-800')
 
     rerender(<ErrorMessage message="Warning" type="warning" />)
-    container = screen.getByText('Warning').closest('div')
-    expect(container).toHaveClass('bg-yellow-50', 'text-yellow-800')
+    errorContainer = container.firstChild
+    expect(errorContainer).toHaveClass('bg-yellow-50', 'text-yellow-800')
 
     rerender(<ErrorMessage message="Info" type="info" />)
-    container = screen.getByText('Info').closest('div')
-    expect(container).toHaveClass('bg-blue-50', 'text-blue-800')
+    errorContainer = container.firstChild
+    expect(errorContainer).toHaveClass('bg-blue-50', 'text-blue-800')
   })
 
   it('shows icon by default', () => {
-    render(<ErrorMessage message="Error" type="error" />)
-    const container = screen.getByText('Error').closest('div')
-    expect(container).toContainHTML('svg')
+    const { container } = render(<ErrorMessage message="Error" type="error" />)
+    const errorContainer = container.firstChild
+    expect(errorContainer).toContainHTML('svg')
   })
 
   it('hides icon when showIcon is false', () => {
-    render(<ErrorMessage message="Error" showIcon={false} />)
-    const container = screen.getByText('Error').closest('div')
-    expect(container).not.toContainHTML('svg')
+    const { container } = render(<ErrorMessage message="Error" showIcon={false} />)
+    const errorContainer = container.firstChild
+    expect(errorContainer).not.toContainHTML('svg')
   })
 
   it('renders action button', () => {
@@ -71,16 +71,16 @@ describe('ErrorMessage', () => {
   })
 
   it('applies custom className', () => {
-    render(<ErrorMessage message="Error" className="custom-error" />)
-    const container = screen.getByText('Error').closest('div')
-    expect(container).toHaveClass('custom-error')
+    const { container } = render(<ErrorMessage message="Error" className="custom-error" />)
+    const errorContainer = container.firstChild
+    expect(errorContainer).toHaveClass('custom-error')
   })
 
   it('has proper accessibility attributes', () => {
-    render(<ErrorMessage message="Error message" />)
-    const container = screen.getByText('Error message').closest('div')
-    expect(container).toBeInTheDocument()
-    expect(container).toHaveClass('rounded-md', 'border', 'p-4')
+    const { container } = render(<ErrorMessage message="Error message" />)
+    const errorContainer = container.firstChild
+    expect(errorContainer).toBeInTheDocument()
+    expect(errorContainer).toHaveClass('rounded-md', 'border', 'p-4')
   })
 })
 

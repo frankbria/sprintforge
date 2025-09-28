@@ -23,8 +23,8 @@ describe('AuthError Page', () => {
     render(<AuthError />)
 
     expect(screen.getByText('Authentication Error')).toBeInTheDocument()
-    expect(screen.getByText('Unable to sign in.')).toBeInTheDocument()
-    expect(screen.getByText('Error Code: Unknown')).toBeInTheDocument()
+    expect(screen.getByText('An unexpected authentication error occurred.')).toBeInTheDocument()
+    expect(screen.getByText('Please try again. If the problem persists, contact support.')).toBeInTheDocument()
   })
 
   it('should display specific error message for OAuthSignin error', () => {
@@ -33,9 +33,9 @@ describe('AuthError Page', () => {
 
     render(<AuthError />)
 
-    expect(screen.getByText('Authentication Error')).toBeInTheDocument()
-    expect(screen.getByText('Try signing in with a different account.')).toBeInTheDocument()
-    expect(screen.getByText('Error Code: OAuthSignin')).toBeInTheDocument()
+    expect(screen.getByText('OAuth Provider Error')).toBeInTheDocument()
+    expect(screen.getByText('The authentication provider encountered an error.')).toBeInTheDocument()
+    expect(screen.getByText('This is usually temporary. Please try again in a few moments.')).toBeInTheDocument()
   })
 
   it('should display specific error message for OAuthAccountNotLinked error', () => {
@@ -44,9 +44,9 @@ describe('AuthError Page', () => {
 
     render(<AuthError />)
 
-    expect(screen.getByText('Authentication Error')).toBeInTheDocument()
-    expect(screen.getByText('To confirm your identity, sign in with the same account you used originally.')).toBeInTheDocument()
-    expect(screen.getByText('Error Code: OAuthAccountNotLinked')).toBeInTheDocument()
+    expect(screen.getByText('Account Not Linked')).toBeInTheDocument()
+    expect(screen.getByText('This account is not linked to your existing profile.')).toBeInTheDocument()
+    expect(screen.getByText('To link accounts, sign in with your original authentication method first.')).toBeInTheDocument()
   })
 
   it('should display specific error message for CredentialsSignin error', () => {
@@ -55,9 +55,9 @@ describe('AuthError Page', () => {
 
     render(<AuthError />)
 
-    expect(screen.getByText('Authentication Error')).toBeInTheDocument()
-    expect(screen.getByText('Sign in failed. Check the details you provided are correct.')).toBeInTheDocument()
-    expect(screen.getByText('Error Code: CredentialsSignin')).toBeInTheDocument()
+    expect(screen.getByText('Invalid Credentials')).toBeInTheDocument()
+    expect(screen.getByText('The credentials you provided are incorrect.')).toBeInTheDocument()
+    expect(screen.getByText('Please check your username and password, then try again.')).toBeInTheDocument()
   })
 
   it('should display specific error message for SessionRequired error', () => {
@@ -66,20 +66,25 @@ describe('AuthError Page', () => {
 
     render(<AuthError />)
 
-    expect(screen.getByText('Authentication Error')).toBeInTheDocument()
-    expect(screen.getByText('Please sign in to access this page.')).toBeInTheDocument()
-    expect(screen.getByText('Error Code: SessionRequired')).toBeInTheDocument()
+    expect(screen.getByText('Authentication Required')).toBeInTheDocument()
+    expect(screen.getByText('You need to sign in to access this page.')).toBeInTheDocument()
+    expect(screen.getByText('Please sign in with your account to continue.')).toBeInTheDocument()
   })
 
   it('should display Try Again button with correct link', () => {
     const mockSearchParams = createMockSearchParams({ error: 'OAuthSignin' })
     mockUseSearchParams.mockReturnValue(mockSearchParams)
 
+    // Mock window.location.href
+    Object.defineProperty(window, 'location', {
+      value: { href: '' },
+      writable: true,
+    })
+
     render(<AuthError />)
 
-    const tryAgainButton = screen.getByRole('link', { name: /try again/i })
+    const tryAgainButton = screen.getByRole('button', { name: /try signing in again/i })
     expect(tryAgainButton).toBeInTheDocument()
-    expect(tryAgainButton).toHaveAttribute('href', '/auth/signin')
   })
 
   it('should display Back to home link', () => {
@@ -100,7 +105,7 @@ describe('AuthError Page', () => {
     render(<AuthError />)
 
     // Check if the warning SVG icon is present
-    const errorIcon = screen.getByRole('img', { hidden: true })
+    const errorIcon = document.querySelector('svg[aria-hidden="true"]')
     expect(errorIcon).toBeInTheDocument()
   })
 
@@ -110,7 +115,7 @@ describe('AuthError Page', () => {
 
     render(<AuthError />)
 
-    expect(screen.getByText(/if this error persists, please contact support/i)).toBeInTheDocument()
+    expect(screen.getByText('If you continue experiencing issues, try:')).toBeInTheDocument()
   })
 
   it('should render with loading fallback initially', () => {

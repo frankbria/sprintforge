@@ -180,7 +180,9 @@ describe('Home Page', () => {
 
     render(<Home />)
 
-    expect(screen.getByRole('link', { name: /dashboard/i })).toHaveAttribute('href', '/dashboard')
+    const dashboardLinks = screen.getAllByRole('link', { name: /dashboard/i })
+    expect(dashboardLinks).toHaveLength(2) // Nav link and button
+    expect(dashboardLinks[0]).toHaveAttribute('href', '/dashboard')
     expect(screen.getByRole('link', { name: /profile/i })).toHaveAttribute('href', '/profile')
   })
 
@@ -235,7 +237,7 @@ describe('Home Page', () => {
 
     render(<Home />)
 
-    // Check that the mobile-only description is present
-    expect(screen.getByText('Project Management & Excel Generation')).toBeInTheDocument()
+    // Check that the mobile-only description is present (there are multiple instances)
+    expect(screen.getAllByText('Project Management & Excel Generation')).toHaveLength(2)
   })
 })

@@ -53,30 +53,29 @@ describe('LoadingSpinner', () => {
 describe('PageLoading', () => {
   it('renders with default message', () => {
     render(<PageLoading />)
-    
-    expect(screen.getByText('Loading...')).toBeInTheDocument()
+
+    expect(screen.getAllByText('Loading...')).toHaveLength(2) // sr-only and visible text
     expect(screen.getByRole('status')).toBeInTheDocument()
   })
 
   it('renders with custom message', () => {
     render(<PageLoading message="Loading your profile..." />)
-    expect(screen.getByText('Loading your profile...')).toBeInTheDocument()
+    expect(screen.getAllByText('Loading your profile...')).toHaveLength(2) // sr-only and visible text
   })
 
   it('has proper loading page structure', () => {
-    render(<PageLoading message="Test loading" />)
-    
-    const container = screen.getByText('Test loading').closest('div')
-    expect(container).toHaveClass('min-h-screen', 'flex', 'items-center', 'justify-center')
-    
+    const { container } = render(<PageLoading message="Test loading" />)
+
+    const outerContainer = container.firstChild
+    expect(outerContainer).toHaveClass('min-h-screen', 'flex', 'items-center', 'justify-center')
+
     const spinner = screen.getByRole('status')
     expect(spinner).toHaveClass('h-12', 'w-12')
   })
 
   it('applies custom className', () => {
-    render(<PageLoading className="custom-page-loading" />)
-    const containers = screen.getAllByText('Loading...')
-    const container = containers[1].closest('div') // Get the outer container
-    expect(container).toHaveClass('custom-page-loading')
+    const { container } = render(<PageLoading className="custom-page-loading" />)
+    const outerContainer = container.firstChild
+    expect(outerContainer).toHaveClass('custom-page-loading')
   })
 })

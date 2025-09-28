@@ -169,7 +169,7 @@ describe('Dashboard Page', () => {
     expect(screen.getByText('Recent Projects')).toBeInTheDocument()
     expect(screen.getByText('No projects yet')).toBeInTheDocument()
     expect(screen.getByText('Get started by creating your first project.')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /new project/i })).toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: /new project/i })).toHaveLength(2)
   })
 
   it('should call logout when sign out button is clicked', async () => {

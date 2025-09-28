@@ -128,7 +128,7 @@ describe('AuthError Page', () => {
 
     expect(window.location.href).toContain('mailto:support@sprintforge.com')
     expect(window.location.href).toContain('subject=Authentication Error')
-    expect(window.location.href).toContain('Error Code: OAuthSignin')
+    expect(decodeURIComponent(window.location.href)).toContain('Error Code: OAuthSignin')
   })
 
   it('handles back to home link', () => {
@@ -175,10 +175,10 @@ describe('AuthError Page', () => {
   it('has proper responsive design classes', () => {
     mockUseSearchParams.mockReturnValue(createMockSearchParams())
 
-    render(<AuthError />)
+    const { container } = render(<AuthError />)
 
-    const container = screen.getByText('Authentication Error').closest('div')
-    expect(container?.closest('div')).toHaveClass('min-h-screen', 'flex', 'items-center', 'justify-center')
+    const outerContainer = container.firstChild
+    expect(outerContainer).toHaveClass('min-h-screen', 'flex', 'items-center', 'justify-center')
   })
 
   it('includes proper ARIA labels and accessibility', () => {
