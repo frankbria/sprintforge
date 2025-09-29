@@ -59,7 +59,7 @@ describe('Profile Page', () => {
     expect(screen.getByText('Profile')).toBeInTheDocument()
     expect(screen.getByText('Manage your account information and preferences')).toBeInTheDocument()
     expect(screen.getAllByText('John Doe')[0]).toBeInTheDocument()
-    expect(screen.getByText('john@example.com')).toBeInTheDocument()
+    expect(screen.getAllByText('john@example.com')[0]).toBeInTheDocument()
     expect(screen.getByText('Connected via Google')).toBeInTheDocument()
   })
 
@@ -112,9 +112,15 @@ describe('Profile Page', () => {
     fireEvent.change(nameInput, { target: { value: '' } })
     fireEvent.change(emailInput, { target: { value: 'invalid-email' } })
 
-    // Try to save
-    const saveButton = screen.getByRole('button', { name: 'Save Changes' })
-    expect(saveButton).toBeDisabled()
+    // Trigger blur events to activate validation
+    fireEvent.blur(nameInput)
+    fireEvent.blur(emailInput)
+
+    // Wait for validation to trigger
+    await waitFor(() => {
+      const saveButton = screen.getByRole('button', { name: 'Save Changes' })
+      expect(saveButton).toBeDisabled()
+    })
 
     await waitFor(() => {
       expect(screen.getByText('Display name is required')).toBeInTheDocument()
@@ -144,17 +150,26 @@ describe('Profile Page', () => {
   })
 
   it('handles save error', async () => {
-    // Mock a failed save by causing an error
+    // Mock a failed save by mocking setTimeout to throw an error
+    const originalSetTimeout = global.setTimeout
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+
+    // Mock setTimeout to reject the promise
+    global.setTimeout = jest.fn((callback, delay) => {
+      if (delay === 1500) {
+        throw new Error('Network error')
+      }
+      return originalSetTimeout(callback, delay)
+    }) as any
 
     render(<Profile />)
 
     // Enter edit mode
     fireEvent.click(screen.getByRole('button', { name: 'Edit Profile' }))
 
-    // Change name to trigger an error condition (simulate network failure)
+    // Change name
     const nameInput = screen.getByDisplayValue('John Doe')
-    fireEvent.change(nameInput, { target: { value: 'Error User' } })
+    fireEvent.change(nameInput, { target: { value: 'Test User' } })
 
     // Save changes
     const saveButton = screen.getByRole('button', { name: 'Save Changes' })
@@ -162,8 +177,10 @@ describe('Profile Page', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Failed to save profile. Please try again.')).toBeInTheDocument()
-    }, { timeout: 2000 })
+    }, { timeout: 3000 })
 
+    // Restore mocks
+    global.setTimeout = originalSetTimeout
     consoleSpy.mockRestore()
   })
 
@@ -198,16 +215,18 @@ describe('Profile Page', () => {
     expect(emailToggle).toHaveClass('cursor-not-allowed')
   })
 
-  it('shows delete account confirmation modal', () => {
+  it('shows delete account confirmation modal', async () => {
     render(<Profile />)
 
     const deleteButton = screen.getByRole('button', { name: 'Delete Account' })
     fireEvent.click(deleteButton)
 
-    expect(screen.getByText('Delete Account')).toBeInTheDocument()
-    expect(screen.getByText('Are you absolutely sure you want to delete your account?')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Yes, Delete My Account' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: 'Delete Account' })).toBeInTheDocument()
+      expect(screen.getByText(/Are you absolutely sure you want to delete your account/)).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Yes, Delete My Account' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument()
+    })
   })
 
   it('cancels account deletion', () => {

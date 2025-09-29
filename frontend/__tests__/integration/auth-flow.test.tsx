@@ -63,15 +63,15 @@ describe('Authentication Flow Integration', () => {
       rerender(<SignIn />)
 
       await waitFor(() => {
-        expect(screen.getByText('Sign in to SprintForge')).toBeInTheDocument()
+        expect(screen.getByText('Welcome to SprintForge')).toBeInTheDocument()
       })
 
-      expect(screen.getByRole('button', { name: /sign in with google/i })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /continue with google/i })).toBeInTheDocument()
 
       // Step 3: User clicks sign-in button
       mockSignIn.mockResolvedValue({ error: null, status: 200, ok: true, url: null })
 
-      fireEvent.click(screen.getByRole('button', { name: /sign in with google/i }))
+      fireEvent.click(screen.getByRole('button', { name: /continue with google/i }))
 
       expect(mockSignIn).toHaveBeenCalledWith('google', { callbackUrl: '/' })
 
@@ -191,10 +191,10 @@ describe('Authentication Flow Integration', () => {
       render(<SignIn />)
 
       await waitFor(() => {
-        expect(screen.getByRole('button', { name: /sign in with google/i })).toBeInTheDocument()
+        expect(screen.getByRole('button', { name: /continue with google/i })).toBeInTheDocument()
       })
 
-      fireEvent.click(screen.getByRole('button', { name: /sign in with google/i }))
+      fireEvent.click(screen.getByRole('button', { name: /continue with google/i }))
 
       await waitFor(() => {
         expect(consoleErrorSpy).toHaveBeenCalledWith('Sign-in error:', expect.any(Error))
@@ -257,19 +257,21 @@ describe('Authentication Flow Integration', () => {
       render(<SignIn />)
 
       await waitFor(() => {
-        expect(screen.getByRole('button', { name: /sign in with google/i })).toBeInTheDocument()
-        expect(screen.getByRole('button', { name: /sign in with azure active directory/i })).toBeInTheDocument()
+        expect(screen.getByRole('button', { name: /continue with google/i })).toBeInTheDocument()
+        expect(screen.getByRole('button', { name: /continue with azure active directory/i })).toBeInTheDocument()
       })
 
       // Test Google sign-in
-      fireEvent.click(screen.getByRole('button', { name: /sign in with google/i }))
+      fireEvent.click(screen.getByRole('button', { name: /continue with google/i }))
       expect(mockSignIn).toHaveBeenCalledWith('google', { callbackUrl: '/' })
 
       mockSignIn.mockClear()
 
       // Test Azure AD sign-in
-      fireEvent.click(screen.getByRole('button', { name: /sign in with azure active directory/i }))
-      expect(mockSignIn).toHaveBeenCalledWith('azure-ad', { callbackUrl: '/' })
+      await waitFor(() => {
+        fireEvent.click(screen.getByRole('button', { name: /continue with azure active directory/i }))
+        expect(mockSignIn).toHaveBeenCalledWith('azure-ad', { callbackUrl: '/' })
+      })
     })
   })
 
