@@ -39,7 +39,7 @@ export function useAuth(): AuthState & AuthActions {
     image: session.user.image,
   } : null
 
-  const login = useCallback(async (provider = "google", callbackUrl = "/dashboard") => {
+  const login = useCallback(async (provider = "google", callbackUrl = "/onboarding") => {
     try {
       await signIn(provider, { callbackUrl })
     } catch (error) {

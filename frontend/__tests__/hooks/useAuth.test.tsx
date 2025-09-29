@@ -129,7 +129,7 @@ describe('useAuth', () => {
 
       await result.current.login()
 
-      expect(mockSignIn).toHaveBeenCalledWith('google', { callbackUrl: '/dashboard' })
+      expect(mockSignIn).toHaveBeenCalledWith('google', { callbackUrl: '/onboarding' })
     })
 
     it('should handle login errors', async () => {
