@@ -56,6 +56,7 @@ htmlcov/
 .cache
 nosetests.xml
 coverage.xml
+coverage.json
 *.cover
 .hypothesis/
 .pytest_cache/
@@ -141,3 +142,9 @@ uploads/
 
 # Local development
 local/
+
+# UV package manager
+uv.lock
+
+# Serena MCP configuration
+.serena/
