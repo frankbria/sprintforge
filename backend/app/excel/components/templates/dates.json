@@ -1,0 +1,48 @@
+{
+  "_metadata": {
+    "description": "Date calculation formulas for working days and business calendars",
+    "contributor": "SprintForge Core Team",
+    "version": "1.0.0"
+  },
+  "working_days": {
+    "formula": "=NETWORKDAYS($start_date, $end_date, $holidays)",
+    "description": "Calculate number of working days between two dates excluding weekends and holidays",
+    "parameters": {
+      "start_date": "Start date cell reference",
+      "end_date": "End date cell reference",
+      "holidays": "Range reference to holiday dates (optional)"
+    }
+  },
+  "add_working_days": {
+    "formula": "=WORKDAY($start_date, $num_days, $holidays)",
+    "description": "Add working days to a start date, skipping weekends and holidays",
+    "parameters": {
+      "start_date": "Start date cell reference",
+      "num_days": "Number of working days to add",
+      "holidays": "Range reference to holiday dates (optional)"
+    }
+  },
+  "sprint_number": {
+    "formula": "=TEXT($date, \"YY\") & \".Q\" & ROUNDUP(MONTH($date)/3, 0) & \".\" & INT((WEEKNUM($date) - WEEKNUM(DATE(YEAR($date), ROUNDUP(MONTH($date)/3, 0)*3-2, 1)))/2)+1",
+    "description": "Generate sprint number in YY.Q.# format from date",
+    "parameters": {
+      "date": "Date cell reference to convert to sprint number"
+    }
+  },
+  "sprint_start_date": {
+    "formula": "=DATE($year, ($quarter-1)*3+1, 1) + ($sprint_num-1)*14",
+    "description": "Calculate sprint start date from year, quarter, and sprint number",
+    "parameters": {
+      "year": "Year (4 digits)",
+      "quarter": "Quarter (1-4)",
+      "sprint_num": "Sprint number within quarter"
+    }
+  },
+  "sprint_end_date": {
+    "formula": "=$sprint_start + 13",
+    "description": "Calculate sprint end date (2 weeks from start)",
+    "parameters": {
+      "sprint_start": "Sprint start date cell reference"
+    }
+  }
+}

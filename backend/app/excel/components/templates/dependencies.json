@@ -1,0 +1,59 @@
+{
+  "_metadata": {
+    "description": "Dependency calculation formulas for project management",
+    "contributor": "SprintForge Core Team",
+    "version": "1.0.0"
+  },
+  "dependency_fs": {
+    "formula": "=IF(ISBLANK($predecessor_finish), $task_start, MAX($task_start, $predecessor_finish + $lag_days))",
+    "description": "Finish-to-start dependency: Task starts after predecessor finishes",
+    "parameters": {
+      "predecessor_finish": "Cell reference to predecessor task finish date",
+      "task_start": "Cell reference to current task earliest start date",
+      "lag_days": "Number of lag days to add after predecessor finishes"
+    }
+  },
+  "dependency_ss": {
+    "formula": "=IF(ISBLANK($predecessor_start), $task_start, MAX($task_start, $predecessor_start + $lag_days))",
+    "description": "Start-to-start dependency: Task starts when predecessor starts",
+    "parameters": {
+      "predecessor_start": "Cell reference to predecessor task start date",
+      "task_start": "Cell reference to current task earliest start date",
+      "lag_days": "Number of lag days to add after predecessor starts"
+    }
+  },
+  "dependency_ff": {
+    "formula": "=IF(ISBLANK($predecessor_finish), $task_finish, MAX($task_finish, $predecessor_finish + $lag_days))",
+    "description": "Finish-to-finish dependency: Task finishes when predecessor finishes",
+    "parameters": {
+      "predecessor_finish": "Cell reference to predecessor task finish date",
+      "task_finish": "Cell reference to current task earliest finish date",
+      "lag_days": "Number of lag days to add after predecessor finishes"
+    }
+  },
+  "dependency_sf": {
+    "formula": "=IF(ISBLANK($predecessor_start), $task_finish, MAX($task_finish, $predecessor_start + $lag_days))",
+    "description": "Start-to-finish dependency: Task finishes after predecessor starts",
+    "parameters": {
+      "predecessor_start": "Cell reference to predecessor task start date",
+      "task_finish": "Cell reference to current task earliest finish date",
+      "lag_days": "Number of lag days to add after predecessor starts"
+    }
+  },
+  "critical_path": {
+    "formula": "=IF(AND($total_float=0, $duration>0), \"CRITICAL\", \"\")",
+    "description": "Critical path detection: Marks tasks with zero float as critical",
+    "parameters": {
+      "total_float": "Cell reference to total float calculation",
+      "duration": "Cell reference to task duration"
+    }
+  },
+  "total_float": {
+    "formula": "=$late_finish - $early_finish",
+    "description": "Total float calculation: Difference between late and early finish",
+    "parameters": {
+      "late_finish": "Cell reference to late finish date",
+      "early_finish": "Cell reference to early finish date"
+    }
+  }
+}
