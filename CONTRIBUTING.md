@@ -23,7 +23,9 @@ We use GitHub to host code, to track issues and feature requests, as well as acc
 
 ### Development Setup
 
-See the [README.md](README.md) for detailed setup instructions.
+For quick command reference and Claude Code guidance, see [CLAUDE.md](CLAUDE.md).
+
+For detailed development environment setup including Docker, see the Quick Start section below.
 
 ## Coding Standards
 
@@ -142,6 +144,16 @@ frontend/
 3. **Compatibility**: Support Excel 2016+ without macros
 4. **Testing**: High test coverage with both unit and integration tests
 5. **Documentation**: All public APIs must be documented
+
+## Documentation Structure
+
+- **README.md** - Project overview, quick start, and features
+- **CLAUDE.md** - Quick reference for Claude Code and development commands
+- **CONTRIBUTING.md** (this file) - Contribution guidelines and coding standards
+- **docs/** - Project documentation and architecture
+  - **archive/** - Completed sprint task history
+  - **sprint-3-tasks.md** - Current sprint planning
+- **tests/docs/** - Testing guides and documentation
 
 ## Getting Help
 

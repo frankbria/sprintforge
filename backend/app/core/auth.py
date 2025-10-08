@@ -150,16 +150,20 @@ async def validate_session_token(session_token: str) -> Optional[Dict[str, Any]]
     Validate a NextAuth.js session token by checking the database.
     This is an alternative to JWT validation for session-based auth.
 
+    Note: Currently not implemented - JWT validation is the primary authentication method.
+    Implementation would require:
+    - Query sessions table with session_token
+    - Validate expiration timestamp
+    - Join with users table for user information
+    - Return user data if valid
+
     Args:
         session_token: Session token string
 
     Returns:
         Dict containing user and session information, or None if invalid
     """
-    # TODO: Implement database session validation
-    # This would query the sessions table to validate the token
-    # and return user information if the session is valid and not expired
-    logger.info("Session token validation", token_hash=hash(session_token))
+    logger.info("Session token validation not implemented, using JWT auth", token_hash=hash(session_token))
     return None
 
 
@@ -218,14 +222,21 @@ async def verify_user_permissions(user: Dict[str, Any], required_permissions: li
     """
     Verify that a user has the required permissions.
 
+    Note: Currently returns True for all authenticated users.
+    Full implementation planned for multi-tenant phase (Sprint 4+) with:
+    - Role-based access control (RBAC)
+    - Project-level permissions (owner, editor, viewer)
+    - Organization-level permissions
+    - Permission inheritance and delegation
+
     Args:
         user: User information from JWT token
         required_permissions: List of required permission strings
 
     Returns:
-        True if user has all required permissions
+        True if user has all required permissions (currently always True)
     """
-    # TODO: Implement permission checking logic
-    # This would check user roles and permissions against requirements
-    logger.info("Permission check", user_id=user.get("sub"), permissions=required_permissions)
-    return True  # For now, allow all authenticated users
+    logger.info("Permission check bypassed - all authenticated users allowed",
+                user_id=user.get("sub"),
+                permissions=required_permissions)
+    return True  # MVP: All authenticated users have full access

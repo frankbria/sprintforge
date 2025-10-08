@@ -293,6 +293,13 @@ SprintForge implements enterprise-friendly two-way synchronization:
 
 We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
+### Quick Links for Contributors
+
+- **Development Setup**: See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed setup
+- **Claude Code Guide**: See [CLAUDE.md](CLAUDE.md) for AI-assisted development
+- **Test Documentation**: See [tests/docs/](tests/docs/) for testing guides
+- **Sprint History**: See [docs/archive/](docs/archive/) for completed sprint tasks
+
 ### Development Workflow
 
 1. Fork the repository
@@ -308,7 +315,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 - **Python**: Black formatting, type hints required, docstrings for all functions
 - **TypeScript**: ESLint + Prettier, strict mode enabled
-- **Testing**: Aim for >90% code coverage
+- **Testing**: Aim for >90% code coverage (see [tests/docs/](tests/docs/))
 - **Commits**: Conventional commit format
 
 ## 📄 License

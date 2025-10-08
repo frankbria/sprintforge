@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__serena__list_dir",
+      "Bash(npm run type-check:*)",
+      "Bash(python -m pytest --collect-only)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
