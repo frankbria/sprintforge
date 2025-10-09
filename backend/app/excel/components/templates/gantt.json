@@ -1,0 +1,90 @@
+{
+  "_metadata": {
+    "description": "Gantt chart visualization and timeline formulas",
+    "contributor": "SprintForge Core Team",
+    "version": "1.0.0"
+  },
+  "gantt_bar": {
+    "formula": "=IF(AND($timeline_date>=$start_date, $timeline_date<=$end_date), \"█\", \"\")",
+    "description": "Display bar character if timeline date falls within task dates",
+    "parameters": {
+      "timeline_date": "Date for this Gantt chart column",
+      "start_date": "Task start date cell reference",
+      "end_date": "Task end date cell reference"
+    }
+  },
+  "gantt_bar_progress": {
+    "formula": "=IF(AND($timeline_date>=$start_date, $timeline_date<=$end_date), IF($timeline_date<=$start_date+($duration*$percent_complete/100), \"█\", \"░\"), \"\")",
+    "description": "Display solid bar for completed portion, light bar for remaining",
+    "parameters": {
+      "timeline_date": "Date for this Gantt chart column",
+      "start_date": "Task start date cell reference",
+      "end_date": "Task end date cell reference",
+      "duration": "Task duration in days",
+      "percent_complete": "Percentage complete (0-100)"
+    }
+  },
+  "gantt_milestone": {
+    "formula": "=IF($timeline_date=$milestone_date, \"◆\", \"\")",
+    "description": "Display diamond for milestone on its date",
+    "parameters": {
+      "timeline_date": "Date for this Gantt chart column",
+      "milestone_date": "Milestone date cell reference"
+    }
+  },
+  "gantt_today_marker": {
+    "formula": "=IF($timeline_date=TODAY(), \"│\", \"\")",
+    "description": "Display vertical line on today's date",
+    "parameters": {
+      "timeline_date": "Date for this Gantt chart column"
+    }
+  },
+  "gantt_critical_bar": {
+    "formula": "=IF(AND($timeline_date>=$start_date, $timeline_date<=$end_date, $is_critical), \"█\", IF(AND($timeline_date>=$start_date, $timeline_date<=$end_date), \"▓\", \"\"))",
+    "description": "Solid bar for critical tasks, pattern bar for non-critical",
+    "parameters": {
+      "timeline_date": "Date for this Gantt chart column",
+      "start_date": "Task start date cell reference",
+      "end_date": "Task end date cell reference",
+      "is_critical": "Boolean indicating if task is critical"
+    }
+  },
+  "gantt_baseline_comparison": {
+    "formula": "=IF($timeline_date=$baseline_date, \"▼\", \"\")",
+    "description": "Display baseline marker for comparison",
+    "parameters": {
+      "timeline_date": "Date for this Gantt chart column",
+      "baseline_date": "Baseline date for this timeline position"
+    }
+  },
+  "timeline_week_header": {
+    "formula": "=TEXT($timeline_date, \"MMM DD\")",
+    "description": "Format timeline date as 'Jan 15' for weekly view",
+    "parameters": {
+      "timeline_date": "Date for this timeline column"
+    }
+  },
+  "timeline_month_header": {
+    "formula": "=TEXT($timeline_date, \"MMM YYYY\")",
+    "description": "Format timeline date as 'Jan 2025' for monthly view",
+    "parameters": {
+      "timeline_date": "Date for this timeline column"
+    }
+  },
+  "timeline_quarter_header": {
+    "formula": "=TEXT($timeline_date, \"YYYY\") & \" Q\" & ROUNDUP(MONTH($timeline_date)/3, 0)",
+    "description": "Format timeline date as '2025 Q1' for quarterly view",
+    "parameters": {
+      "timeline_date": "Date for this timeline column"
+    }
+  },
+  "resource_utilization": {
+    "formula": "=SUMIF($task_dates, $timeline_date, $resource_allocation)",
+    "description": "Calculate total resource allocation for a given date",
+    "parameters": {
+      "task_dates": "Range of all task dates",
+      "timeline_date": "Date to calculate utilization for",
+      "resource_allocation": "Range of resource allocations per task"
+    }
+  }
+}

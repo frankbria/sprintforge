@@ -1,0 +1,86 @@
+{
+  "_metadata": {
+    "description": "Critical Path Method (CPM) formulas for schedule analysis",
+    "contributor": "SprintForge Core Team",
+    "version": "1.0.0"
+  },
+  "early_start": {
+    "formula": "=MAX($predecessors_early_finish + $lag_days)",
+    "description": "Early Start: Latest early finish of all predecessors plus lag",
+    "parameters": {
+      "predecessors_early_finish": "Range of predecessor tasks' early finish dates",
+      "lag_days": "Lag days for the dependency relationship"
+    }
+  },
+  "early_finish": {
+    "formula": "=$early_start + $duration",
+    "description": "Early Finish: Early start plus task duration",
+    "parameters": {
+      "early_start": "Cell reference to task early start date",
+      "duration": "Task duration in days"
+    }
+  },
+  "late_finish": {
+    "formula": "=MIN($successors_late_start - $lag_days)",
+    "description": "Late Finish: Earliest late start of all successors minus lag",
+    "parameters": {
+      "successors_late_start": "Range of successor tasks' late start dates",
+      "lag_days": "Lag days for the dependency relationship"
+    }
+  },
+  "late_start": {
+    "formula": "=$late_finish - $duration",
+    "description": "Late Start: Late finish minus task duration",
+    "parameters": {
+      "late_finish": "Cell reference to task late finish date",
+      "duration": "Task duration in days"
+    }
+  },
+  "total_float": {
+    "formula": "=$late_start - $early_start",
+    "description": "Total Float (Slack): Difference between late and early start",
+    "parameters": {
+      "late_start": "Cell reference to task late start date",
+      "early_start": "Cell reference to task early start date"
+    }
+  },
+  "free_float": {
+    "formula": "=MIN($successors_early_start) - $early_finish",
+    "description": "Free Float: Time task can delay without delaying successors",
+    "parameters": {
+      "successors_early_start": "Range of successor tasks' early start dates",
+      "early_finish": "Cell reference to task early finish date"
+    }
+  },
+  "is_critical": {
+    "formula": "=IF(AND($total_float<=0, $duration>0), TRUE, FALSE)",
+    "description": "Boolean indicator if task is on critical path",
+    "parameters": {
+      "total_float": "Cell reference to total float calculation",
+      "duration": "Cell reference to task duration"
+    }
+  },
+  "critical_path_highlight": {
+    "formula": "=IF($is_critical, \"CRITICAL\", \"\")",
+    "description": "Display 'CRITICAL' for tasks on critical path",
+    "parameters": {
+      "is_critical": "Cell reference to boolean critical path indicator"
+    }
+  },
+  "schedule_variance": {
+    "formula": "=$actual_finish - $planned_finish",
+    "description": "Schedule variance in days (negative = ahead, positive = behind)",
+    "parameters": {
+      "actual_finish": "Cell reference to actual finish date",
+      "planned_finish": "Cell reference to planned finish date"
+    }
+  },
+  "percent_complete": {
+    "formula": "=IF($duration=0, 0, MIN(100, ($actual_duration / $duration) * 100))",
+    "description": "Calculate percentage complete based on actual vs planned duration",
+    "parameters": {
+      "actual_duration": "Cell reference to actual duration worked",
+      "duration": "Cell reference to planned total duration"
+    }
+  }
+}

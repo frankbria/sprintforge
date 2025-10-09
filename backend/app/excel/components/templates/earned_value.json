@@ -1,0 +1,111 @@
+{
+  "_metadata": {
+    "description": "Earned Value Management (EVM) formulas for project performance",
+    "contributor": "SprintForge Core Team",
+    "version": "1.0.0"
+  },
+  "planned_value": {
+    "formula": "=$budget_at_completion * ($planned_percent_complete / 100)",
+    "description": "Planned Value (PV): Budgeted cost of work scheduled",
+    "parameters": {
+      "budget_at_completion": "Total project budget (BAC)",
+      "planned_percent_complete": "Planned percentage complete at this point"
+    }
+  },
+  "earned_value": {
+    "formula": "=$budget_at_completion * ($actual_percent_complete / 100)",
+    "description": "Earned Value (EV): Budgeted cost of work actually performed",
+    "parameters": {
+      "budget_at_completion": "Total project budget (BAC)",
+      "actual_percent_complete": "Actual percentage complete achieved"
+    }
+  },
+  "actual_cost": {
+    "formula": "=SUM($actual_costs_range)",
+    "description": "Actual Cost (AC): Total cost incurred for work performed",
+    "parameters": {
+      "actual_costs_range": "Range of actual costs incurred"
+    }
+  },
+  "cost_variance": {
+    "formula": "=$earned_value - $actual_cost",
+    "description": "Cost Variance (CV): EV - AC (positive = under budget)",
+    "parameters": {
+      "earned_value": "Cell reference to earned value",
+      "actual_cost": "Cell reference to actual cost"
+    }
+  },
+  "schedule_variance_ev": {
+    "formula": "=$earned_value - $planned_value",
+    "description": "Schedule Variance (SV): EV - PV (positive = ahead of schedule)",
+    "parameters": {
+      "earned_value": "Cell reference to earned value",
+      "planned_value": "Cell reference to planned value"
+    }
+  },
+  "cost_performance_index": {
+    "formula": "=IF($actual_cost=0, 1, $earned_value / $actual_cost)",
+    "description": "Cost Performance Index (CPI): EV/AC (>1 = under budget)",
+    "parameters": {
+      "earned_value": "Cell reference to earned value",
+      "actual_cost": "Cell reference to actual cost"
+    }
+  },
+  "schedule_performance_index": {
+    "formula": "=IF($planned_value=0, 1, $earned_value / $planned_value)",
+    "description": "Schedule Performance Index (SPI): EV/PV (>1 = ahead of schedule)",
+    "parameters": {
+      "earned_value": "Cell reference to earned value",
+      "planned_value": "Cell reference to planned value"
+    }
+  },
+  "estimate_at_completion": {
+    "formula": "=IF($cpi=0, $budget_at_completion, $budget_at_completion / $cpi)",
+    "description": "Estimate at Completion (EAC): Projected total cost",
+    "parameters": {
+      "budget_at_completion": "Total project budget (BAC)",
+      "cpi": "Cell reference to Cost Performance Index"
+    }
+  },
+  "estimate_to_complete": {
+    "formula": "=$estimate_at_completion - $actual_cost",
+    "description": "Estimate to Complete (ETC): Remaining cost to finish",
+    "parameters": {
+      "estimate_at_completion": "Cell reference to EAC",
+      "actual_cost": "Cell reference to actual cost incurred"
+    }
+  },
+  "variance_at_completion": {
+    "formula": "=$budget_at_completion - $estimate_at_completion",
+    "description": "Variance at Completion (VAC): Budget variance at project end",
+    "parameters": {
+      "budget_at_completion": "Total project budget (BAC)",
+      "estimate_at_completion": "Cell reference to EAC"
+    }
+  },
+  "to_complete_performance_index": {
+    "formula": "=IF($budget_at_completion - $actual_cost = 0, 1, ($budget_at_completion - $earned_value) / ($budget_at_completion - $actual_cost))",
+    "description": "To-Complete Performance Index (TCPI): Required CPI to meet budget",
+    "parameters": {
+      "budget_at_completion": "Total project budget (BAC)",
+      "earned_value": "Cell reference to earned value",
+      "actual_cost": "Cell reference to actual cost"
+    }
+  },
+  "percent_spent": {
+    "formula": "=IF($budget_at_completion=0, 0, ($actual_cost / $budget_at_completion) * 100)",
+    "description": "Percentage of budget spent",
+    "parameters": {
+      "actual_cost": "Cell reference to actual cost incurred",
+      "budget_at_completion": "Total project budget (BAC)"
+    }
+  },
+  "percent_complete_formula": {
+    "formula": "=IF($budget_at_completion=0, 0, ($earned_value / $budget_at_completion) * 100)",
+    "description": "Percentage complete based on earned value",
+    "parameters": {
+      "earned_value": "Cell reference to earned value",
+      "budget_at_completion": "Total project budget (BAC)"
+    }
+  }
+}
