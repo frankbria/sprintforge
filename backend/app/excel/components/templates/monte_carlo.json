@@ -1,0 +1,147 @@
+{
+  "_metadata": {
+    "description": "Monte Carlo simulation formulas for probabilistic project estimation",
+    "contributor": "SprintForge Core Team",
+    "version": "1.0.0",
+    "statistical_foundation": "PERT distribution (Beta distribution approximation)",
+    "note": "These formulas use statistically sound methods - not simplified approximations"
+  },
+  "pert_mean": {
+    "formula": "=($optimistic + 4*$most_likely + $pessimistic) / 6",
+    "description": "PERT mean (Expected value): Weighted average using Beta distribution approximation",
+    "parameters": {
+      "optimistic": "Best case scenario (minimum duration)",
+      "most_likely": "Most likely scenario (mode of distribution)",
+      "pessimistic": "Worst case scenario (maximum duration)"
+    },
+    "statistical_basis": "E[X] = (a + 4m + b) / 6 where a=optimistic, m=mode, b=pessimistic"
+  },
+  "pert_std_dev": {
+    "formula": "=($pessimistic - $optimistic) / 6",
+    "description": "PERT standard deviation: Approximation based on 6-sigma range",
+    "parameters": {
+      "pessimistic": "Worst case scenario (maximum duration)",
+      "optimistic": "Best case scenario (minimum duration)"
+    },
+    "statistical_basis": "σ ≈ (b - a) / 6 assumes ~99.7% of values within range"
+  },
+  "monte_carlo_sample": {
+    "formula": "=NORM.INV(RAND(), $mean, $std_dev)",
+    "description": "Single Monte Carlo sample from normal distribution",
+    "parameters": {
+      "mean": "Expected value (PERT mean or other)",
+      "std_dev": "Standard deviation"
+    },
+    "note": "Use F9 to recalculate or enable iterative calculation for multiple samples"
+  },
+  "monte_carlo_triangular": {
+    "formula": "=IF(RAND()<($most_likely-$optimistic)/($pessimistic-$optimistic), $optimistic+SQRT(RAND()*($pessimistic-$optimistic)*($most_likely-$optimistic)), $pessimistic-SQRT((1-RAND())*($pessimistic-$optimistic)*($pessimistic-$most_likely)))",
+    "description": "Triangular distribution (alternative to PERT for asymmetric distributions)",
+    "parameters": {
+      "optimistic": "Minimum value",
+      "most_likely": "Mode (peak) value",
+      "pessimistic": "Maximum value"
+    },
+    "use_case": "When distribution is known to be asymmetric or has sharp mode"
+  },
+  "confidence_interval_lower": {
+    "formula": "=$mean - NORM.S.INV($confidence_level) * $std_dev",
+    "description": "Lower bound of confidence interval",
+    "parameters": {
+      "mean": "Expected value",
+      "std_dev": "Standard deviation",
+      "confidence_level": "Confidence level (e.g., 0.95 for 95%)"
+    },
+    "example": "95% CI lower bound: mean - 1.96*std_dev"
+  },
+  "confidence_interval_upper": {
+    "formula": "=$mean + NORM.S.INV($confidence_level) * $std_dev",
+    "description": "Upper bound of confidence interval",
+    "parameters": {
+      "mean": "Expected value",
+      "std_dev": "Standard deviation",
+      "confidence_level": "Confidence level (e.g., 0.95 for 95%)"
+    },
+    "example": "95% CI upper bound: mean + 1.96*std_dev"
+  },
+  "percentile_estimate": {
+    "formula": "=NORM.INV($percentile, $mean, $std_dev)",
+    "description": "Estimate at specific percentile (P10, P50, P90, etc.)",
+    "parameters": {
+      "percentile": "Percentile value (0.1 for P10, 0.5 for P50, 0.9 for P90)",
+      "mean": "Expected value",
+      "std_dev": "Standard deviation"
+    },
+    "common_use": "P10=optimistic, P50=median, P90=pessimistic for reporting"
+  },
+  "probability_on_time": {
+    "formula": "=NORM.DIST($target_date, $mean, $std_dev, TRUE)",
+    "description": "Probability of completing by target date (cumulative distribution)",
+    "parameters": {
+      "target_date": "Target completion date or duration",
+      "mean": "Expected duration",
+      "std_dev": "Standard deviation of duration"
+    },
+    "interpretation": "Result is probability (0-1) of finishing on or before target"
+  },
+  "risk_buffer": {
+    "formula": "=NORM.S.INV($confidence_level) * $std_dev",
+    "description": "Risk buffer for target confidence level",
+    "parameters": {
+      "confidence_level": "Desired confidence (e.g., 0.8 for 80%)",
+      "std_dev": "Standard deviation of estimates"
+    },
+    "use_case": "Add to mean to get conservative estimate with desired confidence"
+  },
+  "coefficient_of_variation": {
+    "formula": "=IF($mean=0, 0, $std_dev / $mean)",
+    "description": "Coefficient of Variation (CV): Relative measure of uncertainty",
+    "parameters": {
+      "std_dev": "Standard deviation",
+      "mean": "Expected value"
+    },
+    "interpretation": "CV > 0.3 indicates high uncertainty; CV < 0.1 indicates low uncertainty"
+  },
+  "_extension_hooks": {
+    "multi_constraint_optimization": {
+      "description": "Hook for advanced optimization with multiple constraints",
+      "implementation_guide": "Use Excel Solver API or Python optimization (scipy.optimize)",
+      "parameters": {
+        "objective_function": "Function to minimize/maximize (e.g., cost, time)",
+        "constraints": "Array of constraint functions (resource limits, dependencies)",
+        "decision_variables": "Variables to optimize (task assignments, schedules)"
+      },
+      "suggested_approach": "Implement as separate worksheet with Solver setup or external Python script"
+    },
+    "multi_goal_scenarios": {
+      "description": "Hook for scenario analysis with multiple competing objectives",
+      "implementation_guide": "Pareto frontier analysis or weighted goal programming",
+      "parameters": {
+        "goals": "Array of objectives (cost, time, quality, risk)",
+        "weights": "Relative importance of each goal",
+        "scenarios": "Different parameter combinations"
+      },
+      "suggested_approach": "Create scenario comparison matrix with sensitivity analysis"
+    },
+    "portfolio_optimization": {
+      "description": "Hook for project portfolio optimization under uncertainty",
+      "implementation_guide": "Mean-variance optimization or stochastic programming",
+      "parameters": {
+        "projects": "Array of project options with returns and risks",
+        "budget_constraint": "Total available budget",
+        "correlation_matrix": "Correlation between project outcomes"
+      },
+      "suggested_approach": "Use efficient frontier calculation with Monte Carlo for risk assessment"
+    },
+    "decision_tree_analysis": {
+      "description": "Hook for decision tree with probabilistic outcomes",
+      "implementation_guide": "Expected value calculation with decision nodes",
+      "parameters": {
+        "decisions": "Array of decision points",
+        "probabilities": "Outcome probabilities at each node",
+        "payoffs": "Values at terminal nodes"
+      },
+      "suggested_approach": "Build tree structure in Excel with rollback calculation"
+    }
+  }
+}

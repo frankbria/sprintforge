@@ -1,0 +1,204 @@
+{
+  "_metadata": {
+    "description": "Conditional formatting formulas for visual project indicators",
+    "contributor": "SprintForge Core Team",
+    "version": "1.0.0",
+    "note": "These formulas return TRUE/FALSE for conditional formatting rules"
+  },
+  "status_not_started": {
+    "formula": "=AND(ISBLANK($actual_start), ISBLANK($percent_complete))",
+    "description": "Highlight tasks that haven't started",
+    "parameters": {
+      "actual_start": "Actual start date cell",
+      "percent_complete": "Percent complete cell"
+    },
+    "suggested_format": "Light gray background"
+  },
+  "status_in_progress": {
+    "formula": "=AND(NOT(ISBLANK($actual_start)), $percent_complete<100, $percent_complete>0)",
+    "description": "Highlight tasks in progress",
+    "parameters": {
+      "actual_start": "Actual start date cell",
+      "percent_complete": "Percent complete cell"
+    },
+    "suggested_format": "Yellow background"
+  },
+  "status_complete": {
+    "formula": "=$percent_complete>=100",
+    "description": "Highlight completed tasks",
+    "parameters": {
+      "percent_complete": "Percent complete cell"
+    },
+    "suggested_format": "Green background"
+  },
+  "overdue_task": {
+    "formula": "=AND($end_date<TODAY(), $percent_complete<100)",
+    "description": "Highlight overdue tasks",
+    "parameters": {
+      "end_date": "Planned end date",
+      "percent_complete": "Percent complete cell"
+    },
+    "suggested_format": "Red background, bold red text"
+  },
+  "at_risk_task": {
+    "formula": "=AND($end_date-TODAY()<=5, $end_date-TODAY()>0, $percent_complete<80)",
+    "description": "Highlight at-risk tasks (due soon but not nearly complete)",
+    "parameters": {
+      "end_date": "Planned end date",
+      "percent_complete": "Percent complete cell"
+    },
+    "suggested_format": "Orange background"
+  },
+  "critical_path_highlight": {
+    "formula": "=$is_critical=TRUE",
+    "description": "Highlight critical path tasks",
+    "parameters": {
+      "is_critical": "Critical path boolean cell"
+    },
+    "suggested_format": "Red text, bold"
+  },
+  "over_budget": {
+    "formula": "=$actual_cost>$budget",
+    "description": "Highlight tasks over budget",
+    "parameters": {
+      "actual_cost": "Actual cost incurred",
+      "budget": "Budgeted cost"
+    },
+    "suggested_format": "Red background in cost column"
+  },
+  "under_budget": {
+    "formula": "=AND($percent_complete>50, $actual_cost<$budget*0.9)",
+    "description": "Highlight tasks significantly under budget",
+    "parameters": {
+      "percent_complete": "Percent complete",
+      "actual_cost": "Actual cost incurred",
+      "budget": "Budgeted cost"
+    },
+    "suggested_format": "Green background in cost column"
+  },
+  "resource_overallocated": {
+    "formula": "=$resource_utilization>1",
+    "description": "Highlight overallocated resources",
+    "parameters": {
+      "resource_utilization": "Resource utilization ratio cell"
+    },
+    "suggested_format": "Red background"
+  },
+  "resource_underutilized": {
+    "formula": "=$resource_utilization<0.5",
+    "description": "Highlight underutilized resources",
+    "parameters": {
+      "resource_utilization": "Resource utilization ratio cell"
+    },
+    "suggested_format": "Yellow background"
+  },
+  "gantt_bar_active": {
+    "formula": "=AND($timeline_date>=$start_date, $timeline_date<=$end_date)",
+    "description": "Show Gantt bar for active date range",
+    "parameters": {
+      "timeline_date": "Column header date",
+      "start_date": "Task start date",
+      "end_date": "Task end date"
+    },
+    "suggested_format": "Blue background"
+  },
+  "gantt_bar_completed": {
+    "formula": "=AND($timeline_date>=$start_date, $timeline_date<=$start_date+($duration*$percent_complete/100))",
+    "description": "Show completed portion of Gantt bar",
+    "parameters": {
+      "timeline_date": "Column header date",
+      "start_date": "Task start date",
+      "duration": "Task duration in days",
+      "percent_complete": "Percent complete"
+    },
+    "suggested_format": "Dark blue/green background"
+  },
+  "gantt_bar_remaining": {
+    "formula": "=AND($timeline_date>$start_date+($duration*$percent_complete/100), $timeline_date<=$end_date)",
+    "description": "Show remaining portion of Gantt bar",
+    "parameters": {
+      "timeline_date": "Column header date",
+      "start_date": "Task start date",
+      "duration": "Task duration in days",
+      "percent_complete": "Percent complete",
+      "end_date": "Task end date"
+    },
+    "suggested_format": "Light blue/gray background"
+  },
+  "gantt_today_marker": {
+    "formula": "=$timeline_date=TODAY()",
+    "description": "Highlight today's date column in Gantt",
+    "parameters": {
+      "timeline_date": "Column header date"
+    },
+    "suggested_format": "Vertical border or bold column"
+  },
+  "milestone_indicator": {
+    "formula": "=AND($duration=0, NOT(ISBLANK($end_date)))",
+    "description": "Highlight milestone tasks (zero duration)",
+    "parameters": {
+      "duration": "Task duration",
+      "end_date": "Milestone date"
+    },
+    "suggested_format": "Diamond shape or special icon"
+  },
+  "high_priority": {
+    "formula": "=$priority=\"High\"",
+    "description": "Highlight high priority tasks",
+    "parameters": {
+      "priority": "Priority text cell"
+    },
+    "suggested_format": "Red flag icon or bold"
+  },
+  "blocked_task": {
+    "formula": "=$status=\"Blocked\"",
+    "description": "Highlight blocked tasks",
+    "parameters": {
+      "status": "Task status cell"
+    },
+    "suggested_format": "Red strikethrough or warning icon"
+  },
+  "dependency_warning": {
+    "formula": "=AND(NOT(ISBLANK($predecessor)), INDIRECT($predecessor&\"percent_complete\")<100, $start_date<=TODAY())",
+    "description": "Warn when starting task with incomplete predecessors",
+    "parameters": {
+      "predecessor": "Predecessor task row reference",
+      "start_date": "Task start date"
+    },
+    "suggested_format": "Orange background with warning icon"
+  },
+  "velocity_above_average": {
+    "formula": "=$sprint_velocity>$average_velocity*1.1",
+    "description": "Highlight sprints with above-average velocity",
+    "parameters": {
+      "sprint_velocity": "Sprint velocity value",
+      "average_velocity": "Team average velocity"
+    },
+    "suggested_format": "Green background"
+  },
+  "velocity_below_average": {
+    "formula": "=$sprint_velocity<$average_velocity*0.9",
+    "description": "Highlight sprints with below-average velocity",
+    "parameters": {
+      "sprint_velocity": "Sprint velocity value",
+      "average_velocity": "Team average velocity"
+    },
+    "suggested_format": "Red background"
+  },
+  "confidence_high": {
+    "formula": "=$confidence_level>=0.8",
+    "description": "Highlight high-confidence estimates",
+    "parameters": {
+      "confidence_level": "Monte Carlo confidence level (0-1)"
+    },
+    "suggested_format": "Green text"
+  },
+  "confidence_low": {
+    "formula": "=$confidence_level<0.5",
+    "description": "Highlight low-confidence estimates",
+    "parameters": {
+      "confidence_level": "Monte Carlo confidence level (0-1)"
+    },
+    "suggested_format": "Red text"
+  }
+}

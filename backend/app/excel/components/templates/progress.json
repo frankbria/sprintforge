@@ -1,0 +1,202 @@
+{
+  "_metadata": {
+    "description": "Progress tracking, burndown/burnup charts, and velocity calculations",
+    "contributor": "SprintForge Core Team",
+    "version": "1.0.0"
+  },
+  "percent_complete_duration": {
+    "formula": "=IF($duration=0, 0, MIN(100, ($actual_duration / $duration) * 100))",
+    "description": "Percent complete based on duration (time-based)",
+    "parameters": {
+      "actual_duration": "Actual time spent so far",
+      "duration": "Total estimated duration"
+    }
+  },
+  "percent_complete_work": {
+    "formula": "=IF($total_work=0, 0, MIN(100, ($work_completed / $total_work) * 100))",
+    "description": "Percent complete based on work units (task-based)",
+    "parameters": {
+      "work_completed": "Work units completed",
+      "total_work": "Total work units estimated"
+    }
+  },
+  "burndown_remaining": {
+    "formula": "=$total_work - SUMIF($date_column, \"<=\"&$current_date, $work_completed_column)",
+    "description": "Calculate remaining work for burndown chart",
+    "parameters": {
+      "total_work": "Total work units (story points, hours)",
+      "date_column": "Range containing completion dates",
+      "current_date": "Current date or date to calculate for",
+      "work_completed_column": "Range containing completed work per date"
+    }
+  },
+  "burndown_ideal": {
+    "formula": "=$total_work - (($total_work / $total_days) * $days_elapsed)",
+    "description": "Ideal burndown line (linear)",
+    "parameters": {
+      "total_work": "Total work units",
+      "total_days": "Total days in sprint/project",
+      "days_elapsed": "Days since start"
+    }
+  },
+  "burnup_completed": {
+    "formula": "=SUMIF($date_column, \"<=\"&$current_date, $work_completed_column)",
+    "description": "Calculate cumulative work completed for burnup chart",
+    "parameters": {
+      "date_column": "Range containing completion dates",
+      "current_date": "Current date or date to calculate for",
+      "work_completed_column": "Range containing completed work per date"
+    }
+  },
+  "burnup_ideal": {
+    "formula": "=($total_work / $total_days) * $days_elapsed",
+    "description": "Ideal burnup line (linear)",
+    "parameters": {
+      "total_work": "Total work units",
+      "total_days": "Total days in sprint/project",
+      "days_elapsed": "Days since start"
+    }
+  },
+  "velocity_average": {
+    "formula": "=AVERAGE($sprint_velocity_range)",
+    "description": "Calculate average velocity over sprints",
+    "parameters": {
+      "sprint_velocity_range": "Range containing velocity per sprint"
+    }
+  },
+  "velocity_trend": {
+    "formula": "=SLOPE($sprint_velocity_range, $sprint_number_range)",
+    "description": "Calculate velocity trend (increasing/decreasing)",
+    "parameters": {
+      "sprint_velocity_range": "Range containing velocity per sprint",
+      "sprint_number_range": "Range containing sprint numbers (1, 2, 3...)"
+    },
+    "interpretation": "Positive slope = improving velocity; Negative = declining"
+  },
+  "velocity_forecast": {
+    "formula": "=FORECAST($future_sprint, $sprint_velocity_range, $sprint_number_range)",
+    "description": "Forecast velocity for future sprint using linear regression",
+    "parameters": {
+      "future_sprint": "Sprint number to forecast",
+      "sprint_velocity_range": "Historical velocity data",
+      "sprint_number_range": "Historical sprint numbers"
+    }
+  },
+  "sprint_capacity": {
+    "formula": "=$team_size * $days_per_sprint * $hours_per_day * $focus_factor",
+    "description": "Calculate sprint capacity in hours",
+    "parameters": {
+      "team_size": "Number of team members",
+      "days_per_sprint": "Working days in sprint",
+      "hours_per_day": "Working hours per day",
+      "focus_factor": "Percentage of time on sprint work (0.6-0.8 typical)"
+    }
+  },
+  "sprint_commitment_ratio": {
+    "formula": "=($actual_completed / $sprint_commitment) * 100",
+    "description": "Calculate what percentage of commitment was completed",
+    "parameters": {
+      "actual_completed": "Work actually completed",
+      "sprint_commitment": "Work committed to at sprint start"
+    },
+    "target": "Healthy teams achieve 85-100%"
+  },
+  "days_remaining": {
+    "formula": "=NETWORKDAYS($current_date, $end_date, $holidays)",
+    "description": "Calculate working days remaining",
+    "parameters": {
+      "current_date": "Current date",
+      "end_date": "Sprint or project end date",
+      "holidays": "Range of holiday dates"
+    }
+  },
+  "completion_forecast_date": {
+    "formula": "=WORKDAY($current_date, $remaining_work / $velocity, $holidays)",
+    "description": "Forecast completion date based on current velocity",
+    "parameters": {
+      "current_date": "Current date",
+      "remaining_work": "Work units still to complete",
+      "velocity": "Current velocity (work units per day)",
+      "holidays": "Range of holiday dates"
+    }
+  },
+  "completion_probability": {
+    "formula": "=NORM.DIST($target_date, $forecast_date, $forecast_std_dev, TRUE)",
+    "description": "Probability of completing by target date",
+    "parameters": {
+      "target_date": "Desired completion date",
+      "forecast_date": "Forecasted completion date (mean)",
+      "forecast_std_dev": "Standard deviation of forecast"
+    }
+  },
+  "story_point_to_hours": {
+    "formula": "=$story_points * $hours_per_point",
+    "description": "Convert story points to estimated hours",
+    "parameters": {
+      "story_points": "Story points estimate",
+      "hours_per_point": "Team's historical hours per story point"
+    }
+  },
+  "hours_to_story_points": {
+    "formula": "=IF($hours_per_point=0, 0, $hours / $hours_per_point)",
+    "description": "Convert hours to story points",
+    "parameters": {
+      "hours": "Hours estimate",
+      "hours_per_point": "Team's historical hours per story point"
+    }
+  },
+  "cycle_time_average": {
+    "formula": "=AVERAGE($cycle_time_range)",
+    "description": "Calculate average cycle time for completed items",
+    "parameters": {
+      "cycle_time_range": "Range containing cycle times (days from start to done)"
+    }
+  },
+  "lead_time_average": {
+    "formula": "=AVERAGE($lead_time_range)",
+    "description": "Calculate average lead time for completed items",
+    "parameters": {
+      "lead_time_range": "Range containing lead times (days from request to done)"
+    }
+  },
+  "throughput": {
+    "formula": "=COUNTIF($completion_date_column, \">=\"&$period_start) - COUNTIF($completion_date_column, \">\"&$period_end)",
+    "description": "Count items completed in time period (throughput)",
+    "parameters": {
+      "completion_date_column": "Range containing completion dates",
+      "period_start": "Period start date",
+      "period_end": "Period end date"
+    }
+  },
+  "cumulative_flow_wip": {
+    "formula": "=COUNTIFS($start_date_column, \"<=\"&$current_date, $end_date_column, \">=\"&$current_date) + COUNTIFS($start_date_column, \"<=\"&$current_date, $end_date_column, \"\")",
+    "description": "Calculate Work In Progress for cumulative flow diagram",
+    "parameters": {
+      "start_date_column": "Range containing task start dates",
+      "end_date_column": "Range containing task end dates",
+      "current_date": "Date to calculate WIP for"
+    }
+  },
+  "_extension_hooks": {
+    "predictive_analytics": {
+      "description": "Hook for machine learning-based progress prediction",
+      "implementation_guide": "Use time series forecasting (ARIMA, exponential smoothing)",
+      "parameters": {
+        "historical_data": "Time series of velocity or completion rates",
+        "external_factors": "Variables affecting performance (holidays, team changes)",
+        "forecast_horizon": "Number of periods to forecast"
+      },
+      "suggested_approach": "Python integration with statsmodels or Prophet library"
+    },
+    "adaptive_forecasting": {
+      "description": "Hook for forecast that adjusts based on recent trends",
+      "implementation_guide": "Weighted moving average with exponential smoothing",
+      "parameters": {
+        "historical_values": "Past performance data",
+        "smoothing_factor": "Weight for recent data (0-1, higher = more weight)",
+        "trend_component": "Optional trend adjustment"
+      },
+      "suggested_approach": "Implement Holt-Winters method in Excel or Python"
+    }
+  }
+}

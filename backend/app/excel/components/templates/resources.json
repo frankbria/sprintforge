@@ -1,0 +1,136 @@
+{
+  "_metadata": {
+    "description": "Resource allocation, leveling, and utilization formulas",
+    "contributor": "SprintForge Core Team",
+    "version": "1.0.0"
+  },
+  "resource_allocation": {
+    "formula": "=$task_duration * $resource_percentage / 100",
+    "description": "Calculate resource hours allocated to task",
+    "parameters": {
+      "task_duration": "Task duration in hours or days",
+      "resource_percentage": "Percentage allocation (0-100)"
+    }
+  },
+  "resource_utilization": {
+    "formula": "=SUMIF($resource_column, $resource_name, $allocation_column) / $capacity",
+    "description": "Calculate resource utilization percentage",
+    "parameters": {
+      "resource_column": "Range containing resource names",
+      "resource_name": "Specific resource to calculate for",
+      "allocation_column": "Range containing allocated hours",
+      "capacity": "Total capacity (hours available)"
+    },
+    "interpretation": "Result > 1.0 indicates over-allocation"
+  },
+  "resource_availability": {
+    "formula": "=$capacity - SUMIF($resource_column, $resource_name, $allocation_column)",
+    "description": "Calculate remaining resource capacity",
+    "parameters": {
+      "capacity": "Total capacity (hours available)",
+      "resource_column": "Range containing resource names",
+      "resource_name": "Specific resource to calculate for",
+      "allocation_column": "Range containing allocated hours"
+    }
+  },
+  "resource_conflict_detection": {
+    "formula": "=IF(SUMIF($resource_column, $resource_name, $allocation_column) > $capacity, \"OVERALLOCATED\", \"\")",
+    "description": "Detect resource over-allocation conflicts",
+    "parameters": {
+      "resource_column": "Range containing resource names",
+      "resource_name": "Specific resource to check",
+      "allocation_column": "Range containing allocated hours",
+      "capacity": "Total capacity (hours available)"
+    }
+  },
+  "resource_load_by_period": {
+    "formula": "=SUMIFS($allocation_column, $resource_column, $resource_name, $date_column, \">=\"&$period_start, $date_column, \"<=\"&$period_end)",
+    "description": "Calculate resource load for specific time period",
+    "parameters": {
+      "allocation_column": "Range containing allocated hours",
+      "resource_column": "Range containing resource names",
+      "resource_name": "Specific resource",
+      "date_column": "Range containing task dates",
+      "period_start": "Period start date",
+      "period_end": "Period end date"
+    }
+  },
+  "peak_resource_demand": {
+    "formula": "=MAX(IF($resource_column=$resource_name, $allocation_column, 0))",
+    "description": "Find peak demand period for resource (array formula)",
+    "parameters": {
+      "resource_column": "Range containing resource names",
+      "resource_name": "Specific resource",
+      "allocation_column": "Range containing allocated hours per period"
+    },
+    "note": "Enter as array formula with Ctrl+Shift+Enter in older Excel"
+  },
+  "resource_leveling_priority": {
+    "formula": "=IF($total_float=0, 1, IF($total_float<5, 2, 3))",
+    "description": "Calculate leveling priority (1=critical, 2=near-critical, 3=non-critical)",
+    "parameters": {
+      "total_float": "Total float (slack) in days"
+    },
+    "use_case": "Prioritize resource leveling for critical path tasks first"
+  },
+  "multi_resource_allocation": {
+    "formula": "=SUMPRODUCT(($resource_column=$resource_list), $allocation_column)",
+    "description": "Calculate total allocation across multiple resources",
+    "parameters": {
+      "resource_column": "Range containing resource names",
+      "resource_list": "Array of resource names to sum",
+      "allocation_column": "Range containing allocated hours"
+    },
+    "use_case": "Calculate team or department total allocation"
+  },
+  "resource_efficiency": {
+    "formula": "=IF($allocated_hours=0, 1, $actual_hours / $allocated_hours)",
+    "description": "Calculate resource efficiency ratio",
+    "parameters": {
+      "actual_hours": "Actual hours spent",
+      "allocated_hours": "Hours allocated/estimated"
+    },
+    "interpretation": "Ratio < 1 = more efficient; Ratio > 1 = less efficient than planned"
+  },
+  "capacity_utilization_rate": {
+    "formula": "=(SUMIF($resource_column, $resource_name, $allocation_column) / $total_available_hours) * 100",
+    "description": "Calculate percentage of total capacity utilized",
+    "parameters": {
+      "resource_column": "Range containing resource names",
+      "resource_name": "Specific resource",
+      "allocation_column": "Range containing allocated hours",
+      "total_available_hours": "Total hours available in period"
+    }
+  },
+  "skill_weighted_allocation": {
+    "formula": "=$allocation_hours * $skill_match_percentage / 100",
+    "description": "Weight allocation by skill match quality",
+    "parameters": {
+      "allocation_hours": "Raw allocated hours",
+      "skill_match_percentage": "How well resource skills match requirements (0-100)"
+    },
+    "use_case": "Adjust estimates based on resource skill fit"
+  },
+  "_extension_hooks": {
+    "constraint_based_scheduling": {
+      "description": "Hook for advanced resource-constrained scheduling",
+      "implementation_guide": "Use critical chain or resource-constrained critical path",
+      "parameters": {
+        "resource_constraints": "Array of resource capacity limits",
+        "task_dependencies": "Precedence relationships",
+        "resource_requirements": "Resource needs per task"
+      },
+      "suggested_approach": "Implement as optimization problem with constraint propagation"
+    },
+    "skill_matrix_optimization": {
+      "description": "Hook for optimal resource assignment based on skills",
+      "implementation_guide": "Use Hungarian algorithm or linear programming",
+      "parameters": {
+        "skill_requirements": "Matrix of required skills per task",
+        "resource_skills": "Matrix of resource skill levels",
+        "optimization_objective": "Minimize cost, maximize quality, or balance"
+      },
+      "suggested_approach": "Create skill-task matching matrix with optimization solver"
+    }
+  }
+}
