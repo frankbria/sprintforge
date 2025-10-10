@@ -6,7 +6,7 @@ import secrets
 import time
 from typing import Optional
 from fastapi import HTTPException, Request
-from fastapi.middleware.base import BaseHTTPMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 from fastapi.responses import Response
 import structlog
 

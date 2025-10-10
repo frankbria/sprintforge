@@ -10,7 +10,7 @@ import structlog
 
 from app.core.auth import require_auth, optional_auth, verify_nextauth_jwt
 from app.core.security import get_client_ip
-from app.database.connection import get_db
+from app.database.connection import get_database_session
 from app.models.user import User, Session
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -51,7 +51,7 @@ class UpdateProfileRequest(BaseModel):
 @router.get("/me", response_model=UserResponse)
 async def get_current_user(
     user_info: Dict[str, Any] = Depends(require_auth),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_database_session)
 ) -> UserResponse:
     """
     Get current authenticated user information.
@@ -100,7 +100,7 @@ async def get_current_user(
 async def update_current_user(
     profile_data: UpdateProfileRequest,
     user_info: Dict[str, Any] = Depends(require_auth),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_database_session)
 ) -> UserResponse:
     """
     Update current authenticated user's profile.
@@ -163,7 +163,7 @@ async def update_current_user(
 @router.get("/session", response_model=SessionInfo)
 async def get_session_info(
     user_info: Dict[str, Any] = Depends(require_auth),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_database_session)
 ) -> SessionInfo:
     """
     Get current session information including user data and session details.
@@ -243,7 +243,7 @@ async def validate_token(
 @router.delete("/session")
 async def revoke_session(
     user_info: Dict[str, Any] = Depends(require_auth),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_database_session)
 ):
     """
     Revoke current session (logout functionality).
