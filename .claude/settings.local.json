@@ -3,7 +3,11 @@
     "allow": [
       "mcp__serena__list_dir",
       "Bash(npm run type-check:*)",
-      "Bash(python -m pytest --collect-only)"
+      "Bash(python -m pytest --collect-only)",
+      "mcp__serena__find_symbol",
+      "Bash(python -m pytest tests/api/endpoints/test_excel.py -v)",
+      "Bash(python -m pytest tests/api/endpoints/test_excel.py --cov=app.api.endpoints.excel --cov=app.services.excel_service --cov-report=term-missing)",
+      "Bash(python -m pytest tests/api/endpoints/test_excel.py --cov=app.api.endpoints.excel --cov=app.services.excel_service --cov-report=term-missing -v)"
     ],
     "deny": [],
     "ask": []
