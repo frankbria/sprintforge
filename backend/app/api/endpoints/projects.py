@@ -16,6 +16,7 @@ from app.schemas.project import (
     ProjectListResponse,
 )
 from app.services.project_service import ProjectService
+from app.services.quota_service import QuotaService
 
 logger = structlog.get_logger(__name__)
 
@@ -27,7 +28,13 @@ router = APIRouter(prefix="/projects", tags=["projects"])
     response_model=ProjectResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Create a new project",
-    description="Create a new project with Excel configuration. Requires authentication.",
+    description="Create a new project with Excel configuration. Requires authentication. Free tier limited to 3 active projects.",
+    responses={
+        201: {"description": "Project created successfully"},
+        400: {"description": "Bad request - Invalid configuration"},
+        403: {"description": "Forbidden - Project quota exceeded"},
+        500: {"description": "Internal server error"},
+    },
 )
 async def create_project(
     project_data: ProjectCreate,
@@ -36,6 +43,11 @@ async def create_project(
 ) -> ProjectResponse:
     """
     Create a new project.
+
+    **Quota Limits:**
+    - Free tier: 3 active projects
+    - Pro tier: Unlimited projects
+    - Enterprise tier: Unlimited projects
 
     Args:
         project_data: Project creation data including configuration
@@ -46,7 +58,7 @@ async def create_project(
         Created project with ID and timestamps
 
     Raises:
-        HTTPException: If validation fails or creation error occurs
+        HTTPException: If validation fails, quota exceeded, or creation error occurs
     """
     user_id = UUID(user_info.get("sub"))
 
@@ -57,6 +69,10 @@ async def create_project(
     )
 
     try:
+        # Check project quota BEFORE creating
+        quota_service = QuotaService(db)
+        await quota_service.check_project_quota(user_id)
+
         service = ProjectService(db)
         project = await service.create_project(user_id, project_data)
 
