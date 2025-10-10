@@ -4,6 +4,21 @@
 **Goal**: Generate sophisticated Excel templates with project management formulas
 **Success Criteria**: Users can generate Excel files with working dependencies, Monte Carlo, and sprint calculations
 
+## 📖 Primary Documentation
+
+**Sprint 3 Implementation Guide**: [`Sprint-3-Implementation.md`](Sprint-3-Implementation.md)
+
+This is the single source of truth for all Sprint 3 implementation details, including:
+- Complete architecture and technical specifications
+- All implemented features across Tasks 3.1-3.7
+- Comprehensive usage guide with code examples
+- Performance benchmarks and quality metrics
+- Complete formula reference and template catalog
+
+> **Note**: Individual task documents have been archived to `backend/docs/archive/` for historical reference.
+
+---
+
 ## Sprint Status: ✅ **SPRINT 3 COMPLETE** (All Tasks 3.1-3.7 Complete)
 
 ### Completed Tasks
@@ -32,7 +47,7 @@
 - `d6f3962` - Task 3.4: Advanced Formulas (Monte Carlo)
 - `3c4512d` - Task 3.5: Excel Compatibility
 - `352117b` - Task 3.6: Template System
-- [pending] - Task 3.7: Testing & Validation
+- `a5d96ca` - Task 3.7: Testing & Validation
 
 ### Sprint Goals Achieved ✅
 - ✅ Generate sophisticated Excel templates with project management formulas
