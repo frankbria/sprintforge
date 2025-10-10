@@ -9,8 +9,8 @@ from collections import defaultdict, deque
 from datetime import datetime, timedelta
 
 from fastapi import HTTPException, Request
-from fastapi.middleware.base import BaseHTTPMiddleware
 from fastapi.responses import Response
+from starlette.middleware.base import BaseHTTPMiddleware
 import structlog
 from jose import jwt
 

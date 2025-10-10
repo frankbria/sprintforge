@@ -35,14 +35,17 @@ def create_engine():
         database_url = get_database_url()
         settings = get_settings()
 
-        _engine = create_async_engine(
-            database_url,
-            echo=settings.debug,  # Log SQL queries in debug mode
-            pool_size=20,
-            max_overflow=30,
-            pool_pre_ping=True,  # Verify connections before use
-            pool_recycle=3600,   # Recycle connections every hour
-        )
+        # SQLite doesn't support pool configuration
+        engine_kwargs = {"echo": settings.debug}
+        if "postgresql" in database_url:
+            engine_kwargs.update({
+                "pool_size": 20,
+                "max_overflow": 30,
+                "pool_pre_ping": True,
+                "pool_recycle": 3600,
+            })
+
+        _engine = create_async_engine(database_url, **engine_kwargs)
 
     return _engine
 
@@ -81,6 +84,10 @@ async def get_database_session() -> AsyncGenerator[AsyncSession, None]:
             raise
         finally:
             await session.close()
+
+
+# Alias for shorter import name
+get_db = get_database_session
 
 
 async def check_database_connection() -> bool:

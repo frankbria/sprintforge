@@ -2,15 +2,18 @@
 
 from fastapi import APIRouter
 
-from .endpoints import auth
+from .endpoints import auth, projects
 
 api_router = APIRouter()
 
 # Include authentication routes
 api_router.include_router(auth.router)
 
+# Include project management routes
+api_router.include_router(projects.router)
+
 # Import other routers here as they are created
-# from .endpoints import projects, sync
+# from .endpoints import sync, excel
 
 @api_router.get("/")
 async def api_root():

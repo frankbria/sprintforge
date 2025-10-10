@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Optional
 from uuid import UUID, uuid4
 
-from sqlalchemy import Boolean, String, Text, DateTime, BigInteger, JSON
+from sqlalchemy import Boolean, String, Text, DateTime, BigInteger, JSON, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID as PGUUID, JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
@@ -53,7 +53,7 @@ class User(Base):
     accounts = relationship("Account", back_populates="user", cascade="all, delete-orphan")
     sessions = relationship("Session", back_populates="user", cascade="all, delete-orphan")
     projects = relationship("Project", back_populates="owner", cascade="all, delete-orphan")
-    memberships = relationship("ProjectMembership", back_populates="user", cascade="all, delete-orphan")
+    memberships = relationship("ProjectMembership", back_populates="user", foreign_keys="[ProjectMembership.user_id]", cascade="all, delete-orphan")
     sync_operations = relationship("SyncOperation", back_populates="user", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
@@ -66,7 +66,7 @@ class Account(Base):
     __tablename__ = "accounts"
 
     id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), primary_key=True, default=uuid4)
-    user_id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), nullable=False, index=True)
+    user_id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     type: Mapped[str] = mapped_column(String(255), nullable=False)
     provider: Mapped[str] = mapped_column(String(255), nullable=False)
     provider_account_id: Mapped[str] = mapped_column(String(255), nullable=False)
@@ -102,7 +102,7 @@ class Session(Base):
 
     id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), primary_key=True, default=uuid4)
     session_token: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
-    user_id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), nullable=False, index=True)
+    user_id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     expires: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, index=True)
 
     # Timestamps

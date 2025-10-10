@@ -101,7 +101,7 @@ class ProjectMembership(Base):
 
     # Relationships
     project = relationship("Project", back_populates="memberships")
-    user = relationship("User", back_populates="memberships")
+    user = relationship("User", back_populates="memberships", foreign_keys=[user_id])
     inviter = relationship("User", foreign_keys=[invited_by])
 
     def __repr__(self) -> str:
