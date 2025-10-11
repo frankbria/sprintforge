@@ -5,8 +5,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![TypeScript](https://img.shields.io/badge/typescript-5.0+-blue.svg)](https://www.typescriptlang.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-green.svg)](https://fastapi.tiangolo.com/)
-[![Next.js](https://img.shields.io/badge/Next.js-15+-black.svg)](https://nextjs.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.104.1-green.svg)](https://fastapi.tiangolo.com/)
+[![Next.js](https://img.shields.io/badge/Next.js-15.5.3-black.svg)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19.1.0-blue.svg)](https://reactjs.org/)
 
 ## 🚀 Overview
 
@@ -20,6 +21,29 @@ SprintForge addresses the critical gap between sophisticated project management 
 - **👥 Collaboration layer** - Multi-user updates with Excel as source of truth
 - **🌟 Truly open source** - MIT licensed core with transparent pricing
 - **🤖 AI-enhanced** - Optional AI assistance for planning and estimation
+
+## 📊 Current Development Status
+
+**Version**: 1.0 (MVP) - **IN PROGRESS**
+**Last Updated**: October 11, 2025
+**Sprint**: Sprint 4 - Week 2 (Project Management & Integration)
+
+### ✅ Completed Milestones
+- **Sprint 1-2**: Authentication & User Management (100% complete)
+- **Sprint 3**: Excel Generation Engine (100% complete)
+- **Sprint 4**: Project Management API (83% complete - 5/6 tasks done)
+
+### 🚧 Current Sprint Progress
+- ✅ Task 4.1: Project CRUD API
+- ✅ Task 4.2: Excel Generation API
+- ✅ Task 4.3: Rate Limiting & Abuse Prevention
+- ✅ Task 4.4: Public Sharing System
+- ✅ Task 4.5: Project Setup Wizard
+- 🔄 Task 4.6: Project Dashboard (In Progress)
+
+### 🎯 Next Up
+- Sprint 5: Advanced Features & Analytics
+- Sprint 6: Collaboration & Real-time Updates
 
 ## 📁 Project Structure
 
@@ -37,7 +61,11 @@ sprintforge/
 ├── frontend/         # Next.js TypeScript frontend
 │   ├── app/         # App Router pages
 │   ├── components/  # Reusable components
-│   ├── lib/         # Utility libraries
+│   │   ├── ui/      # Base UI components (Card, Input, Progress, etc.)
+│   │   └── wizard/  # Project setup wizard components
+│   ├── hooks/       # Custom React hooks
+│   ├── lib/         # Utility libraries and API clients
+│   ├── types/       # TypeScript type definitions
 │   └── public/      # Static assets
 ├── core/            # Core scheduling algorithms (MIT)
 ├── docs/           # Documentation
@@ -57,12 +85,17 @@ sprintforge/
 - **Testing**: pytest with pytest-cov and pytest-asyncio
 
 ### Frontend
-- **Framework**: Next.js 15+ with TypeScript
-- **Authentication**: NextAuth.js
+- **Framework**: Next.js 15.5.3 with App Router
+- **UI Library**: React 19.1.0
+- **Language**: TypeScript 5+
+- **Authentication**: NextAuth.js 4.24+
+- **Forms**: React Hook Form 7.65+ with Zod validation
 - **State Management**: TanStack Query (React Query)
-- **Styling**: TailwindCSS
+- **UI Components**: Radix UI primitives with custom components
+- **Styling**: TailwindCSS v4 with Framer Motion animations
+- **Icons**: Lucide React
 - **Testing**: Jest with React Testing Library
-- **API Client**: Axios
+- **API Client**: Axios 1.12+
 
 ### Core Engine
 - **Language**: Python (NumPy, Pandas for calculations)
@@ -118,8 +151,8 @@ sprintforge/
 4. **Access the application**
    - Frontend: http://localhost:3000
    - Backend API: http://localhost:8000
-   - API Docs: http://localhost:8000/docs
-   - Live Demo: https://SprintForge.app
+   - API Documentation (Swagger): http://localhost:8000/docs
+   - API Documentation (ReDoc): http://localhost:8000/redoc
 
 ### Docker Development
 
@@ -134,47 +167,68 @@ docker-compose up frontend
 
 ## 🎯 Key Features
 
-### Version 1.0 - Core MVP (Target: Q2 2025)
+### ✅ Completed Features (Version 1.0 MVP)
 
-#### ✅ Sprint Planning Engine
-- Custom sprint pattern definition (YY.Q.WW, PI-N.Sprint-M, etc.)
-- Sprint duration configuration with blackout period support
-- Sprint-to-date conversion with velocity tracking
+#### 🔐 Authentication & User Management
+- **User Registration & Login** - Secure JWT-based authentication
+- **Email Verification** - Automated verification flow
+- **Session Management** - NextAuth.js integration
+- **User Profiles** - Profile management and settings
 
-#### ✅ Task Management  
-- Task creation with dependencies and parent-child hierarchies
-- Work breakdown structure (WBS) with duration estimation
-- Progress tracking with multiple dependency types (FS, SS, FF, SF)
+#### 📊 Sprint Planning Engine
+- **Custom Sprint Patterns** - 4 pattern types (YY.Q.#, PI-Sprint, Sequential, YY.WW)
+- **Sprint Configuration** - Duration (1-8 weeks), working days, hours per day
+- **Holiday Calendars** - Preset calendars (US, UK, EU) + custom holidays
+- **Sprint Calculator** - Automatic sprint-to-date conversion
 
-#### ✅ Excel Generation
-- Clean XLSX output with no macros required
-- Interactive dropdowns via data validation
-- Conditional formatting for timeline visualization
-- Formula-based date calculations with print-optimized layouts
+#### 📋 Project Management
+- **Project CRUD API** - Complete project lifecycle management
+- **Project Wizard** - 6-step guided project setup
+  - Project basics and template selection
+  - Sprint configuration with live preview
+  - Holiday calendar management
+  - Advanced feature toggles
+  - Configuration review and creation
+- **Template System** - 5 predefined templates (Agile/Waterfall/Hybrid)
+- **Configuration Storage** - JSONB-based flexible configuration
 
-### Version 1.5 - Collaboration Layer (Target: Q3 2025)
+#### 📈 Excel Generation Engine
+- **Template Generation** - Clean XLSX output with no macros
+- **Formula Engine** - 67 formula templates across 8 categories
+- **Gantt Charts** - Visual timeline with conditional formatting
+- **Interactive Features** - Data validation dropdowns
+- **Advanced Analytics** - Critical Path, EVM, Monte Carlo simulation support
+- **Excel API** - Streaming response for large files
+- **Cross-platform** - Windows, Mac, Web Excel compatibility
 
-#### 🔄 Two-Way Sync
-- Excel upload and parsing with change detection
-- Conflict resolution with audit trail
-- Version history with rollback capabilities
+#### 🔗 Sharing & Collaboration
+- **Public Sharing** - Secure "viewable by link" functionality
+- **Access Control** - Token-based public access
+- **Share Management** - Enable/disable/revoke share links
+- **Rate Limiting** - Abuse prevention (100 req/min, 1000 req/hour)
 
-#### 👥 Multi-User Features
-- Web-based task updates with comment system
-- Email notifications and change tracking
-- Role-based access (viewer, editor, owner)
+### 🚧 In Development
 
-### Version 2.0 - Intelligence Layer (Target: Q4 2025)
+#### 📊 Project Dashboard (Sprint 4 - Week 2)
+- Project listing and management
+- Quick actions and statistics
+- Recent activity feed
 
-#### 🎲 Monte Carlo Simulation
-- Three-point estimation with historical analysis
-- Confidence intervals (50%, 75%, 90%, 95%)
-- Risk-adjusted critical path with buffer calculation
+### 🔮 Planned Features (Future Versions)
 
-#### 🤖 AI Planning Assistant
-- Natural language project creation
-- Task breakdown suggestions with duration estimation
-- Dependency inference and risk identification
+#### Version 1.5 - Collaboration Layer (Q1 2026)
+- **Two-Way Sync** - Excel upload and parsing with change detection
+- **Conflict Resolution** - Audit trail and version history
+- **Multi-User Updates** - Real-time collaboration
+- **Comment System** - Task-level discussions
+- **Notifications** - Email and in-app notifications
+
+#### Version 2.0 - Intelligence Layer (Q2 2026)
+- **Advanced Monte Carlo** - Enhanced probabilistic scheduling
+- **AI Planning Assistant** - Natural language project creation
+- **Task Recommendations** - AI-powered task breakdown
+- **Dependency Inference** - Automatic dependency detection
+- **Risk Analysis** - Predictive risk identification
 
 ## 🔧 Configuration
 
@@ -330,19 +384,27 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🛟 Support & Community
 
-- **Live Demo**: [SprintForge.app](https://SprintForge.app)
-- **Documentation**: [docs.sprintforge.com](https://docs.sprintforge.com)
-- **Issues**: [GitHub Issues](https://github.com/frankbria/sprintforge/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/frankbria/sprintforge/discussions)
-- **Discord**: [SprintForge Community](https://discord.gg/sprintforge)
+- **GitHub Issues**: [Report Bugs & Request Features](https://github.com/frankbria/sprintforge/issues)
+- **GitHub Discussions**: [Community Q&A](https://github.com/frankbria/sprintforge/discussions)
+- **Documentation**: See [docs/](docs/) directory for technical guides
+- **Contributing**: See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines
+- **Development Guide**: See [CLAUDE.md](CLAUDE.md) for AI-assisted development
+
+> **Note**: Live demo and community Discord coming with Version 1.0 release
 
 ## 🗺️ Roadmap
 
-- **Q2 2025**: Version 1.0 - Core MVP with sprint planning and Excel generation
-- **Q3 2025**: Version 1.5 - Collaboration features and two-way sync  
-- **Q4 2025**: Version 2.0 - AI assistance and Monte Carlo simulations
-- **Q1 2026**: Version 2.5 - Enterprise features and integrations
-- **Q2 2026**: Version 3.0 - Multi-project management and mobile apps
+### Completed
+- **✅ Q1-Q2 2025**: Sprints 1-2 - Authentication & User Management
+- **✅ Q3 2025**: Sprint 3 - Excel Generation Engine (67 formulas, 5 templates, 150+ tests)
+- **🚧 Q4 2025**: Sprint 4 - Project Management API (83% complete - 5/6 tasks done)
+
+### Upcoming
+- **Q4 2025**: Sprint 5 - Advanced Features & Analytics
+- **Q1 2026**: Sprint 6 - Collaboration & Real-time Updates (Version 1.5)
+- **Q2 2026**: Version 2.0 - AI assistance and enhanced Monte Carlo
+- **Q3 2026**: Version 2.5 - Enterprise features and integrations
+- **Q4 2026**: Version 3.0 - Multi-project portfolio management
 
 ## 🙏 Acknowledgments
 
