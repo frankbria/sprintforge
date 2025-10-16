@@ -23,6 +23,11 @@ from app.services.scheduler.scheduler_service import (
     TaskInput,
     ScheduleResult,
 )
+from app.services.scheduler.monte_carlo import (
+    MonteCarloEngine,
+    MonteCarloResult,
+    TaskDistributionInput,
+)
 
 __all__ = [
     "TaskGraph",
@@ -40,4 +45,7 @@ __all__ = [
     "SchedulerError",
     "TaskInput",
     "ScheduleResult",
+    "MonteCarloEngine",
+    "MonteCarloResult",
+    "TaskDistributionInput",
 ]
