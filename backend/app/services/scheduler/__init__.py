@@ -15,6 +15,7 @@ from app.services.scheduler.cpm import (
     calculate_critical_path,
 )
 from app.services.scheduler.models import TaskScheduleData, CriticalPathResult
+from app.services.scheduler.work_calendar import WorkCalendar, calculate_task_dates
 
 __all__ = [
     "TaskGraph",
@@ -24,4 +25,6 @@ __all__ = [
     "calculate_critical_path",
     "TaskScheduleData",
     "CriticalPathResult",
+    "WorkCalendar",
+    "calculate_task_dates",
 ]
