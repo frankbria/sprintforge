@@ -4,12 +4,19 @@ from typing import Any, Dict
 from uuid import UUID
 
 import structlog
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.auth import require_auth
 from app.database.connection import get_db
-from app.schemas.simulation import SimulationRequest, SimulationResponse
+from app.schemas.simulation import (
+    SimulationDetailResponse,
+    SimulationHistoryItem,
+    SimulationHistoryResponse,
+    SimulationRequest,
+    SimulationResponse,
+)
+from app.services.simulation_persistence_service import SimulationPersistenceService
 from app.services.simulation_service import SimulationService
 
 logger = structlog.get_logger(__name__)
@@ -206,4 +213,173 @@ async def run_project_simulation(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An unexpected error occurred. Please contact support if this persists.",
+        )
+
+
+@router.get(
+    "/{project_id}/simulations",
+    response_model=SimulationHistoryResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get project simulation history",
+    description="""
+    Retrieve historical Monte Carlo simulation results for a project.
+
+    Returns simulation history ordered by most recent first with pagination support.
+
+    **Query Parameters:**
+    - **page**: Page number (0-indexed, default: 0)
+    - **page_size**: Results per page (1-100, default: 10)
+
+    **Authentication:**
+    Requires valid JWT token. User must own the project.
+    """,
+)
+async def get_project_simulations(
+    project_id: UUID,
+    page: int = Query(0, ge=0, description="Page number (0-indexed)"),
+    page_size: int = Query(10, ge=1, le=100, description="Results per page"),
+    user_info: Dict[str, Any] = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+) -> SimulationHistoryResponse:
+    """
+    Get simulation history for a project.
+
+    Args:
+        project_id: Project UUID
+        page: Page number (0-indexed)
+        page_size: Number of results per page (1-100)
+        user_info: Authenticated user information
+        db: Database session
+
+    Returns:
+        SimulationHistoryResponse with paginated simulation results
+
+    Raises:
+        HTTPException:
+            - 401: Authentication failed
+            - 404: Project not found or access denied
+    """
+    user_id = UUID(user_info.get("sub"))
+
+    logger.info(
+        "Fetching simulation history",
+        project_id=str(project_id),
+        user_id=str(user_id),
+        page=page,
+        page_size=page_size,
+    )
+
+    try:
+        # Initialize services
+        persistence_service = SimulationPersistenceService()
+
+        # Calculate offset from page number
+        offset = page * page_size
+
+        # Fetch simulations
+        simulations = await persistence_service.get_project_simulation_history(
+            db=db, project_id=project_id, limit=page_size, offset=offset
+        )
+
+        # Get total count for pagination
+        total_count = await persistence_service.count_project_simulations(
+            db=db, project_id=project_id
+        )
+
+        # Convert to response models
+        simulation_items = [
+            SimulationHistoryItem.model_validate(sim) for sim in simulations
+        ]
+
+        return SimulationHistoryResponse(
+            simulations=simulation_items,
+            total_count=total_count,
+            page=page,
+            page_size=page_size,
+        )
+
+    except Exception as e:
+        logger.error(
+            "Failed to fetch simulation history",
+            project_id=str(project_id),
+            user_id=str(user_id),
+            error=str(e),
+            exc_info=True,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to retrieve simulation history",
+        )
+
+
+@router.get(
+    "/simulations/{simulation_id}",
+    response_model=SimulationDetailResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get simulation result details",
+    description="""
+    Retrieve detailed information for a specific simulation result.
+
+    **Authentication:**
+    Requires valid JWT token. User must have access to the associated project.
+    """,
+)
+async def get_simulation_detail(
+    simulation_id: int,
+    user_info: Dict[str, Any] = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+) -> SimulationDetailResponse:
+    """
+    Get detailed simulation result by ID.
+
+    Args:
+        simulation_id: Simulation result ID
+        user_info: Authenticated user information
+        db: Database session
+
+    Returns:
+        SimulationDetailResponse with complete simulation details
+
+    Raises:
+        HTTPException:
+            - 401: Authentication failed
+            - 404: Simulation not found or access denied
+    """
+    user_id = UUID(user_info.get("sub"))
+
+    logger.info(
+        "Fetching simulation detail",
+        simulation_id=simulation_id,
+        user_id=str(user_id),
+    )
+
+    try:
+        # Initialize service
+        persistence_service = SimulationPersistenceService()
+
+        # Fetch simulation
+        simulation = await persistence_service.get_simulation_result(db, simulation_id)
+
+        if simulation is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Simulation not found",
+            )
+
+        # Convert to response model
+        return SimulationDetailResponse.model_validate(simulation)
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(
+            "Failed to fetch simulation detail",
+            simulation_id=simulation_id,
+            user_id=str(user_id),
+            error=str(e),
+            exc_info=True,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to retrieve simulation details",
         )

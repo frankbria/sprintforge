@@ -183,3 +183,135 @@ class SimulationResponse(BaseModel):
                 "task_count": 2,
             }
         }
+
+
+class SimulationHistoryItem(BaseModel):
+    """Individual simulation result from history."""
+
+    id: int = Field(..., description="Simulation result ID")
+    iterations: int = Field(..., description="Number of iterations performed")
+    task_count: int = Field(..., description="Number of tasks in simulation")
+    project_start_date: date = Field(..., description="Project start date used")
+    mean_duration: float = Field(
+        ..., description="Mean project duration (working days)"
+    )
+    median_duration: float = Field(..., description="Median project duration")
+    std_deviation: float = Field(..., description="Standard deviation of duration")
+    confidence_intervals: Dict[int, float] = Field(
+        ..., description="Percentile confidence intervals"
+    )
+    created_at: datetime = Field(..., description="When simulation was run")
+    simulation_duration_seconds: Optional[float] = Field(
+        None, description="Execution time of simulation"
+    )
+
+    class Config:
+        from_attributes = True
+        json_schema_extra = {
+            "example": {
+                "id": 123,
+                "iterations": 10000,
+                "task_count": 15,
+                "project_start_date": "2025-01-13",
+                "mean_duration": 52.3,
+                "median_duration": 51.5,
+                "std_deviation": 4.8,
+                "confidence_intervals": {
+                    "10": 45.2,
+                    "50": 51.5,
+                    "90": 61.5,
+                    "95": 65.0,
+                    "99": 72.1,
+                },
+                "created_at": "2025-01-15T10:30:00Z",
+                "simulation_duration_seconds": 2.5,
+            }
+        }
+
+
+class SimulationHistoryResponse(BaseModel):
+    """Response for simulation history queries."""
+
+    simulations: List[SimulationHistoryItem] = Field(
+        ..., description="List of simulation results"
+    )
+    total_count: int = Field(..., description="Total number of simulations available")
+    page: int = Field(..., description="Current page number (0-indexed)")
+    page_size: int = Field(..., description="Number of results per page")
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "simulations": [
+                    {
+                        "id": 123,
+                        "iterations": 10000,
+                        "task_count": 15,
+                        "project_start_date": "2025-01-13",
+                        "mean_duration": 52.3,
+                        "median_duration": 51.5,
+                        "std_deviation": 4.8,
+                        "confidence_intervals": {
+                            "10": 45.2,
+                            "50": 51.5,
+                            "90": 61.5,
+                            "95": 65.0,
+                            "99": 72.1,
+                        },
+                        "created_at": "2025-01-15T10:30:00Z",
+                        "simulation_duration_seconds": 2.5,
+                    }
+                ],
+                "total_count": 42,
+                "page": 0,
+                "page_size": 10,
+            }
+        }
+
+
+class SimulationDetailResponse(BaseModel):
+    """Detailed simulation result including project and user information."""
+
+    id: int = Field(..., description="Simulation result ID")
+    project_id: str = Field(..., description="Project UUID")
+    user_id: str = Field(..., description="User UUID who ran the simulation")
+    iterations: int = Field(..., description="Number of iterations performed")
+    task_count: int = Field(..., description="Number of tasks in simulation")
+    project_start_date: date = Field(..., description="Project start date used")
+    mean_duration: float = Field(
+        ..., description="Mean project duration (working days)"
+    )
+    median_duration: float = Field(..., description="Median project duration")
+    std_deviation: float = Field(..., description="Standard deviation of duration")
+    confidence_intervals: Dict[int, float] = Field(
+        ..., description="Percentile confidence intervals"
+    )
+    created_at: datetime = Field(..., description="When simulation was run")
+    simulation_duration_seconds: Optional[float] = Field(
+        None, description="Execution time of simulation"
+    )
+
+    class Config:
+        from_attributes = True
+        json_schema_extra = {
+            "example": {
+                "id": 123,
+                "project_id": "123e4567-e89b-12d3-a456-426614174000",
+                "user_id": "987fcdeb-51a2-43d1-b678-123456789abc",
+                "iterations": 10000,
+                "task_count": 15,
+                "project_start_date": "2025-01-13",
+                "mean_duration": 52.3,
+                "median_duration": 51.5,
+                "std_deviation": 4.8,
+                "confidence_intervals": {
+                    "10": 45.2,
+                    "50": 51.5,
+                    "90": 61.5,
+                    "95": 65.0,
+                    "99": 72.1,
+                },
+                "created_at": "2025-01-15T10:30:00Z",
+                "simulation_duration_seconds": 2.5,
+            }
+        }
