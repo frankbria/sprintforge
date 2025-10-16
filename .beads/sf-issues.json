@@ -1,0 +1,209 @@
+[
+  {
+    "id": "sf-9",
+    "title": "Task 4.6: Project Dashboard",
+    "description": "Frontend dashboard for project listing, quick actions, statistics, and recent activity feed. 10 hours. Currently in progress.",
+    "status": "open",
+    "priority": 0,
+    "issue_type": "task",
+    "created_at": "2025-10-15T19:05:44.871261235-07:00",
+    "updated_at": "2025-10-15T19:05:44.871261235-07:00"
+  },
+  {
+    "id": "sf-8",
+    "title": "Task 4.5: Project Setup Wizard",
+    "description": "6-step wizard with React Hook Form and Zod validation. Template selection, sprint config, holidays, features. 19 files created. 12 hours.",
+    "status": "closed",
+    "priority": 0,
+    "issue_type": "task",
+    "created_at": "2025-10-15T19:05:44.449209095-07:00",
+    "updated_at": "2025-10-15T19:05:44.57928671-07:00",
+    "closed_at": "2025-10-15T19:05:44.57928671-07:00"
+  },
+  {
+    "id": "sf-7",
+    "title": "Task 4.4: Public Sharing System",
+    "description": "Secure 'viewable by link' functionality with token-based public access. Share link generation and management. 10 hours.",
+    "status": "closed",
+    "priority": 0,
+    "issue_type": "task",
+    "created_at": "2025-10-15T19:05:44.017407952-07:00",
+    "updated_at": "2025-10-15T19:05:44.140341749-07:00",
+    "closed_at": "2025-10-15T19:05:44.140341749-07:00"
+  },
+  {
+    "id": "sf-6",
+    "title": "Task 4.3: Rate Limiting \u0026 Abuse Prevention",
+    "description": "Implement rate limiting (100 req/min, 1000 req/hour) using slowapi. Redis-based tracking. 4 hours.",
+    "status": "closed",
+    "priority": 0,
+    "issue_type": "task",
+    "created_at": "2025-10-15T19:05:43.586176281-07:00",
+    "updated_at": "2025-10-15T19:05:43.708473939-07:00",
+    "closed_at": "2025-10-15T19:05:43.708473939-07:00"
+  },
+  {
+    "id": "sf-5",
+    "title": "Task 4.2: Excel Generation API",
+    "description": "API endpoints for Excel template generation with streaming response for large files. Integration with Sprint 3 engine. 8 hours.",
+    "status": "closed",
+    "priority": 0,
+    "issue_type": "task",
+    "created_at": "2025-10-15T19:05:43.22637923-07:00",
+    "updated_at": "2025-10-15T19:05:43.356449078-07:00",
+    "closed_at": "2025-10-15T19:05:43.356449078-07:00"
+  },
+  {
+    "id": "sf-4",
+    "title": "Task 4.1: Project CRUD API",
+    "description": "Complete project lifecycle management with Create, Read, Update, Delete operations. PostgreSQL with JSONB configuration storage. 10 hours estimated.",
+    "status": "closed",
+    "priority": 0,
+    "issue_type": "task",
+    "created_at": "2025-10-15T19:05:03.845066445-07:00",
+    "updated_at": "2025-10-15T19:05:09.385563207-07:00",
+    "closed_at": "2025-10-15T19:05:09.385563207-07:00"
+  },
+  {
+    "id": "sf-3",
+    "title": "Sprint 4: Project Management \u0026 Integration",
+    "description": "Integrate Excel Generation Engine with authentication system for complete project lifecycle. Users can create projects, configure through wizard, generate Excel, and share publicly. 83% complete (5/6 tasks done).",
+    "status": "open",
+    "priority": 0,
+    "issue_type": "epic",
+    "created_at": "2025-10-15T19:04:53.845181948-07:00",
+    "updated_at": "2025-10-15T19:04:53.845181948-07:00"
+  },
+  {
+    "id": "sf-13",
+    "title": "Task 5.3: Analytics Dashboard",
+    "description": "Project analytics with burn-down charts, velocity tracking, and performance metrics.",
+    "status": "open",
+    "priority": 1,
+    "issue_type": "task",
+    "created_at": "2025-10-15T19:05:45.967322555-07:00",
+    "updated_at": "2025-10-15T19:05:45.967322555-07:00"
+  },
+  {
+    "id": "sf-12",
+    "title": "Task 5.2: Critical Path Analysis Enhancement",
+    "description": "Advanced CPM with resource constraints, buffer calculation, and risk-adjusted timelines.",
+    "status": "open",
+    "priority": 1,
+    "issue_type": "task",
+    "created_at": "2025-10-15T19:05:45.698273987-07:00",
+    "updated_at": "2025-10-15T19:05:45.698273987-07:00"
+  },
+  {
+    "id": "sf-11",
+    "title": "Task 5.1: Advanced Monte Carlo Simulation",
+    "description": "Enhanced probabilistic scheduling with confidence intervals (50%, 75%, 90%, 95%). Three-point estimation.",
+    "status": "open",
+    "priority": 1,
+    "issue_type": "task",
+    "created_at": "2025-10-15T19:05:45.393072348-07:00",
+    "updated_at": "2025-10-15T19:05:45.393072348-07:00"
+  },
+  {
+    "id": "sf-10",
+    "title": "Sprint 5: Advanced Features \u0026 Analytics",
+    "description": "Enhanced analytics, advanced Monte Carlo simulations, performance optimizations, and advanced reporting features.",
+    "status": "open",
+    "priority": 1,
+    "issue_type": "epic",
+    "created_at": "2025-10-15T19:05:45.167908373-07:00",
+    "updated_at": "2025-10-15T19:05:45.167908373-07:00"
+  },
+  {
+    "id": "sf-2",
+    "title": "Sprint 3: Excel Generation Engine",
+    "description": "Production-ready Excel generation engine with 67 formula templates, 5 default templates, Gantt charts, conditional formatting, and 150+ tests with 89% coverage. Completed in Q3 2025.",
+    "status": "closed",
+    "priority": 1,
+    "issue_type": "epic",
+    "created_at": "2025-10-15T19:04:41.143988552-07:00",
+    "updated_at": "2025-10-15T19:04:46.953092817-07:00",
+    "closed_at": "2025-10-15T19:04:46.953092817-07:00"
+  },
+  {
+    "id": "sf-1",
+    "title": "Sprint 1-2: Authentication \u0026 User Management",
+    "description": "Complete authentication system with user registration, login, email verification, and session management. Tasks included user registration, login, email verification, JWT tokens, session management, and user profiles.",
+    "status": "closed",
+    "priority": 1,
+    "issue_type": "epic",
+    "created_at": "2025-10-15T19:04:25.30254653-07:00",
+    "updated_at": "2025-10-15T19:04:33.171333712-07:00",
+    "closed_at": "2025-10-15T19:04:33.171333712-07:00"
+  },
+  {
+    "id": "sf-17",
+    "title": "Task 6.3: Notification System",
+    "description": "Email and in-app notifications for project changes, comments, and mentions.",
+    "status": "open",
+    "priority": 2,
+    "issue_type": "task",
+    "created_at": "2025-10-15T19:05:47.028673527-07:00",
+    "updated_at": "2025-10-15T19:05:47.028673527-07:00"
+  },
+  {
+    "id": "sf-16",
+    "title": "Task 6.2: Real-time Collaboration",
+    "description": "WebSocket-based real-time updates. Multiple users can edit simultaneously with conflict resolution.",
+    "status": "open",
+    "priority": 2,
+    "issue_type": "task",
+    "created_at": "2025-10-15T19:05:46.777462443-07:00",
+    "updated_at": "2025-10-15T19:05:46.777462443-07:00"
+  },
+  {
+    "id": "sf-15",
+    "title": "Task 6.1: Excel Upload \u0026 Parsing",
+    "description": "Parse uploaded Excel files, detect changes, and update database. Conflict resolution with audit trail.",
+    "status": "open",
+    "priority": 2,
+    "issue_type": "task",
+    "created_at": "2025-10-15T19:05:46.542649142-07:00",
+    "updated_at": "2025-10-15T19:05:46.542649142-07:00"
+  },
+  {
+    "id": "sf-14",
+    "title": "Sprint 6: Collaboration \u0026 Real-time Updates",
+    "description": "Version 1.5 - Two-way Excel sync, multi-user collaboration, real-time updates, and notification system.",
+    "status": "open",
+    "priority": 2,
+    "issue_type": "epic",
+    "created_at": "2025-10-15T19:05:46.290844528-07:00",
+    "updated_at": "2025-10-15T19:05:46.290844528-07:00"
+  },
+  {
+    "id": "sf-19",
+    "title": "Version 2.5: Enterprise Features",
+    "description": "Enterprise integrations, SSO, audit logging, advanced permissions, and compliance features. Target: Q3 2026",
+    "status": "open",
+    "priority": 3,
+    "issue_type": "epic",
+    "created_at": "2025-10-15T19:05:47.603569584-07:00",
+    "updated_at": "2025-10-15T19:05:47.603569584-07:00"
+  },
+  {
+    "id": "sf-18",
+    "title": "Version 2.0: Intelligence Layer",
+    "description": "AI-powered features including natural language project creation, task recommendations, and dependency inference. Target: Q2 2026",
+    "status": "open",
+    "priority": 3,
+    "issue_type": "epic",
+    "created_at": "2025-10-15T19:05:47.360615805-07:00",
+    "updated_at": "2025-10-15T19:05:47.360615805-07:00"
+  },
+  {
+    "id": "sf-20",
+    "title": "Version 3.0: Multi-Project Portfolio",
+    "description": "Portfolio management, resource allocation across projects, program-level views, and mobile applications. Target: Q4 2026",
+    "status": "open",
+    "priority": 4,
+    "issue_type": "epic",
+    "created_at": "2025-10-15T19:05:45.1839118-07:00",
+    "updated_at": "2025-10-15T19:05:45.1839118-07:00"
+  }
+]
