@@ -5,7 +5,7 @@ import pytest
 import asyncio
 import asyncpg
 from pathlib import Path
-from backend.app.database.migrations import MigrationRunner
+from app.database.migrations import MigrationRunner
 
 
 @pytest.mark.asyncio

@@ -17,9 +17,10 @@ from unittest.mock import MagicMock, patch
 from uuid import uuid4
 
 import pytest
-from fastapi import status
+from fastapi import status, UploadFile
 from httpx import AsyncClient
 from openpyxl import Workbook
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.auth import create_jwt_token
 from app.main import app

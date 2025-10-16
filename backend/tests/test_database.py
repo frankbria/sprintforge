@@ -5,7 +5,7 @@ import pytest
 import asyncio
 import asyncpg
 from sqlalchemy.ext.asyncio import create_async_engine
-from backend.app.core.config import get_settings
+from app.core.config import get_settings
 
 
 @pytest.mark.asyncio

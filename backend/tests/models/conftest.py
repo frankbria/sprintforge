@@ -41,16 +41,24 @@ class GUID(TypeDecorator):
             return UUID(value)
 
 
-# Patch the PGUUID type for SQLite testing
-import app.models.user
-import app.models.project
+# Patch PostgreSQL types for SQLite testing BEFORE importing models
+from sqlalchemy import JSON
 from sqlalchemy.dialects import postgresql
 
-# Store original UUID type
+# Store original types
 _original_uuid = postgresql.UUID
+_original_jsonb = postgresql.JSONB
 
-# Replace with our GUID for testing
+# Replace with SQLite-compatible types
 postgresql.UUID = lambda **kwargs: GUID
+# JSONB needs to return actual JSON type instance, not callable
+_original_jsonb_class = postgresql.JSONB
+postgresql.JSONB = JSON
+
+# Now import models AFTER patching types
+import app.models.user
+import app.models.project
+import app.models.simulation_result
 
 # Use SQLite in-memory for fast model tests
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
@@ -91,5 +99,6 @@ async def test_db_session():
 
     await engine.dispose()
 
-    # Restore original UUID type
+    # Restore original PostgreSQL types
     postgresql.UUID = _original_uuid
+    postgresql.JSONB = _original_jsonb

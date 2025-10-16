@@ -6,7 +6,7 @@ import pytest
 from uuid import uuid4
 from datetime import datetime
 
-from backend.app.models import User, Project, ProjectMembership, SyncOperation
+from app.models import User, Project, ProjectMembership, SyncOperation
 
 
 @pytest.mark.asyncio
