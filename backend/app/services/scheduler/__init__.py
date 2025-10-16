@@ -9,5 +9,19 @@ This module provides:
 """
 
 from app.services.scheduler.task_graph import TaskGraph, CycleDetectedError
+from app.services.scheduler.cpm import (
+    calculate_forward_pass,
+    calculate_backward_pass,
+    calculate_critical_path,
+)
+from app.services.scheduler.models import TaskScheduleData, CriticalPathResult
 
-__all__ = ["TaskGraph", "CycleDetectedError"]
+__all__ = [
+    "TaskGraph",
+    "CycleDetectedError",
+    "calculate_forward_pass",
+    "calculate_backward_pass",
+    "calculate_critical_path",
+    "TaskScheduleData",
+    "CriticalPathResult",
+]
