@@ -16,6 +16,13 @@ from app.services.scheduler.cpm import (
 )
 from app.services.scheduler.models import TaskScheduleData, CriticalPathResult
 from app.services.scheduler.work_calendar import WorkCalendar, calculate_task_dates
+from app.services.scheduler.dependency_parser import parse_dependencies, DependencyParseError
+from app.services.scheduler.scheduler_service import (
+    SchedulerService,
+    SchedulerError,
+    TaskInput,
+    ScheduleResult,
+)
 
 __all__ = [
     "TaskGraph",
@@ -27,4 +34,10 @@ __all__ = [
     "CriticalPathResult",
     "WorkCalendar",
     "calculate_task_dates",
+    "parse_dependencies",
+    "DependencyParseError",
+    "SchedulerService",
+    "SchedulerError",
+    "TaskInput",
+    "ScheduleResult",
 ]
