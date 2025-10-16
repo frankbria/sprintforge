@@ -55,6 +55,7 @@ class User(Base):
     projects = relationship("Project", back_populates="owner", cascade="all, delete-orphan")
     memberships = relationship("ProjectMembership", back_populates="user", foreign_keys="[ProjectMembership.user_id]", cascade="all, delete-orphan")
     sync_operations = relationship("SyncOperation", back_populates="user", cascade="all, delete-orphan")
+    simulation_results = relationship("SimulationResult", back_populates="user", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
         return f"<User(id={self.id}, email='{self.email}')>"
