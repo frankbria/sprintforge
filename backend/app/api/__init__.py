@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter
 
-from .endpoints import auth, projects, excel, sharing, simulation
+from .endpoints import auth, projects, excel, sharing, simulation, excel_workflow
 
 api_router = APIRouter()
 
@@ -14,6 +14,9 @@ api_router.include_router(projects.router)
 
 # Include Excel generation routes
 api_router.include_router(excel.router)
+
+# Include Excel workflow routes (Monte Carlo integration)
+api_router.include_router(excel_workflow.router)
 
 # Include sharing routes
 api_router.include_router(sharing.router)
