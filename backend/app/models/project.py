@@ -57,6 +57,7 @@ class Project(Base):
     sync_operations = relationship("SyncOperation", back_populates="project", cascade="all, delete-orphan")
     share_links = relationship("ShareLink", back_populates="project", cascade="all, delete-orphan")
     simulation_results = relationship("SimulationResult", back_populates="project", cascade="all, delete-orphan")
+    baselines = relationship("ProjectBaseline", back_populates="project", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
         return f"<Project(id={self.id}, name='{self.name}', owner_id={self.owner_id})>"

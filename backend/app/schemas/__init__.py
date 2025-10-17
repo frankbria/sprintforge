@@ -8,6 +8,17 @@ from .project import (
     ProjectListResponse,
     ProjectConfigSchema,
 )
+from .baseline import (
+    BaselineBase,
+    CreateBaselineRequest,
+    BaselineResponse,
+    BaselineDetailResponse,
+    BaselineListResponse,
+    SetBaselineActiveResponse,
+    TaskVarianceSchema,
+    ComparisonSummarySchema,
+    BaselineComparisonResponse,
+)
 
 __all__ = [
     "ProjectBase",
@@ -16,4 +27,13 @@ __all__ = [
     "ProjectResponse",
     "ProjectListResponse",
     "ProjectConfigSchema",
+    "BaselineBase",
+    "CreateBaselineRequest",
+    "BaselineResponse",
+    "BaselineDetailResponse",
+    "BaselineListResponse",
+    "SetBaselineActiveResponse",
+    "TaskVarianceSchema",
+    "ComparisonSummarySchema",
+    "BaselineComparisonResponse",
 ]
