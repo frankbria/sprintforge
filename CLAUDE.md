@@ -124,11 +124,12 @@ docker-compose up frontend
 - **Axios**: HTTP client
 
 ### Development Patterns
+- **Test-Driven Development (TDD)**: MANDATORY for all new features - write tests BEFORE implementation
 - Environment-based configuration using `.env` files
 - Async/await throughout the backend
 - Type hints required for all Python functions
 - Structured logging with contextual information
-- Test-driven development with high coverage targets (>90%)
+- High test coverage targets (85%+ for all new code)
 
 ## Environment Setup
 
@@ -213,6 +214,39 @@ SprintForge's core differentiator is generating sophisticated Excel files withou
 - **Test Quality**: Tests must validate behavior, not just achieve coverage metrics
 - **Test Documentation**: Complex test scenarios must include comments explaining the test strategy
 
+### Test-Driven Development (TDD) Requirements
+
+**CRITICAL**: This project follows strict TDD methodology. All new features MUST be developed using the RED-GREEN-REFACTOR cycle.
+
+**TDD Workflow (MANDATORY)**:
+1. 🔴 **RED** - Write a failing test FIRST
+   - Test must fail for the RIGHT reason (not implementation missing)
+   - Validates that the test actually tests something
+2. 🟢 **GREEN** - Write minimal code to pass the test
+   - Implement ONLY what's needed to make the test pass
+   - No extra features beyond test coverage
+3. 🔵 **REFACTOR** - Improve code quality
+   - Enhance structure, readability, performance
+   - All tests must still pass
+
+**TDD Guidelines Document**: See `/backend/TDD_GUIDELINES.md` for:
+- Detailed RED-GREEN-REFACTOR examples
+- Backend (pytest) and frontend (Jest/Vitest) patterns
+- Anti-patterns to avoid
+- Code review checklist
+
+**TDD Enforcement**:
+- Pre-commit hooks verify tests exist for new code
+- CI/CD pipeline runs all tests before merge
+- Code reviews verify TDD was followed
+- Retroactive TDD tests required if feature was implemented without TDD
+
+**Why TDD is Mandatory**:
+- **Prevents Regressions**: Tests written first catch bugs before they reach production
+- **Better Design**: Writing tests first leads to more testable, modular code
+- **Living Documentation**: Tests serve as executable specifications
+- **Confidence**: High test coverage enables safe refactoring
+
 ### Git Workflow Requirements
 
 Before moving to the next feature, ALL changes must be:
@@ -277,6 +311,7 @@ Before moving to the next feature, ALL changes must be:
 
 Before marking ANY feature as complete, verify:
 
+- [ ] **TDD followed**: Tests written BEFORE implementation (RED-GREEN-REFACTOR)
 - [ ] All tests pass (`uv run pytest` for backend, `npm test` for frontend)
 - [ ] Code coverage meets 85% minimum threshold
 - [ ] Coverage report reviewed for meaningful test quality
@@ -290,6 +325,7 @@ Before marking ANY feature as complete, verify:
 - [ ] CLAUDE.md updated (if new patterns introduced)
 - [ ] Breaking changes documented
 - [ ] CI/CD pipeline passes
+- [ ] If TDD was NOT followed: Retroactive tests added and verified
 
 ### Rationale
 
