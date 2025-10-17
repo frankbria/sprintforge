@@ -5,11 +5,11 @@ from typing import Optional
 from uuid import UUID, uuid4
 
 from sqlalchemy import String, Text, BigInteger, DateTime, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID as PGUUID, JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
 from app.database.connection import Base
+from app.database.types import UUID as DBUUIDType, JSONB
 
 
 class SyncOperation(Base):
@@ -17,12 +17,12 @@ class SyncOperation(Base):
 
     __tablename__ = "sync_operations"
 
-    id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), primary_key=True, default=uuid4)
+    id: Mapped[UUID] = mapped_column(DBUUIDType, primary_key=True, default=uuid4)
     project_id: Mapped[UUID] = mapped_column(
-        PGUUID(as_uuid=True), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True
+        DBUUIDType, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True
     )
     user_id: Mapped[UUID] = mapped_column(
-        PGUUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+        DBUUIDType, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
     )
 
     # Operation details

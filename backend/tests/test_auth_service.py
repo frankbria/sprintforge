@@ -4,7 +4,7 @@ import pytest
 import os
 from datetime import datetime, timezone, timedelta
 from uuid import uuid4
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 # Set environment variables before importing app modules
 os.environ['SECRET_KEY'] = 'test-secret-key-for-testing'
@@ -50,7 +50,10 @@ class TestAuthService:
             name="Test User"
         )
 
-        db.execute.return_value.scalar_one_or_none.return_value = mock_user
+        # Create async mock for execute result
+        mock_result = MagicMock()
+        mock_result.scalar_one_or_none.return_value = mock_user
+        db.execute.return_value = mock_result
 
         result = await AuthService.get_user_by_id(db, user_id)
 
@@ -69,7 +72,10 @@ class TestAuthService:
             name="Test User"
         )
 
-        db.execute.return_value.scalar_one_or_none.return_value = mock_user
+        # Create async mock for execute result
+        mock_result = MagicMock()
+        mock_result.scalar_one_or_none.return_value = mock_user
+        db.execute.return_value = mock_result
 
         result = await AuthService.get_user_by_email(db, email)
 
@@ -146,7 +152,10 @@ class TestAuthService:
             provider_account_id="google123"
         )
 
-        db.execute.return_value.scalar_one_or_none.return_value = mock_account
+        # Create async mock for execute result
+        mock_result = MagicMock()
+        mock_result.scalar_one_or_none.return_value = mock_account
+        db.execute.return_value = mock_result
 
         result = await AuthService.get_account(db, "google", "google123")
 
@@ -164,7 +173,10 @@ class TestAuthService:
             access_token="old_token"
         )
 
-        db.execute.return_value.scalar_one_or_none.return_value = mock_account
+        # Create async mock for execute result
+        mock_result = MagicMock()
+        mock_result.scalar_one_or_none.return_value = mock_account
+        db.execute.return_value = mock_result
 
         result = await AuthService.update_account(
             db, account_id, access_token="new_token", expires_at=1234567890
@@ -207,7 +219,10 @@ class TestAuthService:
             user_id=uuid4()
         )
 
-        db.execute.return_value.scalar_one_or_none.return_value = mock_session
+        # Create async mock for execute result
+        mock_result = MagicMock()
+        mock_result.scalar_one_or_none.return_value = mock_session
+        db.execute.return_value = mock_result
 
         result = await AuthService.get_session_by_token(db, session_token)
 
@@ -227,7 +242,10 @@ class TestAuthService:
             expires=datetime.now(timezone.utc) + timedelta(days=7)
         )
 
-        db.execute.return_value.scalar_one_or_none.return_value = mock_session
+        # Create async mock for execute result
+        mock_result = MagicMock()
+        mock_result.scalar_one_or_none.return_value = mock_session
+        db.execute.return_value = mock_result
 
         result = await AuthService.update_session(db, session_token, new_expires)
 
@@ -242,7 +260,10 @@ class TestAuthService:
         db = AsyncMock()
         session_token = "session123"
 
-        db.execute.return_value.rowcount = 1
+        # Create async mock for execute result with rowcount
+        mock_result = MagicMock()
+        mock_result.rowcount = 1
+        db.execute.return_value = mock_result
 
         result = await AuthService.delete_session(db, session_token)
 
@@ -256,7 +277,10 @@ class TestAuthService:
         db = AsyncMock()
         session_token = "nonexistent"
 
-        db.execute.return_value.rowcount = 0
+        # Create async mock for execute result with rowcount
+        mock_result = MagicMock()
+        mock_result.rowcount = 0
+        db.execute.return_value = mock_result
 
         result = await AuthService.delete_session(db, session_token)
 
@@ -296,7 +320,10 @@ class TestAuthService:
             expires=datetime.now(timezone.utc) + timedelta(hours=24)
         )
 
-        db.execute.return_value.scalar_one_or_none.return_value = mock_token
+        # Create async mock for execute result
+        mock_result = MagicMock()
+        mock_result.scalar_one_or_none.return_value = mock_token
+        db.execute.return_value = mock_result
 
         result = await AuthService.get_verification_token(db, identifier, token)
 
@@ -310,7 +337,10 @@ class TestAuthService:
         identifier = "test@example.com"
         token = "verify123"
 
-        db.execute.return_value.rowcount = 1
+        # Create async mock for execute result with rowcount
+        mock_result = MagicMock()
+        mock_result.rowcount = 1
+        db.execute.return_value = mock_result
 
         result = await AuthService.delete_verification_token(db, identifier, token)
 
@@ -322,7 +352,11 @@ class TestAuthService:
     async def test_cleanup_expired_sessions(self):
         """Test cleanup of expired sessions."""
         db = AsyncMock()
-        db.execute.return_value.rowcount = 5
+        
+        # Create async mock for execute result with rowcount
+        mock_result = MagicMock()
+        mock_result.rowcount = 5
+        db.execute.return_value = mock_result
 
         result = await AuthService.cleanup_expired_sessions(db)
 
@@ -334,7 +368,11 @@ class TestAuthService:
     async def test_cleanup_expired_verification_tokens(self):
         """Test cleanup of expired verification tokens."""
         db = AsyncMock()
-        db.execute.return_value.rowcount = 3
+        
+        # Create async mock for execute result with rowcount
+        mock_result = MagicMock()
+        mock_result.rowcount = 3
+        db.execute.return_value = mock_result
 
         result = await AuthService.cleanup_expired_verification_tokens(db)
 
@@ -353,7 +391,12 @@ class TestAuthService:
             Session(id=uuid4(), user_id=user_id, session_token="token2")
         ]
 
-        db.execute.return_value.scalars.return_value.all.return_value = mock_sessions
+        # Create async mock for execute result with scalars().all()
+        mock_scalars = MagicMock()
+        mock_scalars.all.return_value = mock_sessions
+        mock_result = MagicMock()
+        mock_result.scalars.return_value = mock_scalars
+        db.execute.return_value = mock_result
 
         result = await AuthService.get_user_sessions(db, user_id)
 
@@ -367,7 +410,10 @@ class TestAuthService:
         db = AsyncMock()
         user_id = uuid4()
 
-        db.execute.return_value.rowcount = 3
+        # Create async mock for execute result with rowcount
+        mock_result = MagicMock()
+        mock_result.rowcount = 3
+        db.execute.return_value = mock_result
 
         result = await AuthService.revoke_all_user_sessions(db, user_id)
 
@@ -429,13 +475,19 @@ class TestAuthServiceIntegration:
             expires=new_expires
         )
 
-        db.execute.return_value.scalar_one_or_none.return_value = updated_session
+        # Create async mock for execute result
+        mock_result = MagicMock()
+        mock_result.scalar_one_or_none.return_value = updated_session
+        db.execute.return_value = mock_result
 
         result = await AuthService.update_session(db, session_token, new_expires)
         assert result.expires == new_expires
 
         # Delete session
-        db.execute.return_value.rowcount = 1
+        mock_delete_result = MagicMock()
+        mock_delete_result.rowcount = 1
+        db.execute.return_value = mock_delete_result
+        
         deleted = await AuthService.delete_session(db, session_token)
         assert deleted is True
 
@@ -459,7 +511,11 @@ class TestAuthServiceErrorHandling:
     async def test_update_nonexistent_account(self):
         """Test updating an account that doesn't exist."""
         db = AsyncMock()
-        db.execute.return_value.scalar_one_or_none.return_value = None
+        
+        # Create async mock for execute result returning None
+        mock_result = MagicMock()
+        mock_result.scalar_one_or_none.return_value = None
+        db.execute.return_value = mock_result
 
         result = await AuthService.update_account(
             db, uuid4(), access_token="new_token"
@@ -471,7 +527,11 @@ class TestAuthServiceErrorHandling:
     async def test_update_nonexistent_session(self):
         """Test updating a session that doesn't exist."""
         db = AsyncMock()
-        db.execute.return_value.scalar_one_or_none.return_value = None
+        
+        # Create async mock for execute result returning None
+        mock_result = MagicMock()
+        mock_result.scalar_one_or_none.return_value = None
+        db.execute.return_value = mock_result
 
         result = await AuthService.update_session(
             db, "nonexistent", datetime.now(timezone.utc)
@@ -483,7 +543,11 @@ class TestAuthServiceErrorHandling:
     async def test_cleanup_with_no_expired_data(self):
         """Test cleanup operations when no expired data exists."""
         db = AsyncMock()
-        db.execute.return_value.rowcount = 0
+        
+        # Create async mock for execute result with rowcount 0
+        mock_result = MagicMock()
+        mock_result.rowcount = 0
+        db.execute.return_value = mock_result
 
         # Test expired sessions cleanup
         sessions_cleaned = await AuthService.cleanup_expired_sessions(db)

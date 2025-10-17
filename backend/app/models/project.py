@@ -5,11 +5,11 @@ from typing import Optional
 from uuid import UUID, uuid4
 
 from sqlalchemy import String, Text, Boolean, DateTime, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID as PGUUID, JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
 from app.database.connection import Base
+from app.database.types import UUID as DBUUIDType, JSONB
 
 
 class Project(Base):
@@ -17,11 +17,11 @@ class Project(Base):
 
     __tablename__ = "projects"
 
-    id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), primary_key=True, default=uuid4)
+    id: Mapped[UUID] = mapped_column(DBUUIDType, primary_key=True, default=uuid4)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     owner_id: Mapped[UUID] = mapped_column(
-        PGUUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+        DBUUIDType, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
     )
 
     # Project configuration stored as JSONB for flexibility
@@ -67,12 +67,12 @@ class ProjectMembership(Base):
 
     __tablename__ = "project_memberships"
 
-    id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), primary_key=True, default=uuid4)
+    id: Mapped[UUID] = mapped_column(DBUUIDType, primary_key=True, default=uuid4)
     project_id: Mapped[UUID] = mapped_column(
-        PGUUID(as_uuid=True), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True
+        DBUUIDType, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True
     )
     user_id: Mapped[UUID] = mapped_column(
-        PGUUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+        DBUUIDType, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
     )
 
     # Role-based access control
@@ -85,7 +85,7 @@ class ProjectMembership(Base):
         String(50), default="active", nullable=False, index=True
     )  # pending, active, declined
     invited_by: Mapped[Optional[UUID]] = mapped_column(
-        PGUUID(as_uuid=True), ForeignKey("users.id"), nullable=True
+        DBUUIDType, ForeignKey("users.id"), nullable=True
     )
     invited_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
     joined_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)

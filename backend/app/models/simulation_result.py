@@ -5,12 +5,11 @@ from typing import Optional
 from uuid import UUID
 
 from sqlalchemy import Date, DateTime, Float, ForeignKey, Index, Integer
-from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
 from app.database.connection import Base
+from app.database.types import UUID as DBUUIDType, JSONB
 
 
 class SimulationResult(Base):
@@ -40,13 +39,13 @@ class SimulationResult(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     project_id: Mapped[UUID] = mapped_column(
-        PGUUID(as_uuid=True),
+        DBUUIDType,
         ForeignKey("projects.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     user_id: Mapped[UUID] = mapped_column(
-        PGUUID(as_uuid=True),
+        DBUUIDType,
         ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
         index=True,

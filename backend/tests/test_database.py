@@ -1,50 +1,37 @@
 """
-Database connectivity and migration tests.
+Database connectivity and migration tests using SQLite.
 """
 import pytest
-import asyncio
-import asyncpg
-from sqlalchemy.ext.asyncio import create_async_engine
+import os
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import text
+
+# Set environment variables before importing app modules
+os.environ['SECRET_KEY'] = 'test-secret-key-for-testing'
+os.environ['DATABASE_URL'] = 'sqlite+aiosqlite:///:memory:'
+os.environ['CORS_ORIGINS'] = '["http://localhost:3000"]'
+
 from app.core.config import get_settings
 
 
 @pytest.mark.asyncio
-async def test_postgres_connection():
-    """Test basic PostgreSQL connection."""
+async def test_sqlite_connection():
+    """Test basic SQLite connection using test environment."""
     settings = get_settings()
 
-    # Test direct asyncpg connection
-    try:
-        conn = await asyncpg.connect(
-            host="localhost",
-            port=5432,
-            user="sprintforge",
-            password="sprintforge_dev",
-            database="sprintforge_dev"
-        )
-
-        # Simple query test
-        result = await conn.fetchval('SELECT 1')
-        assert result == 1
-
-        await conn.close()
-    except Exception as e:
-        pytest.fail(f"PostgreSQL connection failed: {e}")
-
-
-@pytest.mark.asyncio
-async def test_sqlalchemy_engine():
-    """Test SQLAlchemy async engine connection."""
-    settings = get_settings()
+    # Verify we're using SQLite for tests
+    assert 'sqlite' in settings.database_url.lower()
 
     engine = create_async_engine(
         settings.database_url,
-        echo=True if settings.environment == "development" else False
+        echo=False
     )
 
     try:
         async with engine.begin() as conn:
-            result = await conn.execute("SELECT 1")
+            # Simple query test
+            result = await conn.execute(text("SELECT 1"))
             row = result.fetchone()
             assert row[0] == 1
     finally:
@@ -52,38 +39,66 @@ async def test_sqlalchemy_engine():
 
 
 @pytest.mark.asyncio
-async def test_database_tables_exist():
-    """Test that required tables exist after migration."""
-    # This test will pass after we create the schema
+async def test_sqlalchemy_engine():
+    """Test SQLAlchemy async engine connection with SQLite."""
+    settings = get_settings()
+
+    engine = create_async_engine(
+        settings.database_url,
+        echo=False
+    )
+
     try:
-        conn = await asyncpg.connect(
-            host="localhost",
-            port=5432,
-            user="sprintforge",
-            password="sprintforge_dev",
-            database="sprintforge_dev"
-        )
+        async with engine.begin() as conn:
+            # Test basic query
+            result = await conn.execute(text("SELECT 1 as test_value"))
+            row = result.fetchone()
+            assert row[0] == 1
 
-        # Check for NextAuth.js tables
-        tables = await conn.fetch("""
-            SELECT table_name FROM information_schema.tables
-            WHERE table_schema = 'public'
-        """)
+            # Test that we can create a simple table
+            await conn.execute(text("""
+                CREATE TABLE IF NOT EXISTS test_table (
+                    id INTEGER PRIMARY KEY,
+                    name TEXT
+                )
+            """))
 
-        table_names = [row['table_name'] for row in tables]
+            # Insert test data
+            await conn.execute(text("""
+                INSERT INTO test_table (id, name) VALUES (1, 'test')
+            """))
 
-        # Initially we expect at least the migration tracking table
-        expected_tables = ['migration_history']
+            # Query test data
+            result = await conn.execute(text("SELECT name FROM test_table WHERE id = 1"))
+            row = result.fetchone()
+            assert row[0] == 'test'
 
-        for table in expected_tables:
-            if table in table_names:
-                assert True  # Table exists
-            else:
-                # Table doesn't exist yet - this is expected for first run
-                pass
+            # Clean up
+            await conn.execute(text("DROP TABLE test_table"))
+    finally:
+        await engine.dispose()
 
-        await conn.close()
 
-    except Exception as e:
-        # Database may not be running in test environment
-        pytest.skip(f"Database not available for testing: {e}")
+@pytest.mark.asyncio
+async def test_database_session_creation():
+    """Test that we can create async database sessions."""
+    settings = get_settings()
+
+    engine = create_async_engine(
+        settings.database_url,
+        echo=False
+    )
+
+    async_session_factory = sessionmaker(
+        engine,
+        class_=AsyncSession,
+        expire_on_commit=False
+    )
+
+    try:
+        async with async_session_factory() as session:
+            result = await session.execute(text("SELECT 1"))
+            row = result.fetchone()
+            assert row[0] == 1
+    finally:
+        await engine.dispose()

@@ -4,7 +4,7 @@ import pytest
 import os
 from datetime import datetime, timezone, timedelta
 from uuid import uuid4
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 # Set environment variables before importing app modules
 os.environ['SECRET_KEY'] = 'test-secret-key-for-testing'
@@ -24,7 +24,13 @@ class TestUserService:
         db = AsyncMock()
 
         # Mock no existing account
-        db.execute.return_value.scalar_one_or_none.side_effect = [None, None]
+        # Create mock for execute result
+
+        mock_result = MagicMock()
+
+        mock_result.scalar_one_or_none.side_effect = [None, None]
+
+        db.execute.return_value = mock_result
 
         oauth_profile = {
             "email": "newuser@example.com",
@@ -72,7 +78,13 @@ class TestUserService:
         )
 
         # Mock existing account found
-        db.execute.return_value.scalar_one_or_none.return_value = existing_account
+        # Create mock for execute result
+
+        mock_result = MagicMock()
+
+        mock_result.scalar_one_or_none.return_value = existing_account
+
+        db.execute.return_value = mock_result
 
         oauth_profile = {
             "email": "existing@example.com",
@@ -105,7 +117,13 @@ class TestUserService:
         )
 
         # Mock no existing account but existing user with same email
-        db.execute.return_value.scalar_one_or_none.side_effect = [None, existing_user]
+        # Create mock for execute result
+
+        mock_result = MagicMock()
+
+        mock_result.scalar_one_or_none.side_effect = [None, existing_user]
+
+        db.execute.return_value = mock_result
 
         oauth_profile = {
             "email": "existing@example.com",
@@ -122,6 +140,11 @@ class TestUserService:
     async def test_sync_user_from_oauth_missing_email(self):
         """Test syncing OAuth profile without email."""
         db = AsyncMock()
+
+        # Mock no existing account (should check for email)
+        mock_result = MagicMock()
+        mock_result.scalar_one_or_none.return_value = None
+        db.execute.return_value = mock_result
 
         oauth_profile = {
             "name": "No Email User",
@@ -236,7 +259,16 @@ class TestUserService:
             preferences={"theme": "dark"}
         )
 
-        db.execute.return_value.scalar_one_or_none.return_value = user
+        # Create mock for execute result
+
+
+        mock_result = MagicMock()
+
+
+        mock_result.scalar_one_or_none.return_value = user
+
+
+        db.execute.return_value = mock_result
 
         profile_data = {
             "name": "New Name",
@@ -256,7 +288,13 @@ class TestUserService:
     async def test_update_user_profile_not_found(self):
         """Test updating profile for non-existent user."""
         db = AsyncMock()
-        db.execute.return_value.scalar_one_or_none.return_value = None
+        # Create mock for execute result
+
+        mock_result = MagicMock()
+
+        mock_result.scalar_one_or_none.return_value = None
+
+        db.execute.return_value = mock_result
 
         result = await UserService.update_user_profile(
             db, uuid4(), {"name": "New Name"}
@@ -277,7 +315,16 @@ class TestUserService:
             preferences={"theme": "dark", "notifications": True}
         )
 
-        db.execute.return_value.scalar_one_or_none.return_value = user
+        # Create mock for execute result
+
+
+        mock_result = MagicMock()
+
+
+        mock_result.scalar_one_or_none.return_value = user
+
+
+        db.execute.return_value = mock_result
 
         new_preferences = {"theme": "light", "language": "fr"}
 
@@ -305,7 +352,16 @@ class TestUserService:
             preferences=None
         )
 
-        db.execute.return_value.scalar_one_or_none.return_value = user
+        # Create mock for execute result
+
+
+        mock_result = MagicMock()
+
+
+        mock_result.scalar_one_or_none.return_value = user
+
+
+        db.execute.return_value = mock_result
 
         new_preferences = {"theme": "light"}
 
@@ -321,7 +377,13 @@ class TestUserService:
         user_id = uuid4()
 
         mock_user = User(id=user_id, email="user@example.com")
-        db.execute.return_value.scalar_one_or_none.return_value = mock_user
+        # Create mock for execute result
+
+        mock_result = MagicMock()
+
+        mock_result.scalar_one_or_none.return_value = mock_user
+
+        db.execute.return_value = mock_result
 
         result = await UserService.get_user_with_accounts(db, user_id)
 
@@ -360,7 +422,7 @@ class TestUserService:
             return_value=user
         ):
             # Mock get_user_sessions from AuthService
-            with patch('app.services.user_service.AuthService.get_user_sessions') as mock_sessions:
+            with patch('app.services.auth_service.AuthService.get_user_sessions') as mock_sessions:
                 mock_sessions.return_value = ["session1", "session2"]
 
                 stats = await UserService.get_user_statistics(db, user_id)
@@ -401,10 +463,19 @@ class TestUserService:
             preferences={"theme": "dark"}
         )
 
-        db.execute.return_value.scalar_one_or_none.return_value = user
+        # Create mock for execute result
+
+
+        mock_result = MagicMock()
+
+
+        mock_result.scalar_one_or_none.return_value = user
+
+
+        db.execute.return_value = mock_result
 
         # Mock revoke_all_user_sessions from AuthService
-        with patch('app.services.user_service.AuthService.revoke_all_user_sessions') as mock_revoke:
+        with patch('app.services.auth_service.AuthService.revoke_all_user_sessions') as mock_revoke:
             mock_revoke.return_value = 2
 
             result = await UserService.deactivate_user(db, user_id, "user_request")
@@ -420,7 +491,13 @@ class TestUserService:
     async def test_deactivate_user_not_found(self):
         """Test deactivating non-existent user."""
         db = AsyncMock()
-        db.execute.return_value.scalar_one_or_none.return_value = None
+        # Create mock for execute result
+
+        mock_result = MagicMock()
+
+        mock_result.scalar_one_or_none.return_value = None
+
+        db.execute.return_value = mock_result
 
         result = await UserService.deactivate_user(db, uuid4())
 
@@ -443,7 +520,16 @@ class TestUserService:
             }
         )
 
-        db.execute.return_value.scalar_one_or_none.return_value = user
+        # Create mock for execute result
+
+
+        mock_result = MagicMock()
+
+
+        mock_result.scalar_one_or_none.return_value = user
+
+
+        db.execute.return_value = mock_result
 
         result = await UserService.reactivate_user(db, user_id)
 
@@ -463,7 +549,22 @@ class TestUserService:
             User(id=uuid4(), email="jane@example.com", name="Jane Smith")
         ]
 
-        db.execute.return_value.scalars.return_value.all.return_value = mock_users
+        # Create mock for execute result with scalars().all()
+
+
+        mock_scalars = MagicMock()
+
+
+        mock_scalars.all.return_value = mock_users
+
+
+        mock_result = MagicMock()
+
+
+        mock_result.scalars.return_value = mock_scalars
+
+
+        db.execute.return_value = mock_result
 
         result = await UserService.search_users(db, "john", limit=10)
 
@@ -482,7 +583,22 @@ class TestUserService:
             User(id=uuid4(), email="recent2@example.com", created_at=recent_date)
         ]
 
-        db.execute.return_value.scalars.return_value.all.return_value = mock_users
+        # Create mock for execute result with scalars().all()
+
+
+        mock_scalars = MagicMock()
+
+
+        mock_scalars.all.return_value = mock_users
+
+
+        mock_result = MagicMock()
+
+
+        mock_result.scalars.return_value = mock_scalars
+
+
+        db.execute.return_value = mock_result
 
         result = await UserService.get_recent_users(db, days=30, limit=50)
 
@@ -505,7 +621,16 @@ class TestUserServiceErrorHandling:
             email="user@example.com"
         )
 
-        db.execute.return_value.scalar_one_or_none.return_value = user
+        # Create mock for execute result
+
+
+        mock_result = MagicMock()
+
+
+        mock_result.scalar_one_or_none.return_value = user
+
+
+        db.execute.return_value = mock_result
 
         # Only provide disallowed fields
         profile_data = {
@@ -533,7 +658,16 @@ class TestUserServiceErrorHandling:
             preferences=None
         )
 
-        db.execute.return_value.scalar_one_or_none.return_value = user
+        # Create mock for execute result
+
+
+        mock_result = MagicMock()
+
+
+        mock_result.scalar_one_or_none.return_value = user
+
+
+        db.execute.return_value = mock_result
 
         result = await UserService.reactivate_user(db, user_id)
 

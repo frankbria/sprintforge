@@ -5,9 +5,10 @@ from typing import Optional
 from uuid import UUID, uuid4
 
 from sqlalchemy import Boolean, String, Text, DateTime, BigInteger, JSON, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID as PGUUID, JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
+
+from app.database.types import UUID as DBUUIDType, JSONB
 
 try:
     from app.database.connection import Base
@@ -22,7 +23,7 @@ class User(Base):
 
     __tablename__ = "users"
 
-    id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), primary_key=True, default=uuid4)
+    id: Mapped[UUID] = mapped_column(DBUUIDType, primary_key=True, default=uuid4)
     name: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     email_verified: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
@@ -66,8 +67,8 @@ class Account(Base):
 
     __tablename__ = "accounts"
 
-    id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), primary_key=True, default=uuid4)
-    user_id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    id: Mapped[UUID] = mapped_column(DBUUIDType, primary_key=True, default=uuid4)
+    user_id: Mapped[UUID] = mapped_column(DBUUIDType, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     type: Mapped[str] = mapped_column(String(255), nullable=False)
     provider: Mapped[str] = mapped_column(String(255), nullable=False)
     provider_account_id: Mapped[str] = mapped_column(String(255), nullable=False)
@@ -101,9 +102,9 @@ class Session(Base):
 
     __tablename__ = "sessions"
 
-    id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), primary_key=True, default=uuid4)
+    id: Mapped[UUID] = mapped_column(DBUUIDType, primary_key=True, default=uuid4)
     session_token: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
-    user_id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    user_id: Mapped[UUID] = mapped_column(DBUUIDType, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     expires: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, index=True)
 
     # Timestamps

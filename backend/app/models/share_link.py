@@ -5,11 +5,11 @@ from typing import Optional
 from uuid import UUID, uuid4
 
 from sqlalchemy import String, Integer, DateTime, ForeignKey, Index
-from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
 from app.database.connection import Base
+from app.database.types import UUID as DBUUIDType
 
 
 class ShareLink(Base):
@@ -25,9 +25,9 @@ class ShareLink(Base):
 
     __tablename__ = "share_links"
 
-    id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), primary_key=True, default=uuid4)
+    id: Mapped[UUID] = mapped_column(DBUUIDType, primary_key=True, default=uuid4)
     project_id: Mapped[UUID] = mapped_column(
-        PGUUID(as_uuid=True), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True
+        DBUUIDType, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False, index=True
     )
 
     # Secure URL-safe token (64 characters)
@@ -47,7 +47,7 @@ class ShareLink(Base):
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
     created_by: Mapped[UUID] = mapped_column(
-        PGUUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+        DBUUIDType, ForeignKey("users.id", ondelete="SET NULL"), nullable=True
     )
     access_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     last_accessed_at: Mapped[Optional[datetime]] = mapped_column(

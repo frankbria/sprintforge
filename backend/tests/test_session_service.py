@@ -4,7 +4,7 @@ import pytest
 import os
 from datetime import datetime, timezone, timedelta
 from uuid import uuid4
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 # Set environment variables before importing app modules
 os.environ['SECRET_KEY'] = 'test-secret-key-for-testing'
@@ -46,7 +46,11 @@ class TestSessionService:
     async def test_cleanup_expired_sessions(self):
         """Test cleanup of expired sessions."""
         db = AsyncMock()
-        db.execute.return_value.rowcount = 7
+
+        # Create mock for execute result with rowcount
+        mock_result = MagicMock()
+        mock_result.rowcount = 7
+        db.execute.return_value = mock_result
 
         result = await SessionService.cleanup_expired_sessions(db)
 
@@ -58,7 +62,11 @@ class TestSessionService:
     async def test_cleanup_expired_sessions_none_found(self):
         """Test cleanup when no expired sessions exist."""
         db = AsyncMock()
-        db.execute.return_value.rowcount = 0
+
+        # Create mock for execute result with rowcount
+        mock_result = MagicMock()
+        mock_result.rowcount = 0
+        db.execute.return_value = mock_result
 
         result = await SessionService.cleanup_expired_sessions(db)
 
@@ -75,20 +83,15 @@ class TestSessionService:
         user_id_1 = uuid4()
         user_id_2 = uuid4()
 
-        # First query: find users with multiple sessions
-        db.execute.return_value.all.side_effect = [
-            [(user_id_1, 3), (user_id_2, 2)],  # Users with multiple sessions
-            [uuid4()],  # Sessions to keep for user 1
-            [uuid4()]   # Sessions to keep for user 2
-        ]
-
         # Mock delete operations
-        delete_results = [AsyncMock(rowcount=2), AsyncMock(rowcount=1)]
+        session_id_1 = uuid4()
+        session_id_2 = uuid4()
+        delete_results = [MagicMock(rowcount=2), MagicMock(rowcount=1)]
         db.execute.side_effect = [
-            AsyncMock(all=lambda: [(user_id_1, 3), (user_id_2, 2)]),  # Users query
-            AsyncMock(all=lambda: [uuid4()]),  # Keep sessions user 1
+            MagicMock(all=lambda: [(user_id_1, 3), (user_id_2, 2)]),  # Users query
+            MagicMock(all=lambda: [(session_id_1,)]),  # Keep sessions user 1 (row format)
             delete_results[0],  # Delete user 1 duplicates
-            AsyncMock(all=lambda: [uuid4()]),  # Keep sessions user 2
+            MagicMock(all=lambda: [(session_id_2,)]),  # Keep sessions user 2 (row format)
             delete_results[1],  # Delete user 2 duplicates
         ]
 
@@ -104,12 +107,12 @@ class TestSessionService:
 
         # Mock database query results
         mock_results = [
-            AsyncMock(scalar=lambda: 25),  # active_sessions
-            AsyncMock(scalar=lambda: 5),   # recent_sessions
-            AsyncMock(scalar=lambda: 15),  # daily_sessions
-            AsyncMock(scalar=lambda: 22),  # weekly_sessions
-            AsyncMock(scalar=lambda: 12.5), # avg_duration
-            AsyncMock(scalar=lambda: 18)   # unique_users
+            MagicMock(scalar=lambda: 25),  # active_sessions
+            MagicMock(scalar=lambda: 5),   # recent_sessions
+            MagicMock(scalar=lambda: 15),  # daily_sessions
+            MagicMock(scalar=lambda: 22),  # weekly_sessions
+            MagicMock(scalar=lambda: 12.5), # avg_duration
+            MagicMock(scalar=lambda: 18)   # unique_users
         ]
 
         db.execute.side_effect = mock_results
@@ -130,13 +133,13 @@ class TestSessionService:
 
         # Mock database query results
         mock_results = [
-            AsyncMock(scalar=lambda: 100),  # total_sessions
-            AsyncMock(scalar=lambda: 75),   # active_sessions
-            AsyncMock(scalar=lambda: 25),   # expired_sessions
-            AsyncMock(scalar=lambda: 10),   # sessions_24h
-            AsyncMock(scalar=lambda: 30),   # sessions_7d
-            AsyncMock(scalar=lambda: 85),   # sessions_30d
-            AsyncMock(scalar=lambda: 5)     # expiring_soon
+            MagicMock(scalar=lambda: 100),  # total_sessions
+            MagicMock(scalar=lambda: 75),   # active_sessions
+            MagicMock(scalar=lambda: 25),   # expired_sessions
+            MagicMock(scalar=lambda: 10),   # sessions_24h
+            MagicMock(scalar=lambda: 30),   # sessions_7d
+            MagicMock(scalar=lambda: 85),   # sessions_30d
+            MagicMock(scalar=lambda: 5)     # expiring_soon
         ]
 
         db.execute.side_effect = mock_results
@@ -167,7 +170,16 @@ class TestSessionService:
             expires=future_time
         )
 
-        db.execute.return_value.scalar_one_or_none.return_value = mock_session
+        # Create mock for execute result
+
+
+        mock_result = MagicMock()
+
+
+        mock_result.scalar_one_or_none.return_value = mock_session
+
+
+        db.execute.return_value = mock_result
 
         result = await SessionService.extend_session(db, session_token, hours=48)
 
@@ -184,7 +196,13 @@ class TestSessionService:
     async def test_extend_session_not_found(self):
         """Test extending non-existent session."""
         db = AsyncMock()
-        db.execute.return_value.scalar_one_or_none.return_value = None
+        # Create mock for execute result
+
+        mock_result = MagicMock()
+
+        mock_result.scalar_one_or_none.return_value = None
+
+        db.execute.return_value = mock_result
 
         result = await SessionService.extend_session(db, "nonexistent", hours=24)
 
@@ -205,7 +223,16 @@ class TestSessionService:
             expires=past_time
         )
 
-        db.execute.return_value.scalar_one_or_none.return_value = mock_session
+        # Create mock for execute result
+
+
+        mock_result = MagicMock()
+
+
+        mock_result.scalar_one_or_none.return_value = mock_session
+
+
+        db.execute.return_value = mock_result
 
         result = await SessionService.extend_session(db, session_token, hours=24)
 
@@ -223,14 +250,14 @@ class TestSessionService:
         batch3_ids = []  # Empty batch (end)
 
         mock_query_results = [
-            AsyncMock(all=lambda: [[sid] for sid in batch1_ids]),
-            AsyncMock(all=lambda: [[sid] for sid in batch2_ids]),
-            AsyncMock(all=lambda: batch3_ids)
+            MagicMock(all=lambda: [[sid] for sid in batch1_ids]),
+            MagicMock(all=lambda: [[sid] for sid in batch2_ids]),
+            MagicMock(all=lambda: batch3_ids)
         ]
 
         mock_delete_results = [
-            AsyncMock(rowcount=1000),  # First batch deleted
-            AsyncMock(rowcount=500)    # Second batch deleted
+            MagicMock(rowcount=1000),  # First batch deleted
+            MagicMock(rowcount=500)    # Second batch deleted
         ]
 
         # Set up side effects
@@ -253,7 +280,9 @@ class TestSessionService:
         db = AsyncMock()
 
         # Mock empty result
-        db.execute.return_value.all.return_value = []
+        mock_result = MagicMock()
+        mock_result.all.return_value = []
+        db.execute.return_value = mock_result
 
         result = await SessionService.batch_cleanup_sessions(db)
 
@@ -282,7 +311,22 @@ class TestSessionService:
             )
         ]
 
-        db.execute.return_value.scalars.return_value.all.return_value = sessions
+        # Create mock for execute result with scalars().all()
+
+
+        mock_scalars = MagicMock()
+
+
+        mock_scalars.all.return_value = sessions
+
+
+        mock_result = MagicMock()
+
+
+        mock_result.scalars.return_value = mock_scalars
+
+
+        db.execute.return_value = mock_result
 
         result = await SessionService.get_user_session_history(db, user_id, limit=10)
 
@@ -303,7 +347,17 @@ class TestSessionService:
     async def test_get_user_session_history_empty(self):
         """Test getting session history when user has no sessions."""
         db = AsyncMock()
-        db.execute.return_value.scalars.return_value.all.return_value = []
+        # Create mock for execute result with scalars().all()
+
+        mock_scalars = MagicMock()
+
+        mock_scalars.all.return_value = []
+
+        mock_result = MagicMock()
+
+        mock_result.scalars.return_value = mock_scalars
+
+        db.execute.return_value = mock_result
 
         result = await SessionService.get_user_session_history(db, uuid4())
 
@@ -316,13 +370,13 @@ class TestSessionService:
 
         # Mock database query results with zero total sessions
         mock_results = [
-            AsyncMock(scalar=lambda: 0),   # total_sessions
-            AsyncMock(scalar=lambda: 0),   # active_sessions
-            AsyncMock(scalar=lambda: 0),   # expired_sessions
-            AsyncMock(scalar=lambda: 0),   # sessions_24h
-            AsyncMock(scalar=lambda: 0),   # sessions_7d
-            AsyncMock(scalar=lambda: 0),   # sessions_30d
-            AsyncMock(scalar=lambda: 0)    # expiring_soon
+            MagicMock(scalar=lambda: 0),   # total_sessions
+            MagicMock(scalar=lambda: 0),   # active_sessions
+            MagicMock(scalar=lambda: 0),   # expired_sessions
+            MagicMock(scalar=lambda: 0),   # sessions_24h
+            MagicMock(scalar=lambda: 0),   # sessions_7d
+            MagicMock(scalar=lambda: 0),   # sessions_30d
+            MagicMock(scalar=lambda: 0)    # expiring_soon
         ]
 
         db.execute.side_effect = mock_results
@@ -376,7 +430,13 @@ class TestSessionServiceIntegration:
         )
 
         # Test extending the session
-        db.execute.return_value.scalar_one_or_none.return_value = active_session
+        # Create mock for execute result
+
+        mock_result = MagicMock()
+
+        mock_result.scalar_one_or_none.return_value = active_session
+
+        db.execute.return_value = mock_result
         extended = await SessionService.extend_session(db, session_token, hours=24)
 
         assert extended == active_session
@@ -402,12 +462,12 @@ class TestSessionServiceErrorHandling:
 
         # Mock database query results with null average
         mock_results = [
-            AsyncMock(scalar=lambda: 25),  # active_sessions
-            AsyncMock(scalar=lambda: 5),   # recent_sessions
-            AsyncMock(scalar=lambda: 15),  # daily_sessions
-            AsyncMock(scalar=lambda: 22),  # weekly_sessions
-            AsyncMock(scalar=lambda: None), # avg_duration (null)
-            AsyncMock(scalar=lambda: 18)   # unique_users
+            MagicMock(scalar=lambda: 25),  # active_sessions
+            MagicMock(scalar=lambda: 5),   # recent_sessions
+            MagicMock(scalar=lambda: 15),  # daily_sessions
+            MagicMock(scalar=lambda: 22),  # weekly_sessions
+            MagicMock(scalar=lambda: None), # avg_duration (null)
+            MagicMock(scalar=lambda: 18)   # unique_users
         ]
 
         db.execute.side_effect = mock_results
@@ -423,7 +483,9 @@ class TestSessionServiceErrorHandling:
         db = AsyncMock()
 
         # Mock empty result for users with multiple sessions
-        db.execute.return_value.all.return_value = []
+        mock_result = MagicMock()
+        mock_result.all.return_value = []
+        db.execute.return_value = mock_result
 
         result = await SessionService.cleanup_duplicate_sessions(db)
 
@@ -443,7 +505,16 @@ class TestSessionServiceErrorHandling:
             expires=datetime.now(timezone.utc) + timedelta(hours=1)
         )
 
-        db.execute.return_value.scalar_one_or_none.return_value = mock_session
+        # Create mock for execute result
+
+
+        mock_result = MagicMock()
+
+
+        mock_result.scalar_one_or_none.return_value = mock_session
+
+
+        db.execute.return_value = mock_result
 
         # Test with 0 hours (should work but not extend much)
         result = await SessionService.extend_session(db, session_token, hours=0)
