@@ -25,25 +25,27 @@ SprintForge addresses the critical gap between sophisticated project management 
 ## 📊 Current Development Status
 
 **Version**: 1.0 (MVP) - **IN PROGRESS**
-**Last Updated**: October 11, 2025
-**Sprint**: Sprint 4 - Week 2 (Project Management & Integration)
+**Last Updated**: October 17, 2025
+**Sprint**: Sprint 4 Complete | Sprint 5 Planning
 
 ### ✅ Completed Milestones
 - **Sprint 1-2**: Authentication & User Management (100% complete)
 - **Sprint 3**: Excel Generation Engine (100% complete)
-- **Sprint 4**: Project Management API (83% complete - 5/6 tasks done)
+- **Sprint 4**: Project Management API (100% complete - all 6 tasks done)
+- **Task 5.1**: Advanced Monte Carlo Simulation (100% complete - all 4 phases)
+- **Task 5.2**: Critical Path Enhancement with CCPM (100% complete - all 4 phases)
 
-### 🚧 Current Sprint Progress
+### ✅ Sprint 4 - ALL TASKS COMPLETE
 - ✅ Task 4.1: Project CRUD API
 - ✅ Task 4.2: Excel Generation API
 - ✅ Task 4.3: Rate Limiting & Abuse Prevention
 - ✅ Task 4.4: Public Sharing System
 - ✅ Task 4.5: Project Setup Wizard
-- 🔄 Task 4.6: Project Dashboard (In Progress)
+- ✅ Task 4.6: Project Dashboard
 
 ### 🎯 Next Up
-- Sprint 5: Advanced Features & Analytics
-- Sprint 6: Collaboration & Real-time Updates
+- **Sprint 5**: Advanced Features & Analytics (planning phase)
+- Sprint 6: Collaboration & Real-time Updates (Q1 2026)
 
 ## 📁 Project Structure
 
@@ -207,12 +209,26 @@ docker-compose up frontend
 - **Share Management** - Enable/disable/revoke share links
 - **Rate Limiting** - Abuse prevention (100 req/min, 1000 req/hour)
 
-### 🚧 In Development
+### 🚀 Recently Completed (October 2025)
 
-#### 📊 Project Dashboard (Sprint 4 - Week 2)
-- Project listing and management
-- Quick actions and statistics
+#### 📊 Advanced Monte Carlo Simulation (Task 5.1)
+- **Phase A**: Foundation scheduler with CPM and dependency resolution
+- **Phase B**: Monte Carlo engine with LHS sampling and PERT distributions
+- **Phase C**: REST API integration with database persistence
+- **Phase D**: Complete Excel workflow (upload → simulate → download)
+- **Quality**: 85%+ test coverage, 100% pass rate, performance targets exceeded
+
+#### 🎯 Critical Path Enhancement (Task 5.2)
+- Resource management and allocation
+- Resource-constrained scheduling
+- CCPM buffer management
+- Risk integration with Monte Carlo analysis
+
+#### 📊 Project Dashboard (Task 4.6)
+- Project listing and management interface
+- Quick actions and project statistics
 - Recent activity feed
+- Full-featured responsive UI
 
 ### 🔮 Planned Features (Future Versions)
 
@@ -266,11 +282,14 @@ NEXTAUTH_SECRET=your-nextauth-secret
 ## 🧪 Testing
 
 ### Backend Tests
+
+**IMPORTANT**: This project uses `uv` for Python package management. Always run tests with `uv run`:
+
 ```bash
 cd backend
-pytest
-pytest --cov=app tests/  # With coverage
-pytest -v  # Verbose output
+uv run pytest                          # Run all tests
+uv run pytest --cov=app tests/        # With coverage
+uv run pytest -v                      # Verbose output
 ```
 
 ### Frontend Tests
@@ -397,7 +416,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ### Completed
 - **✅ Q1-Q2 2025**: Sprints 1-2 - Authentication & User Management
 - **✅ Q3 2025**: Sprint 3 - Excel Generation Engine (67 formulas, 5 templates, 150+ tests)
-- **🚧 Q4 2025**: Sprint 4 - Project Management API (83% complete - 5/6 tasks done)
+- **✅ Q4 2025**: Sprint 4 - Project Management API (100% complete - all 6 tasks done)
+- **✅ October 2025**: Tasks 5.1 & 5.2 - Monte Carlo Simulation & Critical Path Enhancement
 
 ### Upcoming
 - **Q4 2025**: Sprint 5 - Advanced Features & Analytics

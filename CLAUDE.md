@@ -36,19 +36,29 @@ npm run type-check # TypeScript checking
 ```
 
 ### Testing
+
+**IMPORTANT**: This project uses `uv` for Python package management. Always run tests with `uv run` to ensure correct environment:
+
 ```bash
-# Backend tests
-cd backend && pytest
-pytest --cov=app tests/  # With coverage
-pytest -v               # Verbose
+# Backend tests (from /backend directory)
+cd backend
+uv run pytest                          # Run all tests
+uv run pytest --cov=app tests/        # With coverage
+uv run pytest -v                      # Verbose
+uv run pytest tests/ -k "test_name"   # Run specific test
+
+# Why uv run? The project's Python dependencies are managed by uv.
+# Direct 'pytest' uses system Python which may not have required packages.
 
 # Frontend tests
-cd frontend && npm test
-npm run test:coverage    # With coverage
-npm run test:watch       # Watch mode
+cd frontend
+npm test                # Run tests
+npm run test:coverage   # With coverage
+npm run test:watch      # Watch mode
 
-# Integration tests (from project root)
-python -m pytest tests/integration/
+# Integration tests (from backend directory)
+cd backend
+uv run pytest tests/integration/
 ```
 
 ### Code Quality
@@ -192,10 +202,12 @@ SprintForge's core differentiator is generating sophisticated Excel files withou
   - End-to-end tests for critical user workflows (using Playwright when applicable)
 - **Coverage Validation**: Run coverage reports before marking features complete:
   ```bash
-  # Backend
-  pytest --cov=app tests/ --cov-report=term-missing
+  # Backend (from /backend directory)
+  cd backend
+  uv run pytest --cov=app tests/ --cov-report=term-missing
 
   # Frontend
+  cd frontend
   npm run test:coverage
   ```
 - **Test Quality**: Tests must validate behavior, not just achieve coverage metrics
@@ -265,7 +277,7 @@ Before moving to the next feature, ALL changes must be:
 
 Before marking ANY feature as complete, verify:
 
-- [ ] All tests pass (`pytest` for backend, `npm test` for frontend)
+- [ ] All tests pass (`uv run pytest` for backend, `npm test` for frontend)
 - [ ] Code coverage meets 85% minimum threshold
 - [ ] Coverage report reviewed for meaningful test quality
 - [ ] Code formatted and linted (Black, isort, flake8, ESLint)
