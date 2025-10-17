@@ -49,12 +49,18 @@ async def test_docs_endpoint_in_development(test_client: AsyncClient):
 @pytest.mark.asyncio
 async def test_cors_headers(test_client: AsyncClient):
     """Test CORS headers are properly set."""
-    response = await test_client.options("/api/v1/")
+    # CORS middleware only activates when Origin header is present
+    # Simulate a cross-origin request by adding Origin header
+    response = await test_client.get(
+        "/health",
+        headers={"Origin": "http://localhost:3000"}
+    )
 
     # Check for CORS headers
     assert "access-control-allow-origin" in response.headers
-    assert "access-control-allow-methods" in response.headers
-    assert "access-control-allow-headers" in response.headers
+    assert response.headers["access-control-allow-origin"] == "http://localhost:3000"
+    assert "access-control-allow-credentials" in response.headers
+    assert response.headers["access-control-allow-credentials"] == "true"
 
 
 @pytest.mark.asyncio
