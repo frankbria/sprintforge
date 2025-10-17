@@ -6,9 +6,14 @@ Comprehensive test suite for SprintForge Excel generation components.
 
 ### Prerequisites
 
+**IMPORTANT**: This project uses `uv` for Python package management. Always use `uv run` for all commands.
+
 ```bash
-# From backend directory
-pip install -r requirements.txt
+# Install uv (if not already installed)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# From backend directory - install dependencies
+uv pip install -r requirements.txt
 ```
 
 This installs:
@@ -19,23 +24,27 @@ This installs:
 
 ### Running Tests
 
+**CRITICAL**: Always use `uv run pytest` instead of direct `pytest` commands.
+
 ```bash
 # Run all Excel tests
-pytest tests/excel/ -v
+uv run pytest tests/excel/ -v
 
 # Run specific test file
-pytest tests/excel/test_config.py -v
-pytest tests/excel/test_sprint_parser.py -v
+uv run pytest tests/excel/test_config.py -v
+uv run pytest tests/excel/test_sprint_parser.py -v
 
 # Run with coverage
-pytest tests/excel/ --cov=app.excel --cov-report=html
+uv run pytest tests/excel/ --cov=app.excel --cov-report=html
 
 # Run specific test class
-pytest tests/excel/test_config.py::TestProjectConfig -v
+uv run pytest tests/excel/test_config.py::TestProjectConfig -v
 
 # Run specific test method
-pytest tests/excel/test_config.py::TestProjectConfig::test_minimal_project_config -v
+uv run pytest tests/excel/test_config.py::TestProjectConfig::test_minimal_project_config -v
 ```
+
+**Why `uv run`?** The project uses `uv` for dependency management. Running `pytest` directly will use your system Python, which won't have the required packages (like `openpyxl`) installed.
 
 ### Test Markers
 
@@ -43,13 +52,13 @@ Tests are organized with markers for selective execution:
 
 ```bash
 # Run only configuration tests
-pytest -m config
+uv run pytest -m config
 
 # Run only unit tests
-pytest -m unit
+uv run pytest -m unit
 
 # Run only Excel generation tests
-pytest -m excel
+uv run pytest -m excel
 ```
 
 ## Test Coverage
@@ -120,41 +129,41 @@ pytest -m excel
 
 ```bash
 # Working days configuration
-pytest tests/excel/test_config.py::TestWorkingDaysConfig -v
+uv run pytest tests/excel/test_config.py::TestWorkingDaysConfig -v
 
 # Sprint configuration
-pytest tests/excel/test_config.py::TestSprintConfig -v
+uv run pytest tests/excel/test_config.py::TestSprintConfig -v
 
 # Project features
-pytest tests/excel/test_config.py::TestProjectFeatures -v
+uv run pytest tests/excel/test_config.py::TestProjectFeatures -v
 
 # Complete project config
-pytest tests/excel/test_config.py::TestProjectConfig -v
+uv run pytest tests/excel/test_config.py::TestProjectConfig -v
 
 # Example scenarios
-pytest tests/excel/test_config.py::TestProjectConfigExamples -v
+uv run pytest tests/excel/test_config.py::TestProjectConfigExamples -v
 ```
 
 ### Sprint Parser Tests
 
 ```bash
 # Year-Quarter-Number pattern
-pytest tests/excel/test_sprint_parser.py::TestYearQuarterNumberPattern -v
+uv run pytest tests/excel/test_sprint_parser.py::TestYearQuarterNumberPattern -v
 
 # PI-Sprint pattern
-pytest tests/excel/test_sprint_parser.py::TestPISprintPattern -v
+uv run pytest tests/excel/test_sprint_parser.py::TestPISprintPattern -v
 
 # Calendar week pattern
-pytest tests/excel/test_sprint_parser.py::TestCalendarWeekPattern -v
+uv run pytest tests/excel/test_sprint_parser.py::TestCalendarWeekPattern -v
 
 # Custom patterns
-pytest tests/excel/test_sprint_parser.py::TestCustomPattern -v
+uv run pytest tests/excel/test_sprint_parser.py::TestCustomPattern -v
 
 # Sprint ranges
-pytest tests/excel/test_sprint_parser.py::TestSprintRange -v
+uv run pytest tests/excel/test_sprint_parser.py::TestSprintRange -v
 
 # Edge cases
-pytest tests/excel/test_sprint_parser.py::TestEdgeCases -v
+uv run pytest tests/excel/test_sprint_parser.py::TestEdgeCases -v
 ```
 
 ## Expected Test Results
@@ -177,10 +186,23 @@ These tests are designed to run in CI/CD pipelines:
 - name: Run Excel Tests
   run: |
     cd backend
-    pytest tests/excel/ -v --cov=app.excel
+    uv run pytest tests/excel/ -v --cov=app.excel
 ```
 
 ## Troubleshooting
+
+### ModuleNotFoundError: No module named 'openpyxl' (or other packages)
+
+**Cause**: Running `pytest` directly instead of `uv run pytest`
+
+**Solution**:
+```bash
+# ❌ WRONG - uses system Python
+pytest
+
+# ✅ CORRECT - uses uv-managed environment
+uv run pytest
+```
 
 ### Import Errors
 
@@ -189,10 +211,10 @@ These tests are designed to run in CI/CD pipelines:
 cd backend
 
 # Install dependencies
-pip install -r requirements.txt
+uv pip install -r requirements.txt
 
 # Verify pytest is installed
-pytest --version
+uv run pytest --version
 ```
 
 ### ModuleNotFoundError: app.excel
@@ -202,7 +224,7 @@ pytest --version
 export PYTHONPATH="${PYTHONPATH}:$(pwd)"
 
 # Or run pytest from backend directory
-cd backend && pytest tests/excel/
+cd backend && uv run pytest tests/excel/
 ```
 
 ### Pydantic ValidationError
