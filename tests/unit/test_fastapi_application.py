@@ -211,8 +211,8 @@ class TestApplicationStartupShutdown:
         import asyncio
         asyncio.run(startup_event())
 
-        # Verify logging was called
-        mock_logger.info.assert_called_with("SprintForge API starting up")
+        # Verify logging was called - use assert_any_call since startup logs multiple messages
+        mock_logger.info.assert_any_call("SprintForge API starting up")
 
     @patch("app.main.logger")
     def test_shutdown_event_logging(self, mock_logger):
@@ -223,8 +223,8 @@ class TestApplicationStartupShutdown:
         import asyncio
         asyncio.run(shutdown_event())
 
-        # Verify logging was called
-        mock_logger.info.assert_called_with("SprintForge API shutting down")
+        # Verify logging was called - use assert_any_call since shutdown logs multiple messages
+        mock_logger.info.assert_any_call("SprintForge API shutting down")
 
     def test_application_startup_configuration(self):
         """Test application startup configuration."""

@@ -6,7 +6,7 @@ import os
 os.environ.setdefault('SECRET_KEY', 'test-secret-key-for-testing')
 # Use SQLite for unit tests (no PostgreSQL required)
 os.environ.setdefault('DATABASE_URL', 'sqlite+aiosqlite:///:memory:')
-os.environ.setdefault('CORS_ORIGINS', '["http://testserver"]')
+os.environ.setdefault('CORS_ORIGINS', '["http://testserver", "http://localhost:3000", "http://localhost:3001"]')
 
 # Store database type for conditional test skipping
 _using_postgresql = 'postgresql' in os.environ.get('DATABASE_URL', '')
@@ -45,8 +45,8 @@ class TestSettings(Settings):
     # Disable external services for testing
     openai_api_key: str = "test-key"
 
-    # Test-specific CORS
-    cors_origins: list[str] = ["http://testserver"]
+    # Test-specific CORS - include both testserver and localhost:3000 for testing
+    cors_origins: list[str] = ["http://testserver", "http://localhost:3000", "http://localhost:3001"]
 
 
 @pytest.fixture(scope="session")

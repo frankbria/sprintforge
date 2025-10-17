@@ -96,7 +96,7 @@ class TestCriticalPathFormatting:
     def test_critical_path_highlight(self, formula_templates):
         """Test highlighting of critical path tasks."""
         formula = formula_templates.apply_template(
-            "critical_path_highlight",
+            "critical_path_formatting",
             is_critical="$H2"
         )
         # TRUE when is_critical = TRUE
@@ -192,7 +192,7 @@ class TestGanttBarFormatting:
     def test_gantt_today_marker(self, formula_templates):
         """Test Gantt chart today marker column."""
         formula = formula_templates.apply_template(
-            "gantt_today_marker",
+            "gantt_today_formatting",
             timeline_date="$M$1"
         )
         # TRUE when timeline_date = TODAY()

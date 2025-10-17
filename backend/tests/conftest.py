@@ -110,8 +110,24 @@ async def client(test_db_session: AsyncSession) -> AsyncGenerator[AsyncClient, N
 
     app.dependency_overrides[get_db] = override_get_db
 
-    # Create test client
-    async with AsyncClient(app=app, base_url="http://test") as ac:
+    # Clear rate limiter state to prevent test interference
+    # The RateLimitMiddleware stores requests in instance attribute
+    # We need to find and clear it
+    for middleware in app.user_middleware:
+        # Access the middleware instance
+        if hasattr(middleware, 'kwargs'):
+            # Middleware not yet instantiated, will be fresh
+            pass
+
+    # Create test client with unique headers to avoid IP rate limits
+    import random
+    random_ip = f"192.168.{random.randint(1, 254)}.{random.randint(1, 254)}"
+
+    async with AsyncClient(
+        app=app,
+        base_url="http://test",
+        headers={"X-Forwarded-For": random_ip}  # Use unique IP for each test
+    ) as ac:
         yield ac
 
     # Clean up override

@@ -27,6 +27,7 @@ class TestExcelEndToEnd:
         """Mock authenticated user info."""
         return {"sub": str(uuid4()), "email": "test@example.com"}
 
+    @pytest.mark.asyncio
     async def test_complete_excel_workflow(
         self, client: AsyncClient, db_session: AsyncSession, mock_user_info: dict
     ):
@@ -69,7 +70,7 @@ class TestExcelEndToEnd:
         upload_bytes.seek(0)
 
         with patch("app.core.auth.require_auth", return_value=mock_user_info), patch(
-            "app.services.excel_parser_service.ExcelParserService.parse_excel"
+            "app.services.excel_parser_service.ExcelParserService.parse_excel_file"
         ) as mock_parse, patch(
             "app.services.simulation_service.SimulationService.run_simulation"
         ) as mock_simulate, patch(
@@ -77,28 +78,35 @@ class TestExcelEndToEnd:
         ) as mock_save, patch(
             "app.services.simulation_persistence_service.SimulationPersistenceService.get_simulation_result"
         ) as mock_get, patch(
-            "app.services.excel_generation_service.ExcelGenerationService.generate_simulation_excel"
-        ) as mock_generate:
+            "app.services.excel_generation_service.ExcelGenerationService.create_template_workbook"
+        ) as mock_create_workbook, patch(
+            "app.services.excel_generation_service.ExcelGenerationService.save_workbook_to_bytes"
+        ) as mock_save_bytes:
 
-            # Mock parser to return task list
-            parsed_tasks = [
-                {
-                    "task_id": "TASK-1",
-                    "task_name": "Requirements gathering",
-                    "optimistic": 2.0,
-                    "most_likely": 5.0,
-                    "pessimistic": 8.0,
-                    "dependencies": "",
-                },
-                {
-                    "task_id": "TASK-2",
-                    "task_name": "System design",
-                    "optimistic": 3.0,
-                    "most_likely": 7.0,
-                    "pessimistic": 10.0,
-                    "dependencies": "TASK-1",
-                },
-            ]
+            # Mock parser to return ParsedExcelData with ParsedTask objects
+            from app.services.excel_parser_service import ParsedExcelData, ParsedTask
+
+            parsed_tasks = ParsedExcelData(
+                tasks=[
+                    ParsedTask(
+                        task_id="TASK-1",
+                        task_name="Requirements gathering",
+                        optimistic=2.0,
+                        most_likely=5.0,
+                        pessimistic=8.0,
+                        dependencies="",
+                    ),
+                    ParsedTask(
+                        task_id="TASK-2",
+                        task_name="System design",
+                        optimistic=3.0,
+                        most_likely=7.0,
+                        pessimistic=10.0,
+                        dependencies="TASK-1",
+                    ),
+                ],
+                project_name="Test Project"
+            )
             mock_parse.return_value = parsed_tasks
 
             # Mock simulation result
@@ -126,7 +134,7 @@ class TestExcelEndToEnd:
 
             # Step 2: Upload Excel and run simulation
             upload_response = await client.post(
-                f"/api/v1/projects/{project_id}/excel/simulate",
+                f"/api/v1/excel/projects/{project_id}/simulate",
                 files={
                     "file": (
                         "project_tasks.xlsx",
@@ -171,8 +179,9 @@ class TestExcelEndToEnd:
             # Mock Excel generation with enhanced file
             enhanced_wb = Workbook()
 
-            # Tasks sheet (original data)
-            tasks_ws = enhanced_wb.create_sheet("Tasks", 0)
+            # Task List sheet (original data)
+            tasks_ws = enhanced_wb.active
+            tasks_ws.title = "Task List"
             tasks_ws.append(
                 [
                     "Task ID",
@@ -183,15 +192,15 @@ class TestExcelEndToEnd:
                     "Dependencies",
                 ]
             )
-            for task in parsed_tasks:
+            for task in parsed_tasks.tasks:
                 tasks_ws.append(
                     [
-                        task["task_id"],
-                        task["task_name"],
-                        task["optimistic"],
-                        task["most_likely"],
-                        task["pessimistic"],
-                        task["dependencies"],
+                        task.task_id,
+                        task.task_name,
+                        task.optimistic,
+                        task.most_likely,
+                        task.pessimistic,
+                        task.dependencies,
                     ]
                 )
 
@@ -210,10 +219,13 @@ class TestExcelEndToEnd:
             download_bytes = io.BytesIO()
             enhanced_wb.save(download_bytes)
             download_bytes.seek(0)
-            mock_generate.return_value = download_bytes.getvalue()
+
+            # Mock the workbook creation and byte generation
+            mock_create_workbook.return_value = enhanced_wb
+            mock_save_bytes.return_value = download_bytes.getvalue()
 
             download_response = await client.get(
-                f"/api/v1/simulations/{simulation_id}/excel"
+                f"/api/v1/excel/simulations/{simulation_id}/excel"
             )
 
             # Verify download response
@@ -228,9 +240,9 @@ class TestExcelEndToEnd:
             downloaded_bytes = io.BytesIO(download_response.content)
             downloaded_wb = load_workbook(downloaded_bytes)
 
-            # Verify Tasks sheet exists and has data
-            assert "Tasks" in downloaded_wb.sheetnames
-            tasks_sheet = downloaded_wb["Tasks"]
+            # Verify Task List sheet exists and has data
+            assert "Task List" in downloaded_wb.sheetnames
+            tasks_sheet = downloaded_wb["Task List"]
             assert tasks_sheet["A1"].value == "Task ID"
             assert tasks_sheet["A2"].value == "TASK-1"
 
@@ -250,6 +262,7 @@ class TestExcelEndToEnd:
             assert mean_row is not None
             assert mean_row[1].value == 35.5
 
+    @pytest.mark.asyncio
     async def test_template_download_and_upload(
         self, client: AsyncClient, mock_user_info: dict
     ):
@@ -257,9 +270,11 @@ class TestExcelEndToEnd:
         project_id = uuid4()
 
         with patch("app.core.auth.require_auth", return_value=mock_user_info), patch(
-            "app.services.excel_generation_service.ExcelGenerationService.generate_sample_template"
+            "app.services.excel_generation_service.ExcelGenerationService.create_template_workbook"
         ) as mock_template, patch(
-            "app.services.excel_parser_service.ExcelParserService.parse_excel"
+            "app.services.excel_generation_service.ExcelGenerationService.save_workbook_to_bytes"
+        ) as mock_save_bytes, patch(
+            "app.services.excel_parser_service.ExcelParserService.parse_excel_file"
         ) as mock_parse, patch(
             "app.services.simulation_service.SimulationService.run_simulation"
         ) as mock_simulate, patch(
@@ -284,7 +299,9 @@ class TestExcelEndToEnd:
             template_bytes = io.BytesIO()
             wb.save(template_bytes)
             template_bytes.seek(0)
-            mock_template.return_value = template_bytes.getvalue()
+
+            mock_template.return_value = wb
+            mock_save_bytes.return_value = template_bytes.getvalue()
 
             template_response = await client.get(
                 "/api/v1/excel/template", params={"include_sample_data": True}
@@ -295,7 +312,19 @@ class TestExcelEndToEnd:
             # Step 2: Use downloaded template for simulation
             template_content = io.BytesIO(template_response.content)
 
-            mock_parse.return_value = [{"task_id": "SAMPLE-1"}]
+            from app.services.excel_parser_service import ParsedExcelData, ParsedTask
+
+            mock_parse.return_value = ParsedExcelData(
+                tasks=[ParsedTask(
+                    task_id="SAMPLE-1",
+                    task_name="Sample task",
+                    optimistic=1.0,
+                    most_likely=2.0,
+                    pessimistic=3.0,
+                    dependencies="",
+                )],
+                project_name="My Project"
+            )
 
             from unittest.mock import MagicMock
 
@@ -306,7 +335,7 @@ class TestExcelEndToEnd:
             mock_save.return_value = 999
 
             simulate_response = await client.post(
-                f"/api/v1/projects/{project_id}/excel/simulate",
+                f"/api/v1/excel/projects/{project_id}/simulate",
                 files={
                     "file": (
                         "template.xlsx",

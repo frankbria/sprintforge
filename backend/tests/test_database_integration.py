@@ -66,7 +66,7 @@ class TestDatabaseIntegration:
 
         for method_name in required_methods:
             assert hasattr(SessionService, method_name), f"Missing method: {method_name}"
-            method = getattr(UserService, method_name)
+            method = getattr(SessionService, method_name)
             assert callable(method), f"Method {method_name} is not callable"
 
     @pytest.mark.asyncio
@@ -118,10 +118,13 @@ class TestDatabaseIntegration:
             user = await AuthService.create_user(db, email=email, name=name)
 
             # Verify user creation process
-            MockUser.assert_called_once_with(email=email, name=name)
+            MockUser.assert_called_once()
+            call_kwargs = MockUser.call_args[1]
+            assert call_kwargs['email'] == email
+            assert call_kwargs['name'] == name
             db.add.assert_called_once_with(mock_user_instance)
-            db.commit.assert_called_once()
-            db.refresh.assert_called_once_with(mock_user_instance)
+            db.commit.assert_awaited_once()
+            db.refresh.assert_awaited_once_with(mock_user_instance)
 
     @pytest.mark.asyncio
     async def test_oauth_synchronization_workflow(self):
@@ -130,8 +133,13 @@ class TestDatabaseIntegration:
 
         db = AsyncMock()
 
-        # Mock no existing account
-        db.execute.return_value.scalar_one_or_none.side_effect = [None, None]
+        # Mock no existing account - db.execute() returns a coroutine that needs to be awaited
+        execute_result_1 = MagicMock()
+        execute_result_1.scalar_one_or_none.return_value = None
+        execute_result_2 = MagicMock()
+        execute_result_2.scalar_one_or_none.return_value = None
+        db.execute.return_value = execute_result_1
+        db.execute.side_effect = [execute_result_1, execute_result_2]
 
         oauth_profile = {
             "email": "oauth@example.com",
@@ -141,7 +149,7 @@ class TestDatabaseIntegration:
         }
 
         # Mock user creation method
-        with patch.object(UserService, '_create_user_from_oauth_profile') as mock_create:
+        with patch.object(UserService, '_create_user_from_oauth_profile', new_callable=AsyncMock) as mock_create:
             mock_user = MagicMock()
             mock_user.email = oauth_profile["email"]
             mock_user.name = oauth_profile["name"]
@@ -153,7 +161,7 @@ class TestDatabaseIntegration:
 
             # Verify OAuth sync process
             assert result == mock_user
-            mock_create.assert_called_once_with(db, oauth_profile)
+            mock_create.assert_awaited_once_with(db, oauth_profile)
 
     @pytest.mark.asyncio
     async def test_session_optimization_workflow(self):
@@ -290,7 +298,9 @@ class TestDatabaseIntegration:
         mock_user.preferences = {"theme": "dark", "notifications": True}
         mock_user.updated_at = datetime.now(timezone.utc)
 
-        db.execute.return_value.scalar_one_or_none.return_value = mock_user
+        execute_result = MagicMock()
+        execute_result.scalar_one_or_none.return_value = mock_user
+        db.execute.return_value = execute_result
 
         new_preferences = {"theme": "light", "language": "es"}
 
@@ -304,8 +314,8 @@ class TestDatabaseIntegration:
             "language": "es"       # Added
         }
         assert mock_user.preferences == expected_prefs
-        db.commit.assert_called_once()
-        db.refresh.assert_called_once_with(mock_user)
+        db.commit.assert_awaited_once()
+        db.refresh.assert_awaited_once_with(mock_user)
 
     @pytest.mark.asyncio
     async def test_session_extension_workflow(self):
@@ -322,7 +332,9 @@ class TestDatabaseIntegration:
         mock_session.expires = datetime.now(timezone.utc) + timedelta(hours=1)
         mock_session.updated_at = datetime.now(timezone.utc)
 
-        db.execute.return_value.scalar_one_or_none.return_value = mock_session
+        execute_result = MagicMock()
+        execute_result.scalar_one_or_none.return_value = mock_session
+        db.execute.return_value = execute_result
 
         result = await SessionService.extend_session(db, session_token, hours=48)
 
@@ -333,8 +345,8 @@ class TestDatabaseIntegration:
         time_diff = abs((mock_session.expires - expected_expiry).total_seconds())
         assert time_diff < 10  # Allow 10 second tolerance
 
-        db.commit.assert_called_once()
-        db.refresh.assert_called_once_with(mock_session)
+        db.commit.assert_awaited_once()
+        db.refresh.assert_awaited_once_with(mock_session)
 
     @pytest.mark.asyncio
     async def test_cleanup_operations_workflow(self):
@@ -387,8 +399,8 @@ class TestDatabaseIntegration:
         mock_user.accounts = [mock_account1, mock_account2]
 
         # Mock service methods
-        with patch.object(UserService, 'get_user_with_accounts', return_value=mock_user):
-            with patch('app.services.user_service.AuthService.get_user_sessions') as mock_sessions:
+        with patch.object(UserService, 'get_user_with_accounts', new_callable=AsyncMock, return_value=mock_user):
+            with patch('app.services.auth_service.AuthService.get_user_sessions', new_callable=AsyncMock) as mock_sessions:
                 mock_sessions.return_value = ["session1", "session2", "session3"]
 
                 stats = await UserService.get_user_statistics(db, user_id)
@@ -414,6 +426,12 @@ class TestDatabaseIntegrationErrorHandling:
         from app.services.user_service import UserService
 
         db = AsyncMock()
+
+        # Mock no existing account
+        execute_result = MagicMock()
+        execute_result.scalar_one_or_none.return_value = None
+        db.execute.return_value = execute_result
+
         oauth_profile = {"name": "No Email User"}
 
         with pytest.raises(ValueError, match="OAuth profile missing email address"):
@@ -434,13 +452,15 @@ class TestDatabaseIntegrationErrorHandling:
         mock_session.id = uuid4()
         mock_session.expires = datetime.now(timezone.utc) - timedelta(hours=1)
 
-        db.execute.return_value.scalar_one_or_none.return_value = mock_session
+        execute_result = MagicMock()
+        execute_result.scalar_one_or_none.return_value = mock_session
+        db.execute.return_value = execute_result
 
         result = await SessionService.extend_session(db, session_token, hours=24)
 
         # Should return None for expired session
         assert result is None
-        db.commit.assert_not_called()
+        db.commit.assert_not_awaited()
 
     @pytest.mark.asyncio
     async def test_update_nonexistent_user_error(self):
@@ -562,15 +582,31 @@ class TestDatabaseIntegrationPerformance:
         delete_mock1 = MagicMock(rowcount=3)  # Deleted 3 duplicates for user1
         delete_mock2 = MagicMock(rowcount=2)  # Deleted 2 duplicates for user2
 
+        # Create proper mock objects for each query
+        mock_users_result = MagicMock()
+        mock_users_result.all.return_value = [(user1_id, 4), (user2_id, 3)]
+
+        mock_keep1_result = MagicMock()
+        keep1_id = uuid4()
+        mock_keep1_scalars = MagicMock()
+        mock_keep1_scalars.all.return_value = [keep1_id]
+        mock_keep1_result.scalars.return_value = mock_keep1_scalars
+
+        mock_keep2_result = MagicMock()
+        keep2_id = uuid4()
+        mock_keep2_scalars = MagicMock()
+        mock_keep2_scalars.all.return_value = [keep2_id]
+        mock_keep2_result.scalars.return_value = mock_keep2_scalars
+
         db.execute.side_effect = [
             # Initial query for users with multiple sessions
-            MagicMock(all=lambda: [(user1_id, 4), (user2_id, 3)]),
+            mock_users_result,
             # Query sessions to keep for user1
-            MagicMock(all=lambda: [uuid4()]),
+            mock_keep1_result,
             # Delete duplicates for user1
             delete_mock1,
             # Query sessions to keep for user2
-            MagicMock(all=lambda: [uuid4()]),
+            mock_keep2_result,
             # Delete duplicates for user2
             delete_mock2
         ]

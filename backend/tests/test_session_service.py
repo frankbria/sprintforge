@@ -87,11 +87,23 @@ class TestSessionService:
         session_id_1 = uuid4()
         session_id_2 = uuid4()
         delete_results = [MagicMock(rowcount=2), MagicMock(rowcount=1)]
+
+        # Create scalars() mocks
+        scalars_mock_1 = MagicMock()
+        scalars_mock_1.all.return_value = [session_id_1]
+        keep_sessions_1 = MagicMock()
+        keep_sessions_1.scalars.return_value = scalars_mock_1
+
+        scalars_mock_2 = MagicMock()
+        scalars_mock_2.all.return_value = [session_id_2]
+        keep_sessions_2 = MagicMock()
+        keep_sessions_2.scalars.return_value = scalars_mock_2
+
         db.execute.side_effect = [
             MagicMock(all=lambda: [(user_id_1, 3), (user_id_2, 2)]),  # Users query
-            MagicMock(all=lambda: [(session_id_1,)]),  # Keep sessions user 1 (row format)
+            keep_sessions_1,  # Keep sessions user 1 (uses scalars().all())
             delete_results[0],  # Delete user 1 duplicates
-            MagicMock(all=lambda: [(session_id_2,)]),  # Keep sessions user 2 (row format)
+            keep_sessions_2,  # Keep sessions user 2 (uses scalars().all())
             delete_results[1],  # Delete user 2 duplicates
         ]
 

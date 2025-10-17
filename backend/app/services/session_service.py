@@ -90,7 +90,7 @@ class SessionService:
                 .limit(1)
             )
 
-            keep_ids = [row[0] for row in sessions_to_keep.all()]
+            keep_ids = [sid for sid in sessions_to_keep.scalars().all()]
 
             if keep_ids:
                 # Delete all other sessions for this user
