@@ -1,6 +1,7 @@
 """Tests for authentication API endpoints."""
 
 import pytest
+import pytest_asyncio
 from datetime import datetime, timezone, timedelta
 from unittest.mock import Mock, AsyncMock, patch
 from uuid import uuid4, UUID
@@ -9,8 +10,18 @@ from fastapi.testclient import TestClient
 from httpx import AsyncClient
 
 from app.main import app
-from app.core.auth import NEXTAUTH_SECRET, ALGORITHM
+from app.core.auth import NEXTAUTH_SECRET, ALGORITHM, require_auth
 from app.models.user import User
+
+
+@pytest_asyncio.fixture
+async def override_auth():
+    """Override authentication dependency for testing."""
+    def mock_require_auth(user_info: dict):
+        return lambda: user_info
+    
+    yield mock_require_auth
+    app.dependency_overrides.clear()
 
 
 class TestAuthEndpoints:
@@ -49,31 +60,29 @@ class TestAuthEndpoints:
         return user
 
     @pytest.mark.asyncio
-    async def test_get_current_user_success(self):
+    async def test_get_current_user_success(
+        self, 
+        client: AsyncClient, 
+        test_db_session, 
+        test_user,
+        override_auth
+    ):
         """Test successful retrieval of current user."""
-        user = self.create_test_user()
-        token = self.create_test_token(str(user.id), user.email)
+        # Mock authentication to return test user's info
+        app.dependency_overrides[require_auth] = override_auth({
+            "sub": str(test_user.id), 
+            "email": test_user.email
+        })
+        
+        response = await client.get("/api/v1/auth/me")
 
-        with patch('app.database.connection.get_db') as mock_get_db:
-            mock_db = AsyncMock()
-            mock_result = Mock()
-            mock_result.scalar_one_or_none.return_value = user
-            mock_db.execute.return_value = mock_result
-            mock_get_db.return_value = mock_db
-
-            async with AsyncClient(app=app, base_url="http://test") as client:
-                response = await client.get(
-                    "/api/v1/auth/me",
-                    headers={"Authorization": f"Bearer {token}"}
-                )
-
-            assert response.status_code == 200
-            data = response.json()
-            assert data["id"] == str(user.id)
-            assert data["email"] == user.email
-            assert data["name"] == user.name
-            assert data["subscription_tier"] == "free"
-            assert data["is_active"] is True
+        assert response.status_code == 200
+        data = response.json()
+        assert data["id"] == str(test_user.id)
+        assert data["email"] == test_user.email
+        assert data["name"] == test_user.name
+        assert data["subscription_tier"] == "free"
+        assert data["is_active"] is True
 
     @pytest.mark.asyncio
     async def test_get_current_user_unauthorized(self):
@@ -95,136 +104,149 @@ class TestAuthEndpoints:
         assert response.status_code == 401
 
     @pytest.mark.asyncio
-    async def test_get_current_user_not_found(self):
+    async def test_get_current_user_not_found(
+        self, 
+        client: AsyncClient, 
+        test_db_session,
+        override_auth
+    ):
         """Test current user retrieval when user not found in database."""
-        token = self.create_test_token("non-existent-user", "test@example.com")
+        # Use a valid UUID format but non-existent user
+        non_existent_id = str(uuid4())
+        
+        # Mock authentication to return non-existent user's info
+        app.dependency_overrides[require_auth] = override_auth({
+            "sub": non_existent_id, 
+            "email": "nonexistent@example.com"
+        })
+        
+        response = await client.get("/api/v1/auth/me")
 
-        with patch('app.database.connection.get_db') as mock_get_db:
-            mock_db = AsyncMock()
-            mock_result = Mock()
-            mock_result.scalar_one_or_none.return_value = None
-            mock_db.execute.return_value = mock_result
-            mock_get_db.return_value = mock_db
-
-            async with AsyncClient(app=app, base_url="http://test") as client:
-                response = await client.get(
-                    "/api/v1/auth/me",
-                    headers={"Authorization": f"Bearer {token}"}
-                )
-
-            assert response.status_code == 404
-            assert "User not found" in response.json()["detail"]
+        assert response.status_code == 404
+        assert "User not found" in response.json()["detail"]
 
     @pytest.mark.asyncio
-    async def test_get_current_user_inactive(self):
+    async def test_get_current_user_inactive(
+        self, 
+        client: AsyncClient, 
+        test_db_session,
+        override_auth
+    ):
         """Test current user retrieval for inactive user."""
-        user = self.create_test_user()
-        user.is_active = False
-        token = self.create_test_token(str(user.id), user.email)
+        from app.models.user import User
+        
+        # Create an inactive user in the database
+        inactive_user = User(
+            id=uuid4(),
+            name="Inactive User",
+            email="inactive@example.com",
+            subscription_tier="free",
+            subscription_status="active",
+            is_active=False,
+            created_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(timezone.utc),
+            preferences={}
+        )
+        test_db_session.add(inactive_user)
+        await test_db_session.commit()
+        await test_db_session.refresh(inactive_user)
+        
+        # Mock authentication to return inactive user's info
+        app.dependency_overrides[require_auth] = override_auth({
+            "sub": str(inactive_user.id), 
+            "email": inactive_user.email
+        })
+        
+        response = await client.get("/api/v1/auth/me")
 
-        with patch('app.database.connection.get_db') as mock_get_db:
-            mock_db = AsyncMock()
-            mock_result = Mock()
-            mock_result.scalar_one_or_none.return_value = user
-            mock_db.execute.return_value = mock_result
-            mock_get_db.return_value = mock_db
-
-            async with AsyncClient(app=app, base_url="http://test") as client:
-                response = await client.get(
-                    "/api/v1/auth/me",
-                    headers={"Authorization": f"Bearer {token}"}
-                )
-
-            assert response.status_code == 403
-            assert "User account is inactive" in response.json()["detail"]
+        assert response.status_code == 403
+        assert "User account is inactive" in response.json()["detail"]
 
     @pytest.mark.asyncio
-    async def test_update_current_user_success(self):
+    async def test_update_current_user_success(
+        self, 
+        client: AsyncClient, 
+        test_db_session,
+        test_user,
+        override_auth
+    ):
         """Test successful update of current user profile."""
-        user = self.create_test_user()
-        token = self.create_test_token(str(user.id), user.email)
-
+        # Mock authentication to return test user's info
+        app.dependency_overrides[require_auth] = override_auth({
+            "sub": str(test_user.id), 
+            "email": test_user.email
+        })
+        
         update_data = {
             "name": "Updated Name",
             "preferences": {"theme": "dark", "notifications": True}
         }
 
-        with patch('app.database.connection.get_db') as mock_get_db:
-            mock_db = AsyncMock()
-            mock_result = Mock()
-            mock_result.scalar_one_or_none.return_value = user
-            mock_db.execute.return_value = mock_result
-            mock_get_db.return_value = mock_db
+        response = await client.put(
+            "/api/v1/auth/me",
+            json=update_data
+        )
 
-            async with AsyncClient(app=app, base_url="http://test") as client:
-                response = await client.put(
-                    "/api/v1/auth/me",
-                    headers={"Authorization": f"Bearer {token}"},
-                    json=update_data
-                )
-
-            assert response.status_code == 200
-            data = response.json()
-            assert data["name"] == "Updated Name"
-
-            # Verify database operations were called
-            mock_db.commit.assert_called_once()
-            mock_db.refresh.assert_called_once_with(user)
+        assert response.status_code == 200
+        data = response.json()
+        assert data["name"] == "Updated Name"
+        assert data["preferences"]["theme"] == "dark"
+        assert data["preferences"]["notifications"] is True
 
     @pytest.mark.asyncio
-    async def test_update_current_user_partial(self):
+    async def test_update_current_user_partial(
+        self, 
+        client: AsyncClient, 
+        test_db_session,
+        test_user,
+        override_auth
+    ):
         """Test partial update of current user profile."""
-        user = self.create_test_user()
-        token = self.create_test_token(str(user.id), user.email)
-
+        # Mock authentication to return test user's info
+        app.dependency_overrides[require_auth] = override_auth({
+            "sub": str(test_user.id), 
+            "email": test_user.email
+        })
+        
         update_data = {
             "name": "New Name"
         }
 
-        with patch('app.database.connection.get_db') as mock_get_db:
-            mock_db = AsyncMock()
-            mock_result = Mock()
-            mock_result.scalar_one_or_none.return_value = user
-            mock_db.execute.return_value = mock_result
-            mock_get_db.return_value = mock_db
+        response = await client.put(
+            "/api/v1/auth/me",
+            json=update_data
+        )
 
-            async with AsyncClient(app=app, base_url="http://test") as client:
-                response = await client.put(
-                    "/api/v1/auth/me",
-                    headers={"Authorization": f"Bearer {token}"},
-                    json=update_data
-                )
-
-            assert response.status_code == 200
-            data = response.json()
-            assert data["name"] == "New Name"
+        assert response.status_code == 200
+        data = response.json()
+        assert data["name"] == "New Name"
 
     @pytest.mark.asyncio
-    async def test_get_session_info_success(self):
+    async def test_get_session_info_success(
+        self, 
+        client: AsyncClient, 
+        test_db_session,
+        test_user,
+        override_auth
+    ):
         """Test successful retrieval of session information."""
-        user = self.create_test_user()
-        token = self.create_test_token(str(user.id), user.email)
+        # Mock authentication to return test user's info with provider
+        app.dependency_overrides[require_auth] = override_auth({
+            "sub": str(test_user.id), 
+            "email": test_user.email,
+            "provider": "google",
+            "exp": (datetime.now(timezone.utc) + timedelta(minutes=30)).timestamp()
+        })
+        
+        response = await client.get("/api/v1/auth/session")
 
-        with patch('app.database.connection.get_db') as mock_get_db:
-            mock_db = AsyncMock()
-            mock_result = Mock()
-            mock_result.scalar_one_or_none.return_value = user
-            mock_db.execute.return_value = mock_result
-            mock_get_db.return_value = mock_db
-
-            async with AsyncClient(app=app, base_url="http://test") as client:
-                response = await client.get(
-                    "/api/v1/auth/session",
-                    headers={"Authorization": f"Bearer {token}"}
-                )
-
-            assert response.status_code == 200
-            data = response.json()
-            assert "user" in data
-            assert data["user"]["id"] == str(user.id)
-            assert data["user"]["email"] == user.email
-            assert "expires_at" in data
-            assert data["provider"] == "google"
+        assert response.status_code == 200
+        data = response.json()
+        assert "user" in data
+        assert data["user"]["id"] == str(test_user.id)
+        assert data["user"]["email"] == test_user.email
+        assert "expires_at" in data
+        assert data["provider"] == "google"
 
     @pytest.mark.asyncio
     async def test_validate_token_success(self):
@@ -312,39 +334,58 @@ class TestAuthEndpoints:
         assert "timestamp" in data
 
     @pytest.mark.asyncio
-    async def test_update_user_preferences_merge(self):
+    async def test_update_user_preferences_merge(
+        self, 
+        client: AsyncClient, 
+        test_db_session,
+        override_auth
+    ):
         """Test that user preferences are properly merged, not replaced."""
-        user = self.create_test_user()
-        user.preferences = {"existing": "value", "keep": True}
-        token = self.create_test_token(str(user.id), user.email)
-
+        from app.models.user import User
+        
+        # Create a user with existing preferences
+        user_with_prefs = User(
+            id=uuid4(),
+            name="User With Prefs",
+            email="prefs@example.com",
+            subscription_tier="free",
+            subscription_status="active",
+            is_active=True,
+            created_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(timezone.utc),
+            preferences={"existing": "value", "keep": True}
+        )
+        test_db_session.add(user_with_prefs)
+        await test_db_session.commit()
+        await test_db_session.refresh(user_with_prefs)
+        
+        # Mock authentication to return this user's info
+        app.dependency_overrides[require_auth] = override_auth({
+            "sub": str(user_with_prefs.id), 
+            "email": user_with_prefs.email
+        })
+        
         update_data = {
             "preferences": {"new": "setting", "existing": "updated"}
         }
 
-        with patch('app.database.connection.get_db') as mock_get_db:
-            mock_db = AsyncMock()
-            mock_result = Mock()
-            mock_result.scalar_one_or_none.return_value = user
-            mock_db.execute.return_value = mock_result
-            mock_get_db.return_value = mock_db
+        response = await client.put(
+            "/api/v1/auth/me",
+            json=update_data
+        )
 
-            async with AsyncClient(app=app, base_url="http://test") as client:
-                response = await client.put(
-                    "/api/v1/auth/me",
-                    headers={"Authorization": f"Bearer {token}"},
-                    json=update_data
-                )
-
-            assert response.status_code == 200
-
-            # Verify preferences were merged
-            expected_prefs = {
-                "existing": "updated",  # Updated value
-                "keep": True,          # Kept existing
-                "new": "setting"       # Added new
-            }
-            assert user.preferences == expected_prefs
+        assert response.status_code == 200
+        
+        # Refresh user to get updated preferences
+        await test_db_session.refresh(user_with_prefs)
+        
+        # Verify preferences were merged
+        expected_prefs = {
+            "existing": "updated",  # Updated value
+            "keep": True,          # Kept existing
+            "new": "setting"       # Added new
+        }
+        assert user_with_prefs.preferences == expected_prefs
 
     @pytest.mark.asyncio
     async def test_database_error_handling(self):

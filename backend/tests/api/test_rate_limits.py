@@ -9,6 +9,7 @@ Tests cover:
 """
 
 import pytest
+import pytest_asyncio
 from datetime import datetime, timedelta
 from uuid import uuid4
 import time
@@ -20,13 +21,15 @@ from app.models.user import User
 from app.models.project import Project
 
 
-@pytest.fixture
+@pytest_asyncio.fixture(scope="function")
 async def rate_limiter():
     """Create rate limiter with in-memory store for testing."""
     limiter = GenerationRateLimiter(redis_url=None)  # Use in-memory
-    await limiter.connect()
+    # Don't call connect() - we want to force in-memory mode
+    # If we call connect(), it will try to connect to Redis and succeed if Redis is running
+    limiter.redis_client = None  # Ensure we use in-memory store
     yield limiter
-    await limiter.close()
+    # No need to close since we're not using Redis
 
 
 class TestGenerationRateLimiter:
@@ -332,7 +335,7 @@ class TestAbuseDetectionService:
         assert should_throttle is True
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def db_session():
     """Create a test database session."""
     from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker

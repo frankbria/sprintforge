@@ -1,6 +1,7 @@
 """Tests for project API endpoints."""
 
 import pytest
+import pytest_asyncio
 from datetime import datetime, timezone, timedelta
 from unittest.mock import Mock, AsyncMock, patch
 from uuid import uuid4, UUID
@@ -8,9 +9,19 @@ from jose import jwt
 from httpx import AsyncClient
 
 from app.main import app
-from app.core.auth import NEXTAUTH_SECRET, ALGORITHM
+from app.core.auth import NEXTAUTH_SECRET, ALGORITHM, require_auth
 from app.models.user import User
 from app.models.project import Project
+
+
+@pytest_asyncio.fixture
+async def override_auth():
+    """Override authentication dependency for testing."""
+    def mock_require_auth(user_info: dict):
+        return lambda: user_info
+    
+    yield mock_require_auth
+    app.dependency_overrides.clear()
 
 
 class TestProjectEndpoints:
@@ -75,10 +86,19 @@ class TestProjectEndpoints:
         return project
 
     @pytest.mark.asyncio
-    async def test_create_project_success(self):
+    async def test_create_project_success(
+        self,
+        client: AsyncClient,
+        test_db_session,
+        test_user,
+        override_auth
+    ):
         """Test successful project creation."""
-        user = self.create_test_user()
-        token = self.create_test_token(str(user.id), user.email)
+        # Mock authentication
+        app.dependency_overrides[require_auth] = override_auth({
+            "sub": str(test_user.id),
+            "email": test_user.email
+        })
 
         project_data = {
             "name": "My Agile Project",
@@ -99,24 +119,22 @@ class TestProjectEndpoints:
         }
 
         with patch('app.services.project_service.ProjectService.create_project') as mock_create:
-            created_project = self.create_test_project(user.id)
+            created_project = self.create_test_project(test_user.id)
             created_project.name = project_data["name"]
             created_project.description = project_data["description"]
             mock_create.return_value = created_project
 
-            async with AsyncClient(app=app, base_url="http://test") as client:
-                response = await client.post(
-                    "/api/v1/projects",
-                    json=project_data,
-                    headers={"Authorization": f"Bearer {token}"}
-                )
+            response = await client.post(
+                "/api/v1/projects",
+                json=project_data,
+            )
 
-            assert response.status_code == 201
-            data = response.json()
-            assert data["name"] == project_data["name"]
-            assert data["description"] == project_data["description"]
-            assert "id" in data
-            assert "created_at" in data
+        assert response.status_code == 201
+        data = response.json()
+        assert data["name"] == project_data["name"]
+        assert data["description"] == project_data["description"]
+        assert "id" in data
+        assert "created_at" in data
 
     @pytest.mark.asyncio
     async def test_create_project_unauthorized(self):

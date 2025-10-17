@@ -14,6 +14,7 @@ from app.database.connection import get_database_session
 from app.models.user import User, Session
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.orm import attributes
 
 logger = structlog.get_logger(__name__)
 
@@ -30,6 +31,7 @@ class UserResponse(BaseModel):
     subscription_status: str
     subscription_expires_at: Optional[datetime] = None
     is_active: bool
+    preferences: Dict[str, Any] = {}
     created_at: datetime
     updated_at: datetime
 
@@ -84,10 +86,14 @@ async def get_current_user(
             subscription_status=user.subscription_status,
             subscription_expires_at=user.subscription_expires_at,
             is_active=user.is_active,
+            preferences=user.preferences,
             created_at=user.created_at,
             updated_at=user.updated_at
         )
 
+    except HTTPException:
+        # Re-raise HTTPException to preserve status codes (404, 403)
+        raise
     except ValueError:
         logger.error("Invalid user ID format", user_id=user_id)
         raise HTTPException(status_code=400, detail="Invalid user ID")
@@ -129,6 +135,8 @@ async def update_current_user(
             current_prefs = user.preferences or {}
             current_prefs.update(profile_data.preferences)
             user.preferences = current_prefs
+            # Mark as modified so SQLAlchemy detects the change to mutable JSONB
+            attributes.flag_modified(user, "preferences")
 
         # Update timestamp
         user.updated_at = datetime.now(timezone.utc)
@@ -147,10 +155,14 @@ async def update_current_user(
             subscription_status=user.subscription_status,
             subscription_expires_at=user.subscription_expires_at,
             is_active=user.is_active,
+            preferences=user.preferences,
             created_at=user.created_at,
             updated_at=user.updated_at
         )
 
+    except HTTPException:
+        # Re-raise HTTPException to preserve status codes (404, 403)
+        raise
     except ValueError:
         logger.error("Invalid user ID format", user_id=user_id)
         raise HTTPException(status_code=400, detail="Invalid user ID")

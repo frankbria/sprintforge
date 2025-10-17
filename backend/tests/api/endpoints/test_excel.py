@@ -1,6 +1,7 @@
 """Tests for Excel generation API endpoints."""
 
 import pytest
+import pytest_asyncio
 from datetime import datetime, timezone
 from unittest.mock import Mock, AsyncMock, patch
 from uuid import uuid4
@@ -8,9 +9,19 @@ from jose import jwt
 from httpx import AsyncClient
 
 from app.main import app
-from app.core.auth import NEXTAUTH_SECRET, ALGORITHM
+from app.core.auth import NEXTAUTH_SECRET, ALGORITHM, require_auth
 from app.models.user import User
 from app.models.project import Project
+
+
+@pytest_asyncio.fixture
+async def override_auth():
+    """Override authentication dependency for testing."""
+    def mock_require_auth(user_info: dict):
+        return lambda: user_info
+    
+    yield mock_require_auth
+    app.dependency_overrides.clear()
 
 
 class TestExcelEndpoints:
@@ -68,11 +79,20 @@ class TestExcelEndpoints:
         )
 
     @pytest.mark.asyncio
-    async def test_generate_excel_success(self):
+    async def test_generate_excel_success(
+        self,
+        client: AsyncClient,
+        test_db_session,
+        test_user,
+        test_project,
+        override_auth
+    ):
         """Test successful Excel generation."""
-        user = self.create_test_user()
-        project = self.create_test_project(user.id)
-        token = self.create_test_token(str(user.id), user.email)
+        # Mock authentication
+        app.dependency_overrides[require_auth] = override_auth({
+            "sub": str(test_user.id),
+            "email": test_user.email
+        })
 
         # Mock Excel generation to return dummy bytes
         mock_excel_bytes = b"Excel file content"
@@ -82,20 +102,18 @@ class TestExcelEndpoints:
              patch("app.services.excel_service.ExcelService.generate_excel") as mock_generate:
 
             mock_check.return_value = True
-            mock_get.return_value = project
+            mock_get.return_value = test_project
             mock_generate.return_value = mock_excel_bytes
 
-            async with AsyncClient(app=app, base_url="http://test") as client:
-                response = await client.post(
-                    f"/api/v1/projects/{project.id}/generate",
-                    headers={"Authorization": f"Bearer {token}"},
-                )
+            response = await client.post(
+                f"/api/v1/projects/{test_project.id}/generate",
+            )
 
-            assert response.status_code == 200
-            assert response.headers["content-type"] == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            assert "attachment" in response.headers["content-disposition"]
-            assert ".xlsx" in response.headers["content-disposition"]
-            assert response.content == mock_excel_bytes
+        assert response.status_code == 200
+        assert response.headers["content-type"] == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        assert "attachment" in response.headers["content-disposition"]
+        assert ".xlsx" in response.headers["content-disposition"]
+        assert response.content == mock_excel_bytes
 
     @pytest.mark.asyncio
     async def test_generate_excel_unauthorized(self):
@@ -110,66 +128,90 @@ class TestExcelEndpoints:
         assert response.status_code == 403  # HTTPBearer returns 403 for missing token
 
     @pytest.mark.asyncio
-    async def test_generate_excel_project_not_found(self):
+    async def test_generate_excel_project_not_found(
+        self,
+        client: AsyncClient,
+        test_db_session,
+        test_user,
+        override_auth
+    ):
         """Test Excel generation for non-existent project."""
-        user = self.create_test_user()
         project_id = uuid4()
-        token = self.create_test_token(str(user.id), user.email)
+
+        # Mock authentication
+        app.dependency_overrides[require_auth] = override_auth({
+            "sub": str(test_user.id),
+            "email": test_user.email
+        })
 
         with patch("app.services.project_service.ProjectService.check_owner_permission") as mock_check:
             mock_check.return_value = False
 
-            async with AsyncClient(app=app, base_url="http://test") as client:
-                response = await client.post(
-                    f"/api/v1/projects/{project_id}/generate",
-                    headers={"Authorization": f"Bearer {token}"},
-                )
+            response = await client.post(
+                f"/api/v1/projects/{project_id}/generate",
+            )
 
-            assert response.status_code == 404
-            assert response.json()["detail"] == "Project not found"
+        assert response.status_code == 404
+        assert response.json()["detail"] == "Project not found"
 
     @pytest.mark.asyncio
-    async def test_generate_excel_unauthorized_user(self):
+    async def test_generate_excel_unauthorized_user(
+        self,
+        client: AsyncClient,
+        test_db_session,
+        test_user,
+        test_user_pro,
+        override_auth
+    ):
         """Test Excel generation by non-owner user."""
-        user = self.create_test_user()
-        other_user = self.create_test_user()
-        project = self.create_test_project(other_user.id)
-        token = self.create_test_token(str(user.id), user.email)
+        # Create a project owned by test_user_pro
+        other_project = self.create_test_project(test_user_pro.id)
+
+        # Mock authentication as test_user (not the owner)
+        app.dependency_overrides[require_auth] = override_auth({
+            "sub": str(test_user.id),
+            "email": test_user.email
+        })
 
         with patch("app.services.project_service.ProjectService.check_owner_permission") as mock_check:
             mock_check.return_value = False
 
-            async with AsyncClient(app=app, base_url="http://test") as client:
-                response = await client.post(
-                    f"/api/v1/projects/{project.id}/generate",
-                    headers={"Authorization": f"Bearer {token}"},
-                )
+            response = await client.post(
+                f"/api/v1/projects/{other_project.id}/generate",
+            )
 
-            assert response.status_code == 404  # Security: return 404 instead of 403
+        assert response.status_code == 404  # Security: return 404 instead of 403
 
     @pytest.mark.asyncio
-    async def test_generate_excel_invalid_configuration(self):
+    async def test_generate_excel_invalid_configuration(
+        self,
+        client: AsyncClient,
+        test_db_session,
+        test_user,
+        test_project,
+        override_auth
+    ):
         """Test Excel generation with invalid project configuration."""
-        user = self.create_test_user()
-        project = self.create_test_project(user.id)
-        token = self.create_test_token(str(user.id), user.email)
+        # Mock authentication
+        app.dependency_overrides[require_auth] = override_auth({
+            "sub": str(test_user.id),
+            "email": test_user.email
+        })
 
         with patch("app.services.project_service.ProjectService.check_owner_permission") as mock_check, \
              patch("app.services.project_service.ProjectService.get_project") as mock_get, \
              patch("app.services.excel_service.ExcelService.generate_excel") as mock_generate:
 
             mock_check.return_value = True
-            mock_get.return_value = project
+            mock_get.return_value = test_project
             mock_generate.side_effect = ValueError("Invalid sprint pattern")
 
-            async with AsyncClient(app=app, base_url="http://test") as client:
-                response = await client.post(
-                    f"/api/v1/projects/{project.id}/generate",
-                    headers={"Authorization": f"Bearer {token}"},
-                )
+            response = await client.post(
+                f"/api/v1/projects/{test_project.id}/generate",
+            )
 
-            assert response.status_code == 400
-            assert "Invalid project configuration" in response.json()["detail"]
+        assert response.status_code == 400
+        assert "Invalid project configuration" in response.json()["detail"]
 
     @pytest.mark.asyncio
     async def test_generate_excel_server_error(self):
