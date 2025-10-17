@@ -117,9 +117,9 @@ class TestGanttChartFormulas:
         assert "ROUNDUP(MONTH(M1)/3" in formula  # Calculate quarter
 
     def test_resource_utilization_formula(self, formula_templates):
-        """Test resource utilization calculation."""
+        """Test Gantt resource allocation calculation for timeline dates."""
         formula = formula_templates.apply_template(
-            "resource_utilization",
+            "gantt_resource_allocation",
             task_dates="$D$2:$D$100",
             timeline_date="M$1",
             resource_allocation="$K$2:$K$100",
@@ -270,9 +270,9 @@ class TestGanttChartEdgeCases:
         assert "TODAY()" in formula
 
     def test_resource_utilization_zero_resources(self, formula_templates):
-        """Test resource utilization when no resources allocated."""
+        """Test Gantt resource allocation when no resources allocated."""
         formula = formula_templates.apply_template(
-            "resource_utilization",
+            "gantt_resource_allocation",
             task_dates="$D$2:$D$10",
             timeline_date="M$1",
             resource_allocation="$K$2:$K$10",

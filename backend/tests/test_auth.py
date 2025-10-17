@@ -313,7 +313,10 @@ class TestAuthenticationMiddleware:
         with patch('app.core.auth.Request') as mock_request_class:
             mock_request = Mock()
             mock_request.headers.get.return_value = "Bearer invalid_token"
-            mock_request.state = Mock()
+            # Use a real object to track attributes instead of Mock
+            class State:
+                pass
+            mock_request.state = State()
             mock_request_class.return_value = mock_request
 
             await middleware(scope, receive, send)
@@ -344,7 +347,10 @@ class TestAuthenticationMiddleware:
         with patch('app.core.auth.Request') as mock_request_class:
             mock_request = Mock()
             mock_request.headers.get.return_value = None
-            mock_request.state = Mock()
+            # Use a real object to track attributes instead of Mock
+            class State:
+                pass
+            mock_request.state = State()
             mock_request_class.return_value = mock_request
 
             await middleware(scope, receive, send)

@@ -284,8 +284,8 @@ class TestLETFormulas:
         )
 
         assert formula.startswith("=LET(")
-        assert "x, A1*2" in formula.replace(" ", "")
-        assert "y, B1+5" in formula.replace(" ", "")
+        assert "x,A1*2" in formula.replace(" ", "")
+        assert "y,B1+5" in formula.replace(" ", "")
         assert "x+y" in formula
 
     def test_let_fallback_expansion(self):
@@ -323,9 +323,9 @@ class TestLETFormulas:
             calculation="mean",
         )
 
-        assert "optimistic, 10" in formula.replace(" ", "")
-        assert "likely, 20" in formula.replace(" ", "")
-        assert "pessimistic, 30" in formula.replace(" ", "")
+        assert "optimistic,10" in formula.replace(" ", "")
+        assert "likely,20" in formula.replace(" ", "")
+        assert "pessimistic,30" in formula.replace(" ", "")
 
 
 class TestFormulaOptimization:

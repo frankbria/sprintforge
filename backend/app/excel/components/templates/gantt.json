@@ -78,9 +78,9 @@
       "timeline_date": "Date for this timeline column"
     }
   },
-  "resource_utilization": {
+  "gantt_resource_allocation": {
     "formula": "=SUMIF($task_dates, $timeline_date, $resource_allocation)",
-    "description": "Calculate total resource allocation for a given date",
+    "description": "Calculate total resource allocation for a given timeline date in Gantt chart",
     "parameters": {
       "task_dates": "Range of all task dates",
       "timeline_date": "Date to calculate utilization for",

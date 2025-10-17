@@ -3,7 +3,7 @@
 import json
 import pytest
 from io import BytesIO
-from openpyxl import load_workbook
+from openpyxl import load_workbook, Workbook
 
 from app.excel.engine import ExcelTemplateEngine, ProjectConfig
 
@@ -133,7 +133,7 @@ class TestExcelTemplateEngine:
     def test_load_metadata_from_invalid_excel_raises_error(self, engine):
         """Test loading metadata from non-SprintForge Excel raises error."""
         # Create a simple Excel file without metadata
-        workbook = load_workbook()
+        workbook = Workbook()
         workbook.create_sheet("Sheet1")
 
         buffer = BytesIO()

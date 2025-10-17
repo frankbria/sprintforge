@@ -67,8 +67,15 @@ async def verify_nextauth_jwt(token: str) -> Dict[str, Any]:
         return payload
 
     except JWTError as e:
-        logger.warning("JWT validation failed", error=str(e))
+        error_str = str(e)
+        logger.warning("JWT validation failed", error=error_str)
+        # Check for specific error types
+        if "expired" in error_str.lower():
+            raise JWTAuthError("Token has expired")
         raise JWTAuthError("Invalid token")
+    except JWTAuthError:
+        # Re-raise JWTAuthError as-is (from missing sub check)
+        raise
     except Exception as e:
         logger.error("Unexpected error during JWT validation", error=str(e))
         raise JWTAuthError("Authentication error")
@@ -187,9 +194,10 @@ class AuthenticationMiddleware:
                     request.state.user = user_info
                     request.state.user_id = user_info.get("sub")
                     request.state.user_email = user_info.get("email")
-                except JWTAuthError:
+                except (JWTAuthError, Exception):
                     # Invalid token, but don't reject the request
                     # Let individual endpoints decide if auth is required
+                    # Do NOT set user attributes on state
                     pass
 
         await self.app(scope, receive, send)

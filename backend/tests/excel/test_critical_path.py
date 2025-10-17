@@ -60,11 +60,11 @@ class TestCriticalPathFormulas:
         """Test total float (slack) calculation."""
         formula = formula_templates.apply_template(
             "total_float",
-            late_start="F10",
-            early_start="D10",
+            late_finish="G10",
+            early_finish="E10",
         )
 
-        expected = "=F10 - D10"
+        expected = "=G10 - E10"
         assert formula == expected
 
     def test_free_float_formula(self, formula_templates):
@@ -148,7 +148,7 @@ class TestCriticalPathScenarios:
         )
 
         # Should evaluate to TRUE for critical task
-        assert "IF(AND(0<=0, 5>0), TRUE, FALSE)" == is_critical
+        assert "=IF(AND(0<=0, 5>0), TRUE, FALSE)" == is_critical
 
     def test_non_critical_task_identification(self, formula_templates):
         """Test that tasks with positive float are not critical."""
@@ -193,10 +193,10 @@ class TestCriticalPathScenarios:
         # Calculate total float
         total_float = formula_templates.apply_template(
             "total_float",
-            late_start="F5",
-            early_start="D5",
+            late_finish="G5",
+            early_finish="E5",
         )
-        assert total_float == "=F5 - D5"
+        assert total_float == "=G5 - E5"
 
     def test_schedule_performance_positive_variance(self, formula_templates):
         """Test schedule variance for ahead-of-schedule task."""

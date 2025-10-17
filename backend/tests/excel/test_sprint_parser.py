@@ -23,7 +23,7 @@ class TestYearQuarterNumberPattern:
 
         # Second sprint of Q1 2025 (January 15-28)
         sprint2 = parser.calculate_sprint_number(date(2025, 1, 15))
-        assert sprint2 == "25.Q1.3"
+        assert sprint2 == "25.Q1.2"
 
     def test_q2_sprint_calculation(self):
         """Test Q2 sprint number calculation."""

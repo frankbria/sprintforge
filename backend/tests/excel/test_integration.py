@@ -138,6 +138,8 @@ class TestExcelGenerationIntegration:
             "Duration (days)",
             "Start Date",
             "End Date",
+            "Dependencies",
+            "Sprint",
             "Status",
             "Owner",
         ]
@@ -292,7 +294,7 @@ class TestFormulaTemplateIntegration:
 
         # Apply finish-to-start formula
         formula = loader.apply_template(
-            "dependency_finish_to_start",
+            "dependency_fs",
             predecessor_finish="E4",
             task_start="D5",
             lag_days="2",

@@ -284,9 +284,22 @@ def is_safe_redirect_url(url: str, allowed_hosts: list) -> bool:
     try:
         parsed = urlparse(url)
 
-        # Relative URLs are safe
-        if not parsed.netloc:
+        # Block dangerous schemes
+        if parsed.scheme and parsed.scheme not in ('http', 'https', ''):
+            return False
+
+        # Relative URLs are safe (no scheme, no netloc, starts with /)
+        if not parsed.netloc and not parsed.scheme:
+            # Must be a path-only URL (e.g., /dashboard, ../profile)
+            # Reject if it looks malformed (contains : or @ without proper URL structure)
+            if ':' in url or '@' in url:
+                return False
             return True
+
+        # Absolute URLs must have netloc
+        if not parsed.netloc:
+            # Has scheme but no netloc - malformed or dangerous
+            return False
 
         # Check if host is in allowed list
         return parsed.netloc in allowed_hosts

@@ -37,11 +37,11 @@
     }
   },
   "total_float": {
-    "formula": "=$late_start - $early_start",
-    "description": "Total Float (Slack): Difference between late and early start",
+    "formula": "=$late_finish - $early_finish",
+    "description": "Total float calculation: Difference between late and early finish",
     "parameters": {
-      "late_start": "Cell reference to task late start date",
-      "early_start": "Cell reference to task early start date"
+      "early_finish": "Cell reference to early finish date",
+      "late_finish": "Cell reference to late finish date"
     }
   },
   "free_float": {

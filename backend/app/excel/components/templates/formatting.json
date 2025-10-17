@@ -49,9 +49,9 @@
     },
     "suggested_format": "Orange background"
   },
-  "critical_path_highlight": {
+  "critical_path_formatting": {
     "formula": "=$is_critical=TRUE",
-    "description": "Highlight critical path tasks",
+    "description": "Conditional formatting rule for critical path tasks",
     "parameters": {
       "is_critical": "Critical path boolean cell"
     },
@@ -125,9 +125,9 @@
     },
     "suggested_format": "Light blue/gray background"
   },
-  "gantt_today_marker": {
+  "gantt_today_formatting": {
     "formula": "=$timeline_date=TODAY()",
-    "description": "Highlight today's date column in Gantt",
+    "description": "Conditional formatting rule for today's date column in Gantt",
     "parameters": {
       "timeline_date": "Column header date"
     },
