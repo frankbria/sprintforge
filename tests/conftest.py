@@ -8,6 +8,9 @@ os.environ.setdefault('SECRET_KEY', 'test-secret-key-for-testing')
 os.environ.setdefault('DATABASE_URL', 'sqlite+aiosqlite:///:memory:')
 os.environ.setdefault('CORS_ORIGINS', '["http://testserver"]')
 
+# Store database type for conditional test skipping
+_using_postgresql = 'postgresql' in os.environ.get('DATABASE_URL', '')
+
 import asyncio
 import pytest
 import pytest_asyncio
@@ -311,3 +314,16 @@ class AsyncAPITestClient:
 async def async_api_client(async_client: AsyncClient) -> AsyncAPITestClient:
     """Enhanced async API test client."""
     return AsyncAPITestClient(async_client)
+
+# Pytest hooks for conditional test skipping
+def pytest_collection_modifyitems(config, items):
+    """Skip PostgreSQL-specific tests when using SQLite."""
+    if not _using_postgresql:
+        skip_postgresql = pytest.mark.skip(reason="PostgreSQL-specific test, but using SQLite")
+        for item in items:
+            # Skip tests in test_database_foundation.py and test_database_models.py
+            # These files contain PostgreSQL-specific SQL and features
+            if "test_database_foundation.py" in str(item.fspath):
+                item.add_marker(skip_postgresql)
+            elif "test_database_models.py" in str(item.fspath):
+                item.add_marker(skip_postgresql)
