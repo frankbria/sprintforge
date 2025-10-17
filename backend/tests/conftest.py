@@ -1,5 +1,6 @@
 """Pytest configuration with database fixtures for integration tests."""
 
+import asyncio
 import pytest
 import pytest_asyncio
 import os
@@ -28,6 +29,20 @@ def setup_test_environment():
     """Set up test environment."""
     # Ensure environment is properly configured for tests
     yield
+
+
+@pytest.fixture(scope="session")
+def event_loop():
+    """
+    Create session-scoped event loop for pytest-asyncio.
+
+    This is required because we have session-scoped async fixtures (test_engine).
+    Without this, pytest-asyncio's default function-scoped event_loop conflicts
+    with session-scoped async fixtures, causing ScopeMismatch errors.
+    """
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
 
 
 @pytest_asyncio.fixture(scope="session")
@@ -107,3 +122,76 @@ async def client(test_db_session: AsyncSession) -> AsyncGenerator[AsyncClient, N
 async def db_session(test_db_session: AsyncSession) -> AsyncSession:
     """Alias for test_db_session for backward compatibility."""
     return test_db_session
+
+
+@pytest_asyncio.fixture
+async def test_client(client: AsyncClient) -> AsyncClient:
+    """Alias for client fixture for backward compatibility with test_main.py."""
+    return client
+
+
+@pytest_asyncio.fixture
+async def test_user(test_db_session: AsyncSession):
+    """Create a test user for model tests."""
+    from app.models.user import User
+
+    user = User(
+        email="testuser@example.com",
+        name="Test User",
+        subscription_tier="free",
+        subscription_status="active",
+        preferences={},
+        is_active=True,
+    )
+
+    test_db_session.add(user)
+    await test_db_session.commit()
+    await test_db_session.refresh(user)
+
+    return user
+
+
+@pytest_asyncio.fixture
+async def test_user_pro(test_db_session: AsyncSession):
+    """Create a test pro user for model tests."""
+    from app.models.user import User
+
+    user = User(
+        email="prouser@example.com",
+        name="Pro User",
+        subscription_tier="pro",
+        subscription_status="active",
+        preferences={},
+        is_active=True,
+    )
+
+    test_db_session.add(user)
+    await test_db_session.commit()
+    await test_db_session.refresh(user)
+
+    return user
+
+
+@pytest_asyncio.fixture
+async def test_project(test_db_session: AsyncSession, test_user):
+    """Create a test project for model tests."""
+    from app.models.project import Project
+
+    project = Project(
+        name="Test Project",
+        description="A test project",
+        owner_id=test_user.id,
+        configuration={
+            "sprint_pattern": "YY.Q.#",
+            "sprint_duration_weeks": 2,
+            "working_days": [1, 2, 3, 4, 5],
+        },
+        template_version="1.0",
+        is_public=False,
+    )
+
+    test_db_session.add(project)
+    await test_db_session.commit()
+    await test_db_session.refresh(project)
+
+    return project

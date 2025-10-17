@@ -17,7 +17,7 @@ from unittest.mock import MagicMock, patch
 from uuid import uuid4
 
 import pytest
-from fastapi import status, UploadFile
+from fastapi import status
 from httpx import AsyncClient
 from openpyxl import Workbook
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -26,11 +26,18 @@ from app.core.auth import create_jwt_token
 from app.main import app
 
 
+@pytest.fixture
+def mock_user_info() -> dict:
+    """Mock authenticated user info."""
+    return {"sub": str(uuid4()), "email": "test@example.com"}
+
+
+@pytest.mark.asyncio
 class TestUploadExcelAndSimulate:
     """Test cases for POST /projects/{project_id}/excel/simulate endpoint."""
 
     @pytest.fixture
-    def valid_excel_file(self) -> UploadFile:
+    def valid_excel_file(self) -> io.BytesIO:
         """Create a valid Excel file with task data."""
         wb = Workbook()
         ws = wb.active
@@ -51,22 +58,13 @@ class TestUploadExcelAndSimulate:
         wb.save(excel_bytes)
         excel_bytes.seek(0)
 
-        return UploadFile(
-            filename="test_tasks.xlsx",
-            file=excel_bytes,
-            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        )
-
-    @pytest.fixture
-    def mock_user_info(self) -> dict:
-        """Mock authenticated user info."""
-        return {"sub": str(uuid4()), "email": "test@example.com"}
+        return excel_bytes
 
     async def test_upload_valid_excel_and_simulate_success(
         self,
         client: AsyncClient,
         db_session: AsyncSession,
-        valid_excel_file: UploadFile,
+        valid_excel_file: io.BytesIO,
         mock_user_info: dict,
     ):
         """Test uploading valid Excel file and running simulation successfully."""
@@ -108,7 +106,7 @@ class TestUploadExcelAndSimulate:
             # Make request
             response = await client.post(
                 f"/api/v1/projects/{project_id}/excel/simulate",
-                files={"file": ("test.xlsx", valid_excel_file.file, valid_excel_file.content_type)},
+                files={"file": ("test.xlsx", valid_excel_file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")},
                 params={
                     "iterations": 10000,
                     "project_start_date": "2025-01-15",
@@ -168,7 +166,7 @@ class TestUploadExcelAndSimulate:
             assert response.status_code == 415  # Unsupported Media Type
 
     async def test_upload_excel_with_parsing_errors(
-        self, client: AsyncClient, valid_excel_file: UploadFile, mock_user_info: dict
+        self, client: AsyncClient, valid_excel_file: io.BytesIO, mock_user_info: dict
     ):
         """Test handling of Excel parsing errors."""
         project_id = uuid4()
@@ -182,7 +180,7 @@ class TestUploadExcelAndSimulate:
 
             response = await client.post(
                 f"/api/v1/projects/{project_id}/excel/simulate",
-                files={"file": ("test.xlsx", valid_excel_file.file, valid_excel_file.content_type)},
+                files={"file": ("test.xlsx", valid_excel_file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")},
                 params={
                     "iterations": 10000,
                     "project_start_date": "2025-01-15",
@@ -193,7 +191,7 @@ class TestUploadExcelAndSimulate:
             assert "task_name" in response.json()["detail"]
 
     async def test_upload_excel_with_circular_dependencies(
-        self, client: AsyncClient, valid_excel_file: UploadFile, mock_user_info: dict
+        self, client: AsyncClient, valid_excel_file: io.BytesIO, mock_user_info: dict
     ):
         """Test handling of circular dependency errors."""
         project_id = uuid4()
@@ -209,7 +207,7 @@ class TestUploadExcelAndSimulate:
 
             response = await client.post(
                 f"/api/v1/projects/{project_id}/excel/simulate",
-                files={"file": ("test.xlsx", valid_excel_file.file, valid_excel_file.content_type)},
+                files={"file": ("test.xlsx", valid_excel_file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")},
                 params={
                     "iterations": 10000,
                     "project_start_date": "2025-01-15",
@@ -220,14 +218,14 @@ class TestUploadExcelAndSimulate:
             assert "circular" in response.json()["detail"].lower()
 
     async def test_upload_excel_unauthorized(
-        self, client: AsyncClient, valid_excel_file: UploadFile
+        self, client: AsyncClient, valid_excel_file: io.BytesIO
     ):
         """Test upload without authentication."""
         project_id = uuid4()
 
         response = await client.post(
             f"/api/v1/projects/{project_id}/excel/simulate",
-            files={"file": ("test.xlsx", valid_excel_file.file, valid_excel_file.content_type)},
+            files={"file": ("test.xlsx", valid_excel_file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")},
             params={
                 "iterations": 10000,
                 "project_start_date": "2025-01-15",
@@ -237,7 +235,7 @@ class TestUploadExcelAndSimulate:
         assert response.status_code == 401  # Unauthorized
 
     async def test_upload_excel_invalid_iterations(
-        self, client: AsyncClient, valid_excel_file: UploadFile, mock_user_info: dict
+        self, client: AsyncClient, valid_excel_file: io.BytesIO, mock_user_info: dict
     ):
         """Test validation of iterations parameter."""
         project_id = uuid4()
@@ -246,7 +244,7 @@ class TestUploadExcelAndSimulate:
             # Too few iterations
             response = await client.post(
                 f"/api/v1/projects/{project_id}/excel/simulate",
-                files={"file": ("test.xlsx", valid_excel_file.file, valid_excel_file.content_type)},
+                files={"file": ("test.xlsx", valid_excel_file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")},
                 params={
                     "iterations": 50,  # Below minimum of 100
                     "project_start_date": "2025-01-15",
@@ -257,7 +255,7 @@ class TestUploadExcelAndSimulate:
             # Too many iterations
             response = await client.post(
                 f"/api/v1/projects/{project_id}/excel/simulate",
-                files={"file": ("test.xlsx", valid_excel_file.file, valid_excel_file.content_type)},
+                files={"file": ("test.xlsx", valid_excel_file, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")},
                 params={
                     "iterations": 200000,  # Above maximum of 100000
                     "project_start_date": "2025-01-15",
@@ -266,6 +264,7 @@ class TestUploadExcelAndSimulate:
             assert response.status_code == 422
 
 
+@pytest.mark.asyncio
 class TestDownloadSimulationExcel:
     """Test cases for GET /simulations/{simulation_id}/excel endpoint."""
 
@@ -325,6 +324,7 @@ class TestDownloadSimulationExcel:
         assert response.status_code == 401
 
 
+@pytest.mark.asyncio
 class TestDownloadExcelTemplate:
     """Test cases for GET /excel/template endpoint."""
 
@@ -370,6 +370,7 @@ class TestDownloadExcelTemplate:
         assert response.status_code == 401
 
 
+@pytest.mark.asyncio
 class TestExcelWorkflowIntegration:
     """Integration tests for complete Excel workflow."""
 
