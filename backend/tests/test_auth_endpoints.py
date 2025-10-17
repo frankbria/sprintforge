@@ -67,7 +67,13 @@ class TestAuthEndpointsUnit:
                 self.updated_at = datetime.now(timezone.utc)
                 self.preferences = {}  # Real dict, not Mock
                 # Add SQLAlchemy state attribute for flag_modified to work
-                self._sa_instance_state = Mock()
+                # The state needs a manager that supports subscripting
+                mock_attr_impl = Mock()
+                mock_manager = Mock()
+                mock_manager.__getitem__ = Mock(return_value=mock_attr_impl)
+                mock_state = Mock()
+                mock_state.manager = mock_manager
+                self._sa_instance_state = mock_state
 
         return MockUser()
 
@@ -627,7 +633,13 @@ class TestEndpointValidation:
                 self.updated_at = datetime.now(timezone.utc)
                 self.preferences = {}  # Real dict, not Mock
                 # Add SQLAlchemy state attribute for flag_modified to work
-                self._sa_instance_state = Mock()
+                # The state needs a manager that supports subscripting
+                mock_attr_impl = Mock()
+                mock_manager = Mock()
+                mock_manager.__getitem__ = Mock(return_value=mock_attr_impl)
+                mock_state = Mock()
+                mock_state.manager = mock_manager
+                self._sa_instance_state = mock_state
 
         return MockUser()
 

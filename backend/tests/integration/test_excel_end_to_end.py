@@ -27,9 +27,18 @@ class TestExcelEndToEnd:
         """Mock authenticated user info."""
         return {"sub": str(uuid4()), "email": "test@example.com"}
 
+    @pytest.fixture
+    def auth_headers(self, mock_user_info: dict) -> dict:
+        """Generate Authorization headers with valid JWT token."""
+        from app.core.auth import create_jwt_token
+
+        # Create a valid JWT token for the mock user
+        token = create_jwt_token(mock_user_info, expires_delta=60)  # 60 minutes
+        return {"Authorization": f"Bearer {token}"}
+
     @pytest.mark.asyncio
     async def test_complete_excel_workflow(
-        self, client: AsyncClient, db_session: AsyncSession, mock_user_info: dict
+        self, client: AsyncClient, db_session: AsyncSession, mock_user_info: dict, auth_headers: dict
     ):
         """
         Test complete workflow: upload → simulate → download → verify.
@@ -69,7 +78,7 @@ class TestExcelEndToEnd:
         wb.save(upload_bytes)
         upload_bytes.seek(0)
 
-        with patch("app.core.auth.require_auth", return_value=mock_user_info), patch(
+        with patch(
             "app.services.excel_parser_service.ExcelParserService.parse_excel_file"
         ) as mock_parse, patch(
             "app.services.simulation_service.SimulationService.run_simulation"
@@ -146,6 +155,7 @@ class TestExcelEndToEnd:
                     "iterations": 10000,
                     "project_start_date": "2025-01-20",
                 },
+                headers=auth_headers,
             )
 
             # Verify upload response
@@ -225,7 +235,8 @@ class TestExcelEndToEnd:
             mock_save_bytes.return_value = download_bytes.getvalue()
 
             download_response = await client.get(
-                f"/api/v1/excel/simulations/{simulation_id}/excel"
+                f"/api/v1/excel/simulations/{simulation_id}/excel",
+                headers=auth_headers,
             )
 
             # Verify download response
@@ -264,12 +275,12 @@ class TestExcelEndToEnd:
 
     @pytest.mark.asyncio
     async def test_template_download_and_upload(
-        self, client: AsyncClient, mock_user_info: dict
+        self, client: AsyncClient, mock_user_info: dict, auth_headers: dict
     ):
         """Test downloading template and using it for simulation."""
         project_id = uuid4()
 
-        with patch("app.core.auth.require_auth", return_value=mock_user_info), patch(
+        with patch(
             "app.services.excel_generation_service.ExcelGenerationService.create_template_workbook"
         ) as mock_template, patch(
             "app.services.excel_generation_service.ExcelGenerationService.save_workbook_to_bytes"
@@ -304,7 +315,9 @@ class TestExcelEndToEnd:
             mock_save_bytes.return_value = template_bytes.getvalue()
 
             template_response = await client.get(
-                "/api/v1/excel/template", params={"include_sample_data": True}
+                "/api/v1/excel/template",
+                params={"include_sample_data": True},
+                headers=auth_headers,
             )
 
             assert template_response.status_code == 200
@@ -327,10 +340,23 @@ class TestExcelEndToEnd:
             )
 
             from unittest.mock import MagicMock
+            from datetime import datetime
 
             mock_result = MagicMock()
             mock_result.project_duration_days = 2.0
+            mock_result.confidence_intervals = {
+                10: 1.5,
+                50: 2.0,
+                90: 2.5,
+                95: 2.7,
+                99: 3.0,
+            }
             mock_result.mean_duration = 2.0
+            mock_result.median_duration = 2.0
+            mock_result.std_deviation = 0.5
+            mock_result.iterations_run = 1000
+            mock_result.task_count = 1
+            mock_result.simulation_date = datetime.now()
             mock_simulate.return_value = mock_result
             mock_save.return_value = 999
 
@@ -347,6 +373,7 @@ class TestExcelEndToEnd:
                     "iterations": 1000,
                     "project_start_date": "2025-02-01",
                 },
+                headers=auth_headers,
             )
 
             assert simulate_response.status_code == 200
