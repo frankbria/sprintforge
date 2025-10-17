@@ -7,7 +7,11 @@
 'use client';
 
 import * as React from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { Alert, AlertDescription } from '@/components/ui/Alert';
+import { getProgressAnalytics } from '@/lib/api/analytics';
 import {
   LineChart,
   Line,

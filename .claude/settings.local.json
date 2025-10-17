@@ -55,7 +55,10 @@
       "Bash(chmod:*)",
       "Bash(wait:*)",
       "Bash(timeout 30 python -m pytest:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "mcp__morphllm-fast-apply__search_files",
+      "mcp__morphllm-fast-apply__list_directory",
+      "mcp__serena__get_current_config"
     ],
     "deny": [],
     "ask": []
