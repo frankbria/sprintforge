@@ -1,16 +1,22 @@
 """Global test configuration and fixtures for SprintForge."""
 
-import asyncio
+# CRITICAL: Set environment variables BEFORE any imports
+# This prevents Settings validation errors during conftest loading
 import os
+os.environ.setdefault('SECRET_KEY', 'test-secret-key-for-testing')
+# Use SQLite for unit tests (no PostgreSQL required)
+os.environ.setdefault('DATABASE_URL', 'sqlite+aiosqlite:///:memory:')
+os.environ.setdefault('CORS_ORIGINS', '["http://testserver"]')
+
+import asyncio
 import pytest
 import pytest_asyncio
 from typing import AsyncGenerator, Generator
 from unittest.mock import Mock
 
-import asyncpg
 from fastapi.testclient import TestClient
 from httpx import AsyncClient
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
@@ -19,9 +25,9 @@ from app.main import app
 from app.core.config import Settings, get_settings
 
 
-# Test database configuration
-TEST_DATABASE_URL = "postgresql+asyncpg://test_user:test_pass@localhost:5432/test_sprintforge"
-TEST_DATABASE_URL_SYNC = "postgresql://test_user:test_pass@localhost:5432/test_sprintforge"
+# Test database configuration - using SQLite for unit tests
+TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
+TEST_DATABASE_URL_SYNC = "sqlite:///:memory:"
 
 
 class TestSettings(Settings):
@@ -63,44 +69,13 @@ def override_settings(test_settings: TestSettings) -> Generator[None, None, None
 
 
 @pytest_asyncio.fixture(scope="session")
-async def create_test_database(test_settings: TestSettings) -> AsyncGenerator[None, None]:
-    """Create and drop test database."""
-    # Extract database name from URL
-    db_name = test_settings.database_url.split("/")[-1]
-    base_url = test_settings.database_url.rsplit("/", 1)[0]
-
-    # Connect to postgres database to create test database
-    conn = await asyncpg.connect(
-        host="localhost",
-        port=5432,
-        user="test_user",
-        password="test_pass",
-        database="postgres"
-    )
-
-    try:
-        # Drop database if exists and create new one
-        await conn.execute(f"DROP DATABASE IF EXISTS {db_name}")
-        await conn.execute(f"CREATE DATABASE {db_name}")
-        yield
-    finally:
-        # Clean up: drop test database
-        await conn.execute(f"DROP DATABASE IF EXISTS {db_name}")
-        await conn.close()
-
-
-@pytest_asyncio.fixture
-async def async_engine(test_settings: TestSettings, create_test_database):
-    """Create async database engine for testing."""
+async def async_engine(test_settings: TestSettings):
+    """Create async database engine for testing (SQLite in-memory)."""
     engine = create_async_engine(
         test_settings.database_url,
         echo=False,
         poolclass=StaticPool,
-        connect_args={
-            "server_settings": {
-                "application_name": "sprintforge_test",
-            }
-        }
+        connect_args={"check_same_thread": False}
     )
 
     yield engine
@@ -122,15 +97,13 @@ async def async_session(async_engine) -> AsyncGenerator[AsyncSession, None]:
 
 
 @pytest.fixture
-def sync_engine(test_settings: TestSettings, create_test_database):
-    """Create synchronous database engine for testing."""
+def sync_engine(test_settings: TestSettings):
+    """Create synchronous database engine for testing (SQLite in-memory)."""
     engine = create_engine(
         TEST_DATABASE_URL_SYNC,
         echo=False,
         poolclass=StaticPool,
-        connect_args={
-            "application_name": "sprintforge_test_sync",
-        }
+        connect_args={"check_same_thread": False}
     )
 
     yield engine

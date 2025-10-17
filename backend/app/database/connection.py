@@ -93,9 +93,10 @@ get_db = get_database_session
 async def check_database_connection() -> bool:
     """Check if database connection is working."""
     try:
+        from sqlalchemy import text
         engine = create_engine()
         async with engine.begin() as conn:
-            result = await conn.execute("SELECT 1")
+            result = await conn.execute(text("SELECT 1"))
             row = result.fetchone()
             return row[0] == 1
     except Exception as e:
