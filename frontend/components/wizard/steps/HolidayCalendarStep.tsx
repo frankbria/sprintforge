@@ -143,9 +143,9 @@ export function HolidayCalendarStep({
           </div>
         ) : (
           <div className="border border-dashed border-gray-300 rounded-lg p-8 text-center">
-            <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-2" />
+            <Calendar className="h-12 w-12 text-gray-600 mx-auto mb-2" />
             <p className="text-gray-700">No holidays added yet</p>
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-gray-600">
               Import a preset or add custom holidays
             </p>
           </div>

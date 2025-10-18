@@ -73,7 +73,7 @@ export function ProjectList({
   if (!projects.length && !searchQuery) {
     return (
       <div className="bg-white shadow rounded-lg p-8 text-center">
-        <FileSpreadsheet className="mx-auto h-12 w-12 text-gray-400" />
+        <FileSpreadsheet className="mx-auto h-12 w-12 text-gray-600" />
         <h3 className="mt-2 text-sm font-medium text-gray-900">No projects yet</h3>
         <p className="mt-1 text-sm text-gray-700">
           Get started by creating your first project.
@@ -97,7 +97,7 @@ export function ProjectList({
         <div className="flex items-center space-x-4">
           <div className="flex-1 relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search className="h-5 w-5 text-gray-400" />
+              <Search className="h-5 w-5 text-gray-600" />
             </div>
             <input
               type="text"
@@ -173,7 +173,7 @@ export function ProjectList({
                 <div className="ml-4 flex-shrink-0 relative">
                   <button
                     onClick={() => handleMenuToggle(project.id)}
-                    className="inline-flex items-center justify-center w-8 h-8 text-gray-400 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-full"
+                    className="inline-flex items-center justify-center w-8 h-8 text-gray-600 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-full"
                   >
                     <MoreVertical className="h-5 w-5" />
                   </button>

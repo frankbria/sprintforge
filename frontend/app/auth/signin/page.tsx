@@ -311,7 +311,7 @@ export default function SignIn() {
 
         {/* Keyboard Navigation Help */}
         <div className="mt-4 text-center">
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-gray-600">
             Use Tab to navigate • Enter to select
           </p>
         </div>

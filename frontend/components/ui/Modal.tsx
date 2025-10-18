@@ -79,7 +79,7 @@ export function Modal({
               {showCloseButton && (
                 <button
                   type="button"
-                  className="rounded-md bg-white text-gray-400 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  className="rounded-md bg-white text-gray-600 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                   onClick={onClose}
                 >
                   <span className="sr-only">Close</span>

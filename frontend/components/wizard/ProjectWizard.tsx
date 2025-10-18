@@ -127,7 +127,7 @@ export function ProjectWizard({
                       ? 'border-blue-600 bg-blue-600 text-white'
                       : step.id < currentStep
                       ? 'border-blue-600 bg-blue-600 text-white cursor-pointer hover:scale-110'
-                      : 'border-gray-300 bg-white text-gray-400 cursor-not-allowed opacity-50'
+                      : 'border-gray-300 bg-white text-gray-600 cursor-not-allowed opacity-50'
                   )}
                 >
                   {step.id < currentStep ? (
@@ -147,7 +147,7 @@ export function ProjectWizard({
                   >
                     {step.title}
                   </span>
-                  <span className="text-xs text-gray-400 max-w-[100px] truncate">
+                  <span className="text-xs text-gray-600 max-w-[100px] truncate">
                     {step.description}
                   </span>
                 </div>

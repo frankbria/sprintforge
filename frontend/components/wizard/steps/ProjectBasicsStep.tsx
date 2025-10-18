@@ -45,7 +45,7 @@ export function ProjectBasicsStep({ form }: ProjectBasicsStepProps) {
           rows={4}
           placeholder="Describe your project goals and objectives..."
           {...register('description')}
-          className="flex min-h-[100px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:border-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex min-h-[100px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:border-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
         />
         {errors.description && (
           <p className="text-sm text-red-600">{errors.description.message}</p>

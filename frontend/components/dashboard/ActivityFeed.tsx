@@ -116,7 +116,7 @@ export function ActivityFeed({
       <div className="bg-white shadow rounded-lg p-6">
         <h2 className="text-lg font-medium text-gray-900 mb-4">Recent Activity</h2>
         <div className="text-center py-8">
-          <Clock className="mx-auto h-12 w-12 text-gray-400" />
+          <Clock className="mx-auto h-12 w-12 text-gray-600" />
           <p className="mt-2 text-sm text-gray-700">
             No recent activity. Create a project to get started!
           </p>
