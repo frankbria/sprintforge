@@ -127,7 +127,7 @@ export default function AnalyticsPage() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Project Analytics</h1>
-          <p className="text-sm sm:text-base text-gray-600 mt-1">
+          <p className="text-sm sm:text-base text-gray-800 mt-1">
             Comprehensive insights into project health and performance
           </p>
         </div>
@@ -177,15 +177,15 @@ export default function AnalyticsPage() {
               <CardContent>
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Duration</span>
+                    <span className="text-sm text-gray-800">Duration</span>
                     <span className="font-semibold">{data.critical_path_summary.total_duration} days</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Critical Tasks</span>
+                    <span className="text-sm text-gray-800">Critical Tasks</span>
                     <span className="font-semibold">{data.critical_path_summary.critical_tasks_count}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Stability Score</span>
+                    <span className="text-sm text-gray-800">Stability Score</span>
                     <span className="font-semibold">{data.critical_path_summary.path_stability_score.toFixed(1)}/100</span>
                   </div>
                 </div>
@@ -200,15 +200,15 @@ export default function AnalyticsPage() {
               <CardContent>
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Total Resources</span>
+                    <span className="text-sm text-gray-800">Total Resources</span>
                     <span className="font-semibold">{data.resource_summary.total_resources}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Allocated</span>
+                    <span className="text-sm text-gray-800">Allocated</span>
                     <span className="font-semibold">{data.resource_summary.allocated_resources}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Utilization</span>
+                    <span className="text-sm text-gray-800">Utilization</span>
                     <span className="font-semibold">{data.resource_summary.utilization_pct.toFixed(1)}%</span>
                   </div>
                 </div>
@@ -233,11 +233,11 @@ export default function AnalyticsPage() {
                   </div>
                   <div className="space-y-1 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">P50</span>
+                      <span className="text-gray-800">P50</span>
                       <span className="font-semibold">{data.simulation_summary.p50.toFixed(1)} days</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">P90</span>
+                      <span className="text-gray-800">P90</span>
                       <span className="font-semibold">{data.simulation_summary.p90.toFixed(1)} days</span>
                     </div>
                   </div>
@@ -269,7 +269,7 @@ export default function AnalyticsPage() {
       </Tabs>
 
       {/* Data timestamp */}
-      <div className="text-center text-xs text-gray-500">
+      <div className="text-center text-xs text-gray-700">
         Last updated: {new Date(data.generated_at).toLocaleString()}
       </div>
     </div>

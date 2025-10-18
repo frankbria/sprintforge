@@ -75,7 +75,7 @@ export function ProjectList({
       <div className="bg-white shadow rounded-lg p-8 text-center">
         <FileSpreadsheet className="mx-auto h-12 w-12 text-gray-400" />
         <h3 className="mt-2 text-sm font-medium text-gray-900">No projects yet</h3>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-gray-700">
           Get started by creating your first project.
         </p>
         <div className="mt-6">
@@ -146,11 +146,11 @@ export function ProjectList({
                     {project.name}
                   </Link>
                   {project.description && (
-                    <p className="mt-1 text-sm text-gray-500 line-clamp-2">
+                    <p className="mt-1 text-sm text-gray-700 line-clamp-2">
                       {project.description}
                     </p>
                   )}
-                  <div className="mt-2 flex items-center text-xs text-gray-500 space-x-4">
+                  <div className="mt-2 flex items-center text-xs text-gray-700 space-x-4">
                     <div className="flex items-center">
                       <Calendar className="h-4 w-4 mr-1" />
                       Created {formatDate(project.created_at)}
@@ -173,7 +173,7 @@ export function ProjectList({
                 <div className="ml-4 flex-shrink-0 relative">
                   <button
                     onClick={() => handleMenuToggle(project.id)}
-                    className="inline-flex items-center justify-center w-8 h-8 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-full"
+                    className="inline-flex items-center justify-center w-8 h-8 text-gray-400 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-full"
                   >
                     <MoreVertical className="h-5 w-5" />
                   </button>

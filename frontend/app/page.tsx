@@ -35,7 +35,7 @@ export default function Home() {
         <div className="flex flex-col sm:flex-row items-center justify-between w-full gap-4">
           <div className="flex items-center gap-4">
             <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">SprintForge</h1>
-            <div className="text-sm text-gray-600 hidden sm:block">
+            <div className="text-sm text-gray-800 hidden sm:block">
               Project Management & Excel Generation
             </div>
           </div>
@@ -57,7 +57,7 @@ export default function Home() {
           )}
         </div>
 
-        <div className="text-sm text-gray-600 sm:hidden text-center">
+        <div className="text-sm text-gray-800 sm:hidden text-center">
           Project Management & Excel Generation
         </div>
 
@@ -78,7 +78,7 @@ export default function Home() {
                   <h3 className="text-lg font-semibold text-gray-900">
                     Welcome back, {user?.name}!
                   </h3>
-                  <p className="text-sm text-gray-600">{user?.email}</p>
+                  <p className="text-sm text-gray-800">{user?.email}</p>
                 </div>
               </div>
               <div className="mt-6 space-y-3">
@@ -103,7 +103,7 @@ export default function Home() {
               <h2 className="text-xl font-semibold text-gray-900 mb-4">
                 Get Started
               </h2>
-              <p className="text-gray-600 mb-6">
+              <p className="text-gray-800 mb-6">
                 Sign in to create and manage your projects with advanced Excel generation capabilities.
               </p>
               <Link
@@ -124,7 +124,7 @@ export default function Home() {
               </svg>
               <h3 className="font-semibold text-lg">Excel Generation</h3>
             </div>
-            <p className="text-gray-600 text-sm">
+            <p className="text-gray-800 text-sm">
               Generate sophisticated Excel spreadsheets with Gantt charts and probabilistic timelines without macros.
             </p>
           </div>
@@ -135,7 +135,7 @@ export default function Home() {
               </svg>
               <h3 className="font-semibold text-lg">Project Management</h3>
             </div>
-            <p className="text-gray-600 text-sm">
+            <p className="text-gray-800 text-sm">
               Plan, track, and manage your projects with advanced scheduling algorithms and dependency solving.
             </p>
           </div>
@@ -146,14 +146,14 @@ export default function Home() {
               </svg>
               <h3 className="font-semibold text-lg">Open Source</h3>
             </div>
-            <p className="text-gray-600 text-sm">
+            <p className="text-gray-800 text-sm">
               Built with modern technologies and available as an open-source solution for teams of all sizes.
             </p>
           </div>
         </div>
       </main>
       
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center text-sm text-gray-600">
+      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center text-sm text-gray-800">
         <span>© 2025 SprintForge</span>
         <span>•</span>
         <a href="#" className="hover:underline">Privacy</a>

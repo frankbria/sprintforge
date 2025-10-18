@@ -154,7 +154,7 @@ export default function SignIn() {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Welcome to SprintForge
           </h1>
-          <p className="text-gray-600 text-sm sm:text-base">
+          <p className="text-gray-800 text-sm sm:text-base">
             Choose your preferred authentication method to get started
           </p>
         </div>
@@ -179,7 +179,7 @@ export default function SignIn() {
             <div>
               <button
                 onClick={() => setShowCredentialsForm(false)}
-                className="flex items-center text-sm text-gray-600 hover:text-gray-900 mb-6"
+                className="flex items-center text-sm text-gray-800 hover:text-gray-900 mb-6"
               >
                 <svg className="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
@@ -255,7 +255,7 @@ export default function SignIn() {
                 ))
               ) : (
                 <div className="text-center py-8">
-                  <p className="text-gray-500 mb-4">No authentication providers available</p>
+                  <p className="text-gray-700 mb-4">No authentication providers available</p>
                   <Button
                     onClick={() => window.location.reload()}
                     variant="ghost"
@@ -274,12 +274,12 @@ export default function SignIn() {
               <div className="w-full border-t border-gray-200" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">Secure Authentication</span>
+              <span className="px-2 bg-white text-gray-700">Secure Authentication</span>
             </div>
           </div>
 
           {/* Security Features */}
-          <div className="grid grid-cols-2 gap-4 text-xs text-gray-500">
+          <div className="grid grid-cols-2 gap-4 text-xs text-gray-700">
             <div className="flex items-center">
               <svg className="h-4 w-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -297,7 +297,7 @@ export default function SignIn() {
 
         {/* Footer */}
         <div className="text-center mt-6">
-          <p className="text-xs text-gray-500 leading-relaxed">
+          <p className="text-xs text-gray-700 leading-relaxed">
             By signing in, you agree to our{" "}
             <a href="#" className="text-blue-600 hover:text-blue-500 underline">
               Terms of Service

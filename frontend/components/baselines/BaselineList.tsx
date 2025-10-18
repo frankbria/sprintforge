@@ -130,7 +130,7 @@ export function BaselineList({ projectId }: BaselineListProps) {
     return (
       <div className="flex items-center justify-center py-12">
         <LoadingSpinner size="lg" />
-        <span className="ml-3 text-gray-600">Loading baselines...</span>
+        <span className="ml-3 text-gray-800">Loading baselines...</span>
       </div>
     );
   }
@@ -160,7 +160,7 @@ export function BaselineList({ projectId }: BaselineListProps) {
   if (baselines.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500 mb-4">No baselines found for this project.</p>
+        <p className="text-gray-700 mb-4">No baselines found for this project.</p>
         <Button onClick={() => setCreateDialogOpen(true)} icon={<Plus size={16} />}>
           Create Baseline
         </Button>
@@ -206,7 +206,7 @@ export function BaselineList({ projectId }: BaselineListProps) {
                 <div>
                   <div>{baseline.name}</div>
                   {baseline.description && (
-                    <div className="text-xs text-gray-500 mt-0.5">
+                    <div className="text-xs text-gray-700 mt-0.5">
                       {baseline.description}
                     </div>
                   )}
@@ -220,7 +220,7 @@ export function BaselineList({ projectId }: BaselineListProps) {
                     Active
                   </span>
                 ) : (
-                  <span className="text-gray-500 text-sm">Inactive</span>
+                  <span className="text-gray-700 text-sm">Inactive</span>
                 )}
               </TableCell>
               <TableCell>{formatBytes(baseline.snapshot_size_bytes)}</TableCell>

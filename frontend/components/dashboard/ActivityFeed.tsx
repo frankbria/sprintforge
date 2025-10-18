@@ -49,7 +49,7 @@ export function ActivityFeed({
       case "shared":
         return { Icon: Share2, bgColor: "bg-orange-100", iconColor: "text-orange-600" }
       default:
-        return { Icon: Clock, bgColor: "bg-gray-100", iconColor: "text-gray-600" }
+        return { Icon: Clock, bgColor: "bg-gray-100", iconColor: "text-gray-800" }
     }
   }
 
@@ -117,7 +117,7 @@ export function ActivityFeed({
         <h2 className="text-lg font-medium text-gray-900 mb-4">Recent Activity</h2>
         <div className="text-center py-8">
           <Clock className="mx-auto h-12 w-12 text-gray-400" />
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-2 text-sm text-gray-700">
             No recent activity. Create a project to get started!
           </p>
         </div>
@@ -154,7 +154,7 @@ export function ActivityFeed({
                       {activity.projectName}
                     </Link>
                   </p>
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs text-gray-700">
                     {formatTimestamp(activity.timestamp)}
                   </p>
                 </div>

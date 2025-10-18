@@ -74,7 +74,7 @@ export function PageLoading({
     <div className={`min-h-screen flex items-center justify-center bg-gray-50 ${className}`}>
       <div className="text-center">
         <LoadingSpinner size="xl" className="mx-auto mb-4" aria-label={message} />
-        <p className="text-gray-600 text-lg">{message}</p>
+        <p className="text-gray-800 text-lg">{message}</p>
       </div>
     </div>
   )

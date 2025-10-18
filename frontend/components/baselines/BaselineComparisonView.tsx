@@ -60,13 +60,13 @@ function MetricCard({
     blue: 'text-blue-600',
     green: 'text-green-600',
     red: 'text-red-600',
-    gray: 'text-gray-600',
+    gray: 'text-gray-800',
   };
 
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium text-gray-600">{title}</CardTitle>
+        <CardTitle className="text-sm font-medium text-gray-800">{title}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className={`text-3xl font-bold ${colorClasses[color]}`}>{value}</div>
@@ -114,7 +114,7 @@ export function BaselineComparisonView({
     return (
       <div className="flex items-center justify-center py-12">
         <LoadingSpinner size="lg" />
-        <span className="ml-3 text-gray-600">Loading comparison...</span>
+        <span className="ml-3 text-gray-800">Loading comparison...</span>
       </div>
     );
   }
@@ -153,7 +153,7 @@ export function BaselineComparisonView({
       {/* Header */}
       <div className="border-b pb-4">
         <h1 className="text-2xl font-bold text-gray-900">{baseline.name}</h1>
-        <div className="flex gap-4 mt-2 text-sm text-gray-600">
+        <div className="flex gap-4 mt-2 text-sm text-gray-800">
           <div>
             <span className="font-medium">Created:</span> {formatDate(baseline.created_at)}
           </div>
@@ -188,7 +188,7 @@ export function BaselineComparisonView({
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-600">Sort by:</span>
+          <span className="text-sm text-gray-800">Sort by:</span>
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as 'variance' | 'name')}
@@ -249,7 +249,7 @@ export function BaselineComparisonView({
         </Table>
 
         {sortedVariances.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-gray-700">
             No task variances to display.
           </div>
         )}
@@ -266,7 +266,7 @@ export function BaselineComparisonView({
                   <li key={task.task_id} className="flex items-center gap-2">
                     <span className="text-green-600">+</span>
                     <span>{task.task_name}</span>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-gray-700">
                       (added after baseline)
                     </span>
                   </li>
@@ -287,8 +287,8 @@ export function BaselineComparisonView({
                 {deleted_tasks.map((task) => (
                   <li key={task.task_id} className="flex items-center gap-2">
                     <span className="text-red-600">−</span>
-                    <span className="line-through text-gray-500">{task.task_name}</span>
-                    <span className="text-xs text-gray-500">
+                    <span className="line-through text-gray-700">{task.task_name}</span>
+                    <span className="text-xs text-gray-700">
                       (existed in baseline)
                     </span>
                   </li>

@@ -67,7 +67,7 @@ export function HolidayCalendarStep({
               )}
             >
               <div className="font-medium text-gray-900">{preset.name}</div>
-              <div className="text-xs text-gray-500 mt-1">
+              <div className="text-xs text-gray-700 mt-1">
                 {preset.holidays.length} holidays
               </div>
             </button>
@@ -115,7 +115,7 @@ export function HolidayCalendarStep({
                     className="flex items-center justify-between p-2 bg-gray-50 rounded-md"
                   >
                     <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-gray-500" />
+                      <Calendar className="h-4 w-4 text-gray-700" />
                       <span className="font-medium text-gray-900">
                         {new Date(date + 'T00:00:00').toLocaleDateString('en-US', {
                           year: 'numeric',
@@ -124,7 +124,7 @@ export function HolidayCalendarStep({
                         })}
                       </span>
                       {preset && (
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-gray-700">
                           ({preset.name})
                         </span>
                       )}
@@ -144,7 +144,7 @@ export function HolidayCalendarStep({
         ) : (
           <div className="border border-dashed border-gray-300 rounded-lg p-8 text-center">
             <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-2" />
-            <p className="text-gray-500">No holidays added yet</p>
+            <p className="text-gray-700">No holidays added yet</p>
             <p className="text-sm text-gray-400">
               Import a preset or add custom holidays
             </p>
@@ -156,7 +156,7 @@ export function HolidayCalendarStep({
       </div>
 
       <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-gray-800">
           <strong>Tip:</strong> Holidays are automatically excluded from sprint
           calculations. You can add country-specific presets or custom dates.
         </p>

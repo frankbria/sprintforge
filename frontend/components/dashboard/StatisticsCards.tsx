@@ -113,7 +113,7 @@ export function StatisticsCards({ stats, isLoading = false }: StatisticsCardsPro
                 </div>
                 <div className="ml-5 w-0 flex-1">
                   <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">
+                    <dt className="text-sm font-medium text-gray-700 truncate">
                       {card.name}
                     </dt>
                     <dd className="flex items-baseline">
@@ -122,7 +122,7 @@ export function StatisticsCards({ stats, isLoading = false }: StatisticsCardsPro
                       </div>
                     </dd>
                     {card.subtitle && (
-                      <dd className="text-xs text-gray-500 mt-1">
+                      <dd className="text-xs text-gray-700 mt-1">
                         {card.subtitle}
                       </dd>
                     )}

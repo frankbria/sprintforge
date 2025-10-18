@@ -195,7 +195,7 @@ export default function OnboardingSetupPage() {
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Complete Your Account Setup
             </h1>
-            <p className="text-gray-600">
+            <p className="text-gray-800">
               Help us personalize your SprintForge experience by completing your profile and preferences.
             </p>
           </div>
@@ -350,18 +350,18 @@ export default function OnboardingSetupPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="bg-white rounded-lg p-4 border">
                   <h4 className="font-medium text-gray-900">Free</h4>
-                  <p className="text-sm text-gray-600 mt-1">3 projects, basic features</p>
+                  <p className="text-sm text-gray-800 mt-1">3 projects, basic features</p>
                   <p className="text-sm font-medium text-green-600 mt-2">Current Plan</p>
                 </div>
                 <div className="bg-white rounded-lg p-4 border">
                   <h4 className="font-medium text-gray-900">Pro</h4>
-                  <p className="text-sm text-gray-600 mt-1">Unlimited projects, advanced analytics</p>
-                  <p className="text-sm text-gray-500 mt-2">$19/month</p>
+                  <p className="text-sm text-gray-800 mt-1">Unlimited projects, advanced analytics</p>
+                  <p className="text-sm text-gray-700 mt-2">$19/month</p>
                 </div>
                 <div className="bg-white rounded-lg p-4 border">
                   <h4 className="font-medium text-gray-900">Team</h4>
-                  <p className="text-sm text-gray-600 mt-1">Team collaboration, enterprise features</p>
-                  <p className="text-sm text-gray-500 mt-2">$49/month</p>
+                  <p className="text-sm text-gray-800 mt-1">Team collaboration, enterprise features</p>
+                  <p className="text-sm text-gray-700 mt-2">$49/month</p>
                 </div>
               </div>
             </div>

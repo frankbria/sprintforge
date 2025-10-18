@@ -105,7 +105,7 @@ export function ProjectWizard({
         </CardDescription>
         <div className="flex items-center gap-4 pt-4">
           <Progress value={progress} className="flex-1" />
-          <span className="text-sm text-gray-500 whitespace-nowrap">
+          <span className="text-sm text-gray-700 whitespace-nowrap">
             Step {currentStep} of {totalSteps}
           </span>
         </div>
@@ -142,7 +142,7 @@ export function ProjectWizard({
                       'text-xs font-medium',
                       step.id === currentStep
                         ? 'text-gray-900'
-                        : 'text-gray-500'
+                        : 'text-gray-700'
                     )}
                   >
                     {step.title}
@@ -180,7 +180,7 @@ export function ProjectWizard({
                 <h3 className="text-lg font-semibold mb-1">
                   {currentStepInfo?.title}
                 </h3>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-700">
                   {currentStepInfo?.description}
                 </p>
               </div>

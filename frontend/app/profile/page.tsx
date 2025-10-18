@@ -130,13 +130,13 @@ function ProfileContent() {
             <div className="flex items-center space-x-4">
               <Link
                 href="/dashboard"
-                className="text-sm text-gray-600 hover:text-gray-900"
+                className="text-sm text-gray-800 hover:text-gray-900"
               >
                 Dashboard
               </Link>
               <button
                 onClick={handleLogout}
-                className="text-sm text-gray-600 hover:text-gray-900 bg-transparent border border-gray-300 hover:border-gray-400 px-3 py-1 rounded-md transition-colors"
+                className="text-sm text-gray-800 hover:text-gray-900 bg-transparent border border-gray-300 hover:border-gray-400 px-3 py-1 rounded-md transition-colors"
               >
                 Sign Out
               </button>
@@ -149,7 +149,7 @@ function ProfileContent() {
         <div className="px-4 py-6 sm:px-0">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900">Profile</h1>
-            <p className="mt-2 text-gray-600">
+            <p className="mt-2 text-gray-800">
               Manage your account information and preferences
             </p>
           </div>
@@ -179,13 +179,13 @@ function ProfileContent() {
                     <h3 className="text-lg leading-6 font-medium text-gray-900">
                       {user?.name || "No name provided"}
                     </h3>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-700">
                       {user?.email}
                     </p>
                     {provider && (
                       <div className="flex items-center mt-1">
                         <div className="h-2 w-2 bg-green-400 rounded-full mr-2"></div>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-gray-700">
                           Connected via {provider.charAt(0).toUpperCase() + provider.slice(1)}
                         </p>
                       </div>
@@ -278,23 +278,23 @@ function ProfileContent() {
                     </div>
 
                     <div className="pt-2">
-                      <dt className="text-sm font-medium text-gray-500">User ID</dt>
+                      <dt className="text-sm font-medium text-gray-700">User ID</dt>
                       <dd className="text-sm text-gray-900 font-mono mt-1 p-2 bg-gray-50 rounded border">{user?.id}</dd>
-                      <p className="text-xs text-gray-500 mt-1">This cannot be changed</p>
+                      <p className="text-xs text-gray-700 mt-1">This cannot be changed</p>
                     </div>
                   </div>
                 ) : (
                   <dl className="space-y-3">
                     <div>
-                      <dt className="text-sm font-medium text-gray-500">User ID</dt>
+                      <dt className="text-sm font-medium text-gray-700">User ID</dt>
                       <dd className="text-sm text-gray-900 font-mono">{user?.id}</dd>
                     </div>
                     <div>
-                      <dt className="text-sm font-medium text-gray-500">Email Address</dt>
+                      <dt className="text-sm font-medium text-gray-700">Email Address</dt>
                       <dd className="text-sm text-gray-900">{user?.email}</dd>
                     </div>
                     <div>
-                      <dt className="text-sm font-medium text-gray-500">Display Name</dt>
+                      <dt className="text-sm font-medium text-gray-700">Display Name</dt>
                       <dd className="text-sm text-gray-900">{user?.name || "Not set"}</dd>
                     </div>
                   </dl>
@@ -311,7 +311,7 @@ function ProfileContent() {
                   <div className="flex items-center justify-between">
                     <div>
                       <span className="text-sm font-medium text-gray-700">Email notifications</span>
-                      <p className="text-xs text-gray-500">Receive email updates about your projects</p>
+                      <p className="text-xs text-gray-700">Receive email updates about your projects</p>
                     </div>
                     <button
                       onClick={() => isEditing && handleInputChange('emailNotifications', !editForm.emailNotifications)}
@@ -330,7 +330,7 @@ function ProfileContent() {
                   <div className="flex items-center justify-between">
                     <div>
                       <span className="text-sm font-medium text-gray-700">Project reminders</span>
-                      <p className="text-xs text-gray-500">Get reminded about upcoming deadlines</p>
+                      <p className="text-xs text-gray-700">Get reminded about upcoming deadlines</p>
                     </div>
                     <button
                       onClick={() => isEditing && handleInputChange('projectReminders', !editForm.projectReminders)}
@@ -348,7 +348,7 @@ function ProfileContent() {
                   </div>
                   {isEditing && (
                     <div className="pt-4 border-t border-gray-100">
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-gray-700">
                         Toggle switches to change your notification preferences
                       </p>
                     </div>

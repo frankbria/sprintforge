@@ -212,12 +212,12 @@ function DashboardContent() {
               >
                 New Project
               </Link>
-              <span className="text-sm text-gray-600">
+              <span className="text-sm text-gray-800">
                 Welcome, {user?.name}
               </span>
               <button
                 onClick={handleLogout}
-                className="text-sm text-gray-600 hover:text-gray-900 bg-transparent border border-gray-300 hover:border-gray-400 px-3 py-1 rounded-md transition-colors"
+                className="text-sm text-gray-800 hover:text-gray-900 bg-transparent border border-gray-300 hover:border-gray-400 px-3 py-1 rounded-md transition-colors"
               >
                 Sign Out
               </button>
@@ -232,7 +232,7 @@ function DashboardContent() {
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-            <p className="mt-2 text-gray-600">
+            <p className="mt-2 text-gray-800">
               Manage your projects and generate Excel reports
             </p>
           </div>

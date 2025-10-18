@@ -78,7 +78,7 @@ export function TemplateSelectionStep({
                   </span>
                 </div>
 
-                <p className="text-sm text-gray-600">{template.description}</p>
+                <p className="text-sm text-gray-800">{template.description}</p>
 
                 <div className="pt-2">
                   <p className="text-xs font-medium text-gray-700 mb-1">
@@ -103,7 +103,7 @@ export function TemplateSelectionStep({
 
       <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
         <h4 className="font-medium text-gray-900 mb-2">Template Guide</h4>
-        <ul className="text-sm text-gray-600 space-y-1">
+        <ul className="text-sm text-gray-800 space-y-1">
           <li>
             <strong>Agile:</strong> Best for iterative development with sprints
           </li>

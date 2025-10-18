@@ -76,10 +76,10 @@ export function SprintConfigStep({ form }: SprintConfigStepProps) {
               )}
             >
               <div className="font-medium text-gray-900">{pattern.label}</div>
-              <div className="text-sm text-gray-600 mt-1">
+              <div className="text-sm text-gray-800 mt-1">
                 {pattern.description}
               </div>
-              <div className="text-xs text-gray-500 mt-1 font-mono bg-gray-100 px-2 py-1 rounded">
+              <div className="text-xs text-gray-700 mt-1 font-mono bg-gray-100 px-2 py-1 rounded">
                 {pattern.example}
               </div>
             </button>
@@ -117,7 +117,7 @@ export function SprintConfigStep({ form }: SprintConfigStepProps) {
               {...register('sprint_duration_weeks', { valueAsNumber: true })}
               className="w-20 text-center"
             />
-            <span className="text-sm text-gray-600">weeks</span>
+            <span className="text-sm text-gray-800">weeks</span>
           </div>
         </div>
         {errors.sprint_duration_weeks && (
@@ -140,7 +140,7 @@ export function SprintConfigStep({ form }: SprintConfigStepProps) {
                 'flex-1 py-2 px-3 rounded-md font-medium text-sm transition-all',
                 workingDays.includes(day.value)
                   ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
               )}
             >
               {day.label}
@@ -150,7 +150,7 @@ export function SprintConfigStep({ form }: SprintConfigStepProps) {
         {errors.working_days && (
           <p className="text-sm text-red-600">{errors.working_days.message}</p>
         )}
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-gray-700">
           Selected: {workingDays.length} day{workingDays.length !== 1 ? 's' : ''}
         </p>
       </div>

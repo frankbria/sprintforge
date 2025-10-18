@@ -51,7 +51,7 @@ export default function OnboardingPage() {
             <h3 className="text-xl font-semibold text-gray-900 mb-2">
               Hello, {user?.name || 'there'}!
             </h3>
-            <p className="text-gray-600">
+            <p className="text-gray-800">
               SprintForge helps you manage projects with powerful Excel-based Gantt charts and sprint planning.
               Let&apos;s walk through the key features to get you productive quickly.
             </p>
@@ -74,7 +74,7 @@ export default function OnboardingPage() {
               </div>
               <div>
                 <h4 className="font-medium text-gray-900">Excel-Based Gantt Charts</h4>
-                <p className="text-sm text-gray-600">Generate sophisticated project timelines without macros</p>
+                <p className="text-sm text-gray-800">Generate sophisticated project timelines without macros</p>
               </div>
             </div>
 
@@ -86,7 +86,7 @@ export default function OnboardingPage() {
               </div>
               <div>
                 <h4 className="font-medium text-gray-900">Sprint Planning</h4>
-                <p className="text-sm text-gray-600">Plan and track your agile development cycles</p>
+                <p className="text-sm text-gray-800">Plan and track your agile development cycles</p>
               </div>
             </div>
 
@@ -98,7 +98,7 @@ export default function OnboardingPage() {
               </div>
               <div>
                 <h4 className="font-medium text-gray-900">Probabilistic Timelines</h4>
-                <p className="text-sm text-gray-600">Monte Carlo simulations for realistic project estimates</p>
+                <p className="text-sm text-gray-800">Monte Carlo simulations for realistic project estimates</p>
               </div>
             </div>
 
@@ -110,7 +110,7 @@ export default function OnboardingPage() {
               </div>
               <div>
                 <h4 className="font-medium text-gray-900">Team Collaboration</h4>
-                <p className="text-sm text-gray-600">Share projects and coordinate with your team</p>
+                <p className="text-sm text-gray-800">Share projects and coordinate with your team</p>
               </div>
             </div>
           </div>
@@ -240,8 +240,8 @@ export default function OnboardingPage() {
       <div className="bg-white border-b">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between mb-2">
-            <h2 className="text-sm font-medium text-gray-600">Getting Started</h2>
-            <span className="text-sm text-gray-500">{currentStep + 1} of {steps.length}</span>
+            <h2 className="text-sm font-medium text-gray-800">Getting Started</h2>
+            <span className="text-sm text-gray-700">{currentStep + 1} of {steps.length}</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div
@@ -259,7 +259,7 @@ export default function OnboardingPage() {
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               {currentStepData.title}
             </h1>
-            <p className="text-gray-600">
+            <p className="text-gray-800">
               {currentStepData.description}
             </p>
           </div>

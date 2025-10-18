@@ -37,14 +37,14 @@ export default function ProjectHealthCard({ healthScore }: ProjectHealthCardProp
               <div className={cn('absolute inset-0 flex items-center justify-center rounded-full', bgColor)}>
                 <div className="text-center">
                   <div className={cn('text-3xl font-bold', color)}>{healthScore}</div>
-                  <div className="text-xs text-gray-600">out of 100</div>
+                  <div className="text-xs text-gray-800">out of 100</div>
                 </div>
               </div>
             </div>
           </div>
           <div className="flex-1 text-center">
             <div className={cn('text-2xl font-semibold mb-2', color)}>{status}</div>
-            <div className="text-sm text-gray-600 space-y-1">
+            <div className="text-sm text-gray-800 space-y-1">
               <p>Schedule adherence: {healthScore >= 70 ? 'On track' : 'Behind'}</p>
               <p>Resource utilization: {healthScore >= 70 ? 'Optimal' : 'Review needed'}</p>
               <p>Risk level: {healthScore >= 70 ? 'Low' : healthScore >= 40 ? 'Medium' : 'High'}</p>

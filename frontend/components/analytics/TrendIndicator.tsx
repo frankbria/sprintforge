@@ -76,7 +76,7 @@ export default function TrendIndicator({
     ? 'text-green-600'
     : isBadTrend
     ? 'text-red-600'
-    : 'text-gray-500';
+    : 'text-gray-700';
 
   const bgColorClass = isGoodTrend
     ? 'bg-green-50'

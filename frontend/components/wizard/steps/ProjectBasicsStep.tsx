@@ -50,7 +50,7 @@ export function ProjectBasicsStep({ form }: ProjectBasicsStepProps) {
         {errors.description && (
           <p className="text-sm text-red-600">{errors.description.message}</p>
         )}
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-gray-700">
           Maximum 5000 characters
         </p>
       </div>

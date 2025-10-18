@@ -38,7 +38,7 @@ function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
 function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
-      className={cn("text-sm text-gray-500", className)}
+      className={cn("text-sm text-gray-700", className)}
       {...props}
     />
   );

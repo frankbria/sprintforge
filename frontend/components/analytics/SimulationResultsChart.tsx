@@ -49,7 +49,7 @@ export default function SimulationResultsChart({ projectId }: SimulationResultsC
       case 'low': return 'text-green-600 bg-green-100';
       case 'medium': return 'text-yellow-600 bg-yellow-100';
       case 'high': return 'text-red-600 bg-red-100';
-      default: return 'text-gray-600 bg-gray-100';
+      default: return 'text-gray-800 bg-gray-100';
     }
   };
 
@@ -70,11 +70,11 @@ export default function SimulationResultsChart({ projectId }: SimulationResultsC
 
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-gray-50 p-4 rounded-lg">
-              <div className="text-sm text-gray-600">Mean Duration</div>
+              <div className="text-sm text-gray-800">Mean Duration</div>
               <div className="text-2xl font-bold">{data?.mean_duration.toFixed(1)} days</div>
             </div>
             <div className="bg-gray-50 p-4 rounded-lg">
-              <div className="text-sm text-gray-600">Standard Deviation</div>
+              <div className="text-sm text-gray-800">Standard Deviation</div>
               <div className="text-2xl font-bold">{data?.std_deviation.toFixed(1)} days</div>
             </div>
           </div>
@@ -90,7 +90,7 @@ export default function SimulationResultsChart({ projectId }: SimulationResultsC
                 { label: 'P95 (Worst Case)', value: data?.percentiles.p95 },
               ].map(({ label, value }) => (
                 <div key={label} className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">{label}</span>
+                  <span className="text-sm text-gray-800">{label}</span>
                   <span className="font-semibold">{value?.toFixed(1)} days</span>
                 </div>
               ))}
@@ -99,7 +99,7 @@ export default function SimulationResultsChart({ projectId }: SimulationResultsC
 
           <div className="border-t pt-4">
             <h4 className="font-semibold mb-2">80% Confidence Range</h4>
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-gray-800">
               {data?.confidence_80pct_range[0].toFixed(1)} - {data?.confidence_80pct_range[1].toFixed(1)} days
             </div>
           </div>

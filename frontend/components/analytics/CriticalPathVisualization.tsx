@@ -57,11 +57,11 @@ export default function CriticalPathVisualization({ projectId }: CriticalPathVis
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-gray-50 p-4 rounded-lg">
-              <div className="text-sm text-gray-600">Total Duration</div>
+              <div className="text-sm text-gray-800">Total Duration</div>
               <div className="text-2xl font-bold">{data?.total_duration} days</div>
             </div>
             <div className="bg-gray-50 p-4 rounded-lg">
-              <div className="text-sm text-gray-600">Critical Tasks</div>
+              <div className="text-sm text-gray-800">Critical Tasks</div>
               <div className="text-2xl font-bold">{data?.critical_tasks.length}</div>
             </div>
           </div>
@@ -74,14 +74,14 @@ export default function CriticalPathVisualization({ projectId }: CriticalPathVis
                 style={{ width: `${data?.path_stability_score}%` }}
               />
             </div>
-            <div className="text-right text-sm text-gray-600 mt-1">
+            <div className="text-right text-sm text-gray-800 mt-1">
               {data?.path_stability_score.toFixed(1)}%
             </div>
           </div>
 
           <div className="border-t pt-4">
             <h4 className="font-semibold mb-2">Risk Tasks ({data?.risk_tasks.length})</h4>
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-gray-800">
               Tasks with high risk factors that could impact the critical path
             </div>
           </div>

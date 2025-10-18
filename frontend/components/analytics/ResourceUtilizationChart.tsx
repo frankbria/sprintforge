@@ -57,15 +57,15 @@ export default function ResourceUtilizationChart({ projectId }: ResourceUtilizat
         <div className="space-y-4">
           <div className="grid grid-cols-3 gap-4">
             <div className="bg-gray-50 p-4 rounded-lg">
-              <div className="text-sm text-gray-600">Total Resources</div>
+              <div className="text-sm text-gray-800">Total Resources</div>
               <div className="text-2xl font-bold">{data?.total_resources}</div>
             </div>
             <div className="bg-gray-50 p-4 rounded-lg">
-              <div className="text-sm text-gray-600">Allocated</div>
+              <div className="text-sm text-gray-800">Allocated</div>
               <div className="text-2xl font-bold">{data?.allocated_resources}</div>
             </div>
             <div className="bg-gray-50 p-4 rounded-lg">
-              <div className="text-sm text-gray-600">Utilization</div>
+              <div className="text-sm text-gray-800">Utilization</div>
               <div className="text-2xl font-bold">{data?.utilization_pct.toFixed(1)}%</div>
             </div>
           </div>
@@ -77,7 +77,7 @@ export default function ResourceUtilizationChart({ projectId }: ResourceUtilizat
                 {data.over_allocated.map((resource) => (
                   <div key={resource.resource_id} className="bg-red-50 p-3 rounded">
                     <div className="font-medium">{resource.resource_name}</div>
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-gray-800">
                       {resource.allocation_pct.toFixed(1)}% allocated ({resource.tasks_assigned} tasks)
                     </div>
                   </div>
@@ -93,7 +93,7 @@ export default function ResourceUtilizationChart({ projectId }: ResourceUtilizat
                 {data.under_utilized.map((resource) => (
                   <div key={resource.resource_id} className="bg-yellow-50 p-3 rounded">
                     <div className="font-medium">{resource.resource_name}</div>
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-gray-800">
                       {resource.allocation_pct.toFixed(1)}% allocated ({resource.tasks_assigned} tasks)
                     </div>
                   </div>

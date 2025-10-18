@@ -104,7 +104,7 @@ function ErrorContent() {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             {errorInfo.title}
           </h1>
-          <p className="text-gray-600 text-sm sm:text-base max-w-md mx-auto">
+          <p className="text-gray-800 text-sm sm:text-base max-w-md mx-auto">
             {errorInfo.message}
           </p>
         </div>
@@ -121,10 +121,10 @@ function ErrorContent() {
 
           {error && (
             <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-800">
                 <span className="font-medium">Error Code:</span> {error}
               </p>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-700 mt-1">
                 Reference this code when contacting support
               </p>
             </div>
@@ -148,7 +148,7 @@ function ErrorContent() {
               variant="ghost"
               size="md"
               fullWidth
-              className="text-gray-600 hover:text-gray-700"
+              className="text-gray-800 hover:text-gray-700"
             >
               Contact Support
             </Button>
@@ -158,7 +158,7 @@ function ErrorContent() {
                 variant="ghost"
                 size="md"
                 fullWidth
-                className="text-gray-600 hover:text-gray-700"
+                className="text-gray-800 hover:text-gray-700"
               >
                 Back to Home
               </Button>

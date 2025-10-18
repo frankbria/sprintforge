@@ -83,7 +83,7 @@ export function FeatureSelectionStep({ form }: FeatureSelectionStepProps) {
                     </Label>
                   </div>
 
-                  <p className="text-sm text-gray-600 mt-2 ml-14">
+                  <p className="text-sm text-gray-800 mt-2 ml-14">
                     {feature.description}
                   </p>
 
@@ -98,8 +98,8 @@ export function FeatureSelectionStep({ form }: FeatureSelectionStepProps) {
 
                   {hasDependencies && (
                     <div className="flex items-start gap-2 mt-2 ml-14 p-2 bg-gray-50 border border-gray-200 rounded">
-                      <Info className="h-4 w-4 text-gray-500 mt-0.5 flex-shrink-0" />
-                      <p className="text-xs text-gray-600">
+                      <Info className="h-4 w-4 text-gray-700 mt-0.5 flex-shrink-0" />
+                      <p className="text-xs text-gray-800">
                         Requires:{' '}
                         {feature.dependencies
                           .map((dep) => FEATURE_INFO[dep as FeatureKey].name)
@@ -129,7 +129,7 @@ export function FeatureSelectionStep({ form }: FeatureSelectionStepProps) {
               </span>
             ))}
           {featureKeys.filter((key) => features[key]).length === 0 && (
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-gray-700">
               No features enabled (basic configuration only)
             </span>
           )}

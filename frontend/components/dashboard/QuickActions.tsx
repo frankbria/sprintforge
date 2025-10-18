@@ -106,9 +106,9 @@ export function QuickActions({
       case "secondary":
         return "text-blue-600 group-hover:text-blue-700"
       case "tertiary":
-        return "text-gray-600 group-hover:text-gray-700"
+        return "text-gray-800 group-hover:text-gray-700"
       default:
-        return "text-gray-600"
+        return "text-gray-800"
     }
   }
 
@@ -124,7 +124,7 @@ export function QuickActions({
           className={`text-sm ${
             action.variant === "primary"
               ? "text-blue-100"
-              : "text-gray-600"
+              : "text-gray-800"
           }`}
         >
           {action.description}
@@ -160,7 +160,7 @@ export function QuickActions({
     <div className="bg-white shadow rounded-lg p-6">
       <div className="mb-6">
         <h2 className="text-lg font-medium text-gray-900">Quick Actions</h2>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-gray-700">
           Common tasks and operations
         </p>
       </div>

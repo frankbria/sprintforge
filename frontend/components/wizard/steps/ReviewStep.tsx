@@ -56,22 +56,22 @@ export function ReviewStep({ form }: ReviewStepProps) {
         </h4>
         <dl className="space-y-2">
           <div>
-            <dt className="text-sm font-medium text-gray-500">Project Name</dt>
+            <dt className="text-sm font-medium text-gray-700">Project Name</dt>
             <dd className="text-sm text-gray-900 font-medium">
               {formData.name}
             </dd>
           </div>
           {formData.description && (
             <div>
-              <dt className="text-sm font-medium text-gray-500">Description</dt>
+              <dt className="text-sm font-medium text-gray-700">Description</dt>
               <dd className="text-sm text-gray-900">{formData.description}</dd>
             </div>
           )}
           <div>
-            <dt className="text-sm font-medium text-gray-500">Template</dt>
+            <dt className="text-sm font-medium text-gray-700">Template</dt>
             <dd className="text-sm text-gray-900">
               {template?.name}{' '}
-              <span className="text-gray-500">({template?.category})</span>
+              <span className="text-gray-700">({template?.category})</span>
             </dd>
           </div>
         </dl>
@@ -85,18 +85,18 @@ export function ReviewStep({ form }: ReviewStepProps) {
         </h4>
         <dl className="space-y-2">
           <div>
-            <dt className="text-sm font-medium text-gray-500">
+            <dt className="text-sm font-medium text-gray-700">
               Sprint Pattern
             </dt>
             <dd className="text-sm text-gray-900">
               {sprintPattern?.label}{' '}
-              <span className="text-gray-500 font-mono text-xs">
+              <span className="text-gray-700 font-mono text-xs">
                 ({sprintPattern?.example})
               </span>
             </dd>
           </div>
           <div>
-            <dt className="text-sm font-medium text-gray-500">
+            <dt className="text-sm font-medium text-gray-700">
               Sprint Duration
             </dt>
             <dd className="text-sm text-gray-900">
@@ -105,11 +105,11 @@ export function ReviewStep({ form }: ReviewStepProps) {
             </dd>
           </div>
           <div>
-            <dt className="text-sm font-medium text-gray-500">Working Days</dt>
+            <dt className="text-sm font-medium text-gray-700">Working Days</dt>
             <dd className="text-sm text-gray-900">{workingDaysText}</dd>
           </div>
           <div>
-            <dt className="text-sm font-medium text-gray-500">
+            <dt className="text-sm font-medium text-gray-700">
               Hours per Day
             </dt>
             <dd className="text-sm text-gray-900">
@@ -138,7 +138,7 @@ export function ReviewStep({ form }: ReviewStepProps) {
               </span>
             ))}
             {formData.holidays.length > 5 && (
-              <span className="text-xs text-gray-500 px-2 py-1">
+              <span className="text-xs text-gray-700 px-2 py-1">
                 +{formData.holidays.length - 5} more
               </span>
             )}
@@ -161,13 +161,13 @@ export function ReviewStep({ form }: ReviewStepProps) {
                   <p className="text-sm font-medium text-gray-900">
                     {feature.name}
                   </p>
-                  <p className="text-xs text-gray-500">{feature.description}</p>
+                  <p className="text-xs text-gray-700">{feature.description}</p>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-700">
             No advanced features enabled (basic configuration)
           </p>
         )}
