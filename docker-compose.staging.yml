@@ -80,8 +80,8 @@ services:
     container_name: sprintforge-staging-frontend
     restart: unless-stopped
     environment:
-      - NEXT_PUBLIC_API_URL=https://staging.yourdomain.com/api/v1
-      - NEXTAUTH_URL=https://staging.yourdomain.com
+      - NEXT_PUBLIC_API_URL=http://47.88.89.175:8080/api/v1
+      - NEXTAUTH_URL=http://47.88.89.175:8080
       - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-staging-nextauth-secret}
       - NODE_ENV=production
     depends_on:
