@@ -58,7 +58,8 @@
       "Bash(pkill:*)",
       "mcp__morphllm-fast-apply__search_files",
       "mcp__morphllm-fast-apply__list_directory",
-      "mcp__serena__get_current_config"
+      "mcp__serena__get_current_config",
+      "Skill(superpowers:brainstorming)"
     ],
     "deny": [],
     "ask": []
