@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Optional
 from uuid import UUID, uuid4
 
-from sqlalchemy import String, Text, Boolean, Integer, ForeignKey, CheckConstraint, Index
+from sqlalchemy import String, Text, Boolean, Integer, ForeignKey, CheckConstraint, Index, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
