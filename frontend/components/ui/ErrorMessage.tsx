@@ -72,7 +72,7 @@ export function ErrorMessage({
         )}
         <div className={`${showIcon ? 'ml-3' : ''} flex-1`}>
           {title && (
-            <h3 className="text-sm font-medium mb-1">
+            <h3 className="text-sm font-medium text-gray-900 mb-1">
               {title}
             </h3>
           )}

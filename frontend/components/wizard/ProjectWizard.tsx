@@ -177,7 +177,7 @@ export function ProjectWizard({
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             >
               <div className="mb-6">
-                <h3 className="text-lg font-semibold mb-1">
+                <h3 className="text-lg font-semibold text-gray-900 mb-1">
                   {currentStepInfo?.title}
                 </h3>
                 <p className="text-sm text-gray-700">

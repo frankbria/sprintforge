@@ -182,7 +182,7 @@ export function BaselineList({ projectId }: BaselineListProps) {
     <div className="space-y-4">
       {/* Header with Create Button */}
       <div className="flex justify-between items-center">
-        <h2 className="text-lg font-semibold">Baselines ({baselines.length})</h2>
+        <h2 className="text-lg font-semibold text-gray-900">Baselines ({baselines.length})</h2>
         <Button onClick={() => setCreateDialogOpen(true)} icon={<Plus size={16} />}>
           Create Baseline
         </Button>

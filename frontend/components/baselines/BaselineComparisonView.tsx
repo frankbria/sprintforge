@@ -202,7 +202,7 @@ export function BaselineComparisonView({
 
       {/* Variance Table */}
       <div>
-        <h2 className="text-lg font-semibold mb-3">Task Variances</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-3">Task Variances</h2>
         <Table>
           <TableHeader>
             <TableRow>
@@ -258,7 +258,7 @@ export function BaselineComparisonView({
       {/* New Tasks Section */}
       {new_tasks.length > 0 && (
         <div>
-          <h2 className="text-lg font-semibold mb-3">New Tasks</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-3">New Tasks</h2>
           <Card>
             <CardContent className="pt-6">
               <ul className="space-y-2">
@@ -280,7 +280,7 @@ export function BaselineComparisonView({
       {/* Deleted Tasks Section */}
       {deleted_tasks.length > 0 && (
         <div>
-          <h2 className="text-lg font-semibold mb-3">Deleted Tasks</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-3">Deleted Tasks</h2>
           <Card>
             <CardContent className="pt-6">
               <ul className="space-y-2">
