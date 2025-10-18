@@ -1,0 +1,150 @@
+version: '3.8'
+
+# SprintForge Staging Environment - Home Server
+# Designed for sprint demos and internal testing
+# Uses Cloudflare Tunnel for secure public access
+
+services:
+  # PostgreSQL Database (Persistent)
+  postgres:
+    image: postgres:15-alpine
+    container_name: sprintforge-staging-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: sprintforge_staging
+      POSTGRES_USER: sprintforge
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-staging_password_change_me}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - ./data/postgres-staging:/var/lib/postgresql/data
+    networks:
+      - staging_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sprintforge"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: sprintforge-staging-redis
+    restart: unless-stopped
+    volumes:
+      - ./data/redis-staging:/data
+    networks:
+      - staging_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # FastAPI Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.staging
+    container_name: sprintforge-staging-backend
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://sprintforge:${POSTGRES_PASSWORD:-staging_password_change_me}@postgres:5432/sprintforge_staging
+      - REDIS_URL=redis://redis:6379
+      - SECRET_KEY=${SECRET_KEY:-staging-secret-key-change-in-production}
+      - ENVIRONMENT=staging
+      - DEBUG=false
+      - LOG_LEVEL=info
+      - CORS_ORIGINS=https://staging.yourdomain.com,http://localhost:3000
+    volumes:
+      - ./backend/uploads-staging:/app/uploads
+      - ./backend/logs:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - staging_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Next.js Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.staging
+    container_name: sprintforge-staging-frontend
+    restart: unless-stopped
+    environment:
+      - NEXT_PUBLIC_API_URL=https://staging.yourdomain.com/api/v1
+      - NEXTAUTH_URL=https://staging.yourdomain.com
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-staging-nextauth-secret}
+      - NODE_ENV=production
+    depends_on:
+      - backend
+    networks:
+      - staging_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: sprintforge-staging-nginx
+    restart: unless-stopped
+    ports:
+      - "8080:80"  # Internal port (Cloudflare Tunnel will connect here)
+    volumes:
+      - ./deployment/nginx-staging.conf:/etc/nginx/nginx.conf:ro
+      - ./deployment/nginx-logs:/var/log/nginx
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - staging_network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Cloudflare Tunnel (Optional - comment out if using different access method)
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: sprintforge-cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    networks:
+      - staging_network
+    depends_on:
+      - nginx
+
+  # Watchtower (Auto-update containers when images change)
+  watchtower:
+    image: containrrr/watchtower
+    container_name: sprintforge-watchtower
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_INCLUDE_STOPPED=false
+      - WATCHTOWER_SCHEDULE=0 0 2 * * *  # 2 AM daily
+    command: sprintforge-staging-backend sprintforge-staging-frontend
+
+networks:
+  staging_network:
+    driver: bridge
+    name: sprintforge_staging
+
+volumes:
+  postgres_staging_data:
+  redis_staging_data:
+  backend_staging_uploads:
