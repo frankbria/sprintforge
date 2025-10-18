@@ -47,10 +47,19 @@ class Settings(BaseSettings):
     # Celery (background tasks)
     celery_broker_url: str = Field(default="redis://localhost:6379/0", env="CELERY_BROKER_URL")
     celery_result_backend: str = Field(default="redis://localhost:6379/0", env="CELERY_RESULT_BACKEND")
-    
+
+    # Email/SMTP (notifications)
+    smtp_host: str = Field(default="localhost", env="SMTP_HOST")
+    smtp_port: int = Field(default=587, env="SMTP_PORT")
+    smtp_user: Optional[str] = Field(default=None, env="SMTP_USER")
+    smtp_password: Optional[str] = Field(default=None, env="SMTP_PASSWORD")
+    smtp_from_email: str = Field(default="noreply@sprintforge.local", env="SMTP_FROM_EMAIL")
+    smtp_from_name: str = Field(default="SprintForge", env="SMTP_FROM_NAME")
+    smtp_use_tls: bool = Field(default=True, env="SMTP_USE_TLS")
+
     # External services
     openai_api_key: Optional[str] = Field(default=None, env="OPENAI_API_KEY")
-    
+
     # Monitoring
     log_level: str = Field(default="INFO", env="LOG_LEVEL")
 

@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter
 
-from .endpoints import auth, projects, excel, sharing, simulation, excel_workflow, analytics, baselines
+from .endpoints import auth, projects, excel, sharing, simulation, excel_workflow, analytics, baselines, notifications
 
 api_router = APIRouter()
 
@@ -29,6 +29,9 @@ api_router.include_router(analytics.router)
 
 # Include baseline management routes
 api_router.include_router(baselines.router)
+
+# Include notification routes
+api_router.include_router(notifications.router)
 
 @api_router.get("/")
 async def api_root():

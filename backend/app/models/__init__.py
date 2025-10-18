@@ -6,6 +6,15 @@ from .sync import SyncOperation
 from .share_link import ShareLink
 from .simulation_result import SimulationResult
 from .baseline import ProjectBaseline
+from .notification import (
+    Notification,
+    NotificationRule,
+    NotificationLog,
+    NotificationTemplate,
+    NotificationType,
+    NotificationStatus,
+    NotificationChannel,
+)
 
 __all__ = [
     "User",
@@ -15,4 +24,11 @@ __all__ = [
     "ShareLink",
     "SimulationResult",
     "ProjectBaseline",
+    "Notification",
+    "NotificationRule",
+    "NotificationLog",
+    "NotificationTemplate",
+    "NotificationType",
+    "NotificationStatus",
+    "NotificationChannel",
 ]

@@ -22,6 +22,12 @@ from app.models.project import Project, ProjectMembership
 from app.models.sync import SyncOperation
 from app.models.share_link import ShareLink
 from app.models.simulation_result import SimulationResult
+from app.models.notification import (
+    Notification,
+    NotificationRule,
+    NotificationLog,
+    NotificationTemplate,
+)
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -211,3 +217,68 @@ async def test_project(test_db_session: AsyncSession, test_user):
     await test_db_session.refresh(project)
 
     return project
+
+
+# Notification-specific fixtures
+@pytest_asyncio.fixture
+async def test_notification(test_db_session: AsyncSession, test_user):
+    """Create a test notification."""
+    from app.models.notification import Notification, NotificationType, NotificationStatus
+
+    notification = Notification(
+        user_id=test_user.id,
+        type=NotificationType.SPRINT_COMPLETE,
+        title="Test Notification",
+        message="This is a test notification message",
+        status=NotificationStatus.UNREAD,
+        metadata={"test": True},
+    )
+
+    test_db_session.add(notification)
+    await test_db_session.commit()
+    await test_db_session.refresh(notification)
+
+    return notification
+
+
+@pytest_asyncio.fixture
+async def test_notification_rule(test_db_session: AsyncSession, test_user):
+    """Create a test notification rule."""
+    from app.models.notification import (
+        NotificationRule,
+        NotificationType,
+        NotificationChannel,
+    )
+
+    rule = NotificationRule(
+        user_id=test_user.id,
+        event_type=NotificationType.SPRINT_COMPLETE,
+        enabled=True,
+        channels=[NotificationChannel.EMAIL, NotificationChannel.IN_APP],
+        conditions={},
+    )
+
+    test_db_session.add(rule)
+    await test_db_session.commit()
+    await test_db_session.refresh(rule)
+
+    return rule
+
+
+@pytest_asyncio.fixture
+async def test_notification_template(test_db_session: AsyncSession):
+    """Create a test notification template."""
+    from app.models.notification import NotificationTemplate, NotificationType
+
+    template = NotificationTemplate(
+        event_type=NotificationType.SPRINT_COMPLETE,
+        subject_template="Sprint {{ sprint_name }} Complete",
+        body_template_html="<p>Sprint {{ sprint_name }} completed {{ completion }}%</p>",
+        body_template_text="Sprint {{ sprint_name }} completed {{ completion }}%",
+    )
+
+    test_db_session.add(template)
+    await test_db_session.commit()
+    await test_db_session.refresh(template)
+
+    return template

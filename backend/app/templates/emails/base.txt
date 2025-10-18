@@ -1,0 +1,7 @@
+{% block header %}SPRINTFORGE{% endblock %}
+
+{% block content %}{% endblock %}
+
+---
+SprintForge - Macro-Free Project Management
+{% block footer %}You're receiving this email because you have notifications enabled.{% endblock %}

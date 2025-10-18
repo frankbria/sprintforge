@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SprintForge Notification{% endblock %}</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #4F46E5;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+        .content {
+            background-color: #ffffff;
+            padding: 30px;
+            border: 1px solid #e5e7eb;
+            border-top: none;
+        }
+        .footer {
+            background-color: #f9fafb;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #6b7280;
+            border-radius: 0 0 8px 8px;
+            border: 1px solid #e5e7eb;
+            border-top: none;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #4F46E5;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>{% block header %}SprintForge{% endblock %}</h1>
+    </div>
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+    <div class="footer">
+        <p>SprintForge - Macro-Free Project Management</p>
+        <p>{% block footer %}You're receiving this email because you have notifications enabled.{% endblock %}</p>
+    </div>
+</body>
+</html>
