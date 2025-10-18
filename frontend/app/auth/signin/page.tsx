@@ -20,6 +20,7 @@ export default function SignIn() {
   const [loading, setLoading] = useState(true)
   const [signingIn, setSigningIn] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [showCredentialsForm, setShowCredentialsForm] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
@@ -48,9 +49,47 @@ export default function SignIn() {
     try {
       setSigningIn(providerId)
       setError(null)
+
+      // For credentials provider, show the credentials form
+      if (providerId === "credentials") {
+        setShowCredentialsForm(true)
+        setSigningIn(null)
+        return
+      }
+
+      // For OAuth providers, use standard signIn
       await signIn(providerId, { callbackUrl: "/" })
     } catch (error) {
       console.error("Sign-in error:", error)
+      setError("Sign-in failed. Please try again.")
+      setSigningIn(null)
+    }
+  }
+
+  const handleCredentialsSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+    const email = formData.get("email") as string
+    const password = formData.get("password") as string
+
+    try {
+      setSigningIn("credentials")
+      setError(null)
+
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      })
+
+      if (result?.error) {
+        setError("Invalid email or password. Please try again.")
+        setSigningIn(null)
+      } else if (result?.ok) {
+        router.push("/")
+      }
+    } catch (error) {
+      console.error("Credentials sign-in error:", error)
       setError("Sign-in failed. Please try again.")
       setSigningIn(null)
     }
@@ -136,39 +175,98 @@ export default function SignIn() {
 
         {/* Sign In Form */}
         <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-gray-100">
-          <div className="space-y-4">
-            {providers && Object.values(providers).length > 0 ? (
-              Object.values(providers).map((provider) => (
+          {showCredentialsForm ? (
+            <div>
+              <button
+                onClick={() => setShowCredentialsForm(false)}
+                className="flex items-center text-sm text-gray-600 hover:text-gray-900 mb-6"
+              >
+                <svg className="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+                </svg>
+                Back to sign-in options
+              </button>
+              <form onSubmit={handleCredentialsSubmit} className="space-y-4">
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    id="email"
+                    required
+                    placeholder="demo@sprintforge.com"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                    Password
+                  </label>
+                  <input
+                    type="password"
+                    name="password"
+                    id="password"
+                    required
+                    placeholder="Enter your password"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-800">
+                  <p className="font-medium mb-1">Demo Accounts:</p>
+                  <p>• demo@sprintforge.com / demo123</p>
+                  <p>• admin@sprintforge.com / admin123</p>
+                </div>
                 <Button
-                  key={provider.id}
-                  onClick={() => handleSignIn(provider.id)}
-                  loading={signingIn === provider.id}
-                  loadingText={`Signing in with ${provider.name}...`}
+                  type="submit"
+                  loading={signingIn === "credentials"}
+                  loadingText="Signing in..."
                   disabled={!!signingIn}
                   fullWidth
                   size="lg"
-                  variant="secondary"
-                  icon={getProviderIcon(provider.id)}
-                  className="justify-start pl-4 bg-white border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-700 transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  variant="primary"
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
                 >
-                  <span className="flex-1 text-center font-medium">
-                    Continue with {provider.name}
-                  </span>
+                  Sign In
                 </Button>
-              ))
-            ) : (
-              <div className="text-center py-8">
-                <p className="text-gray-500 mb-4">No authentication providers available</p>
-                <Button
-                  onClick={() => window.location.reload()}
-                  variant="ghost"
-                  size="sm"
-                >
-                  Refresh Page
-                </Button>
-              </div>
-            )}
-          </div>
+              </form>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {providers && Object.values(providers).length > 0 ? (
+                Object.values(providers).map((provider) => (
+                  <Button
+                    key={provider.id}
+                    onClick={() => handleSignIn(provider.id)}
+                    loading={signingIn === provider.id}
+                    loadingText={`Signing in with ${provider.name}...`}
+                    disabled={!!signingIn}
+                    fullWidth
+                    size="lg"
+                    variant="secondary"
+                    icon={getProviderIcon(provider.id)}
+                    className="justify-start pl-4 bg-white border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-700 transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <span className="flex-1 text-center font-medium">
+                      Continue with {provider.name}
+                    </span>
+                  </Button>
+                ))
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-gray-500 mb-4">No authentication providers available</p>
+                  <Button
+                    onClick={() => window.location.reload()}
+                    variant="ghost"
+                    size="sm"
+                  >
+                    Refresh Page
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Divider */}
           <div className="relative my-6">
