@@ -1,5 +1,6 @@
 import GoogleProvider from "next-auth/providers/google"
 import AzureADProvider from "next-auth/providers/azure-ad"
+import CredentialsProvider from "next-auth/providers/credentials"
 import type { NextAuthOptions } from "next-auth"
 import { JWT } from "next-auth/jwt"
 
@@ -8,27 +9,58 @@ const tokenBlacklist = new Set<string>()
 
 export const authOptions: NextAuthOptions = {
   providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      authorization: {
-        params: {
-          prompt: "consent",
-          access_type: "offline",
-          response_type: "code"
+    // Credentials provider for staging/demo environments
+    CredentialsProvider({
+      id: "credentials",
+      name: "Email and Password",
+      credentials: {
+        email: { label: "Email", type: "email", placeholder: "demo@sprintforge.com" },
+        password: { label: "Password", type: "password" }
+      },
+      async authorize(credentials) {
+        // For staging: simple demo accounts
+        // In production, this should validate against the backend API
+        const demoUsers = [
+          { id: "1", email: "demo@sprintforge.com", name: "Demo User", password: "demo123" },
+          { id: "2", email: "admin@sprintforge.com", name: "Admin User", password: "admin123" },
+        ]
+
+        const user = demoUsers.find(
+          u => u.email === credentials?.email && u.password === credentials?.password
+        )
+
+        if (user) {
+          return { id: user.id, email: user.email, name: user.name }
         }
+        return null
       }
     }),
-    AzureADProvider({
-      clientId: process.env.AZURE_AD_CLIENT_ID!,
-      clientSecret: process.env.AZURE_AD_CLIENT_SECRET!,
-      tenantId: process.env.AZURE_AD_TENANT_ID,
-      authorization: {
-        params: {
-          scope: "openid profile email offline_access"
+    // OAuth providers (only enabled if credentials are configured)
+    ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET ? [
+      GoogleProvider({
+        clientId: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        authorization: {
+          params: {
+            prompt: "consent",
+            access_type: "offline",
+            response_type: "code"
+          }
         }
-      }
-    }),
+      })
+    ] : []),
+    ...(process.env.AZURE_AD_CLIENT_ID && process.env.AZURE_AD_CLIENT_SECRET ? [
+      AzureADProvider({
+        clientId: process.env.AZURE_AD_CLIENT_ID,
+        clientSecret: process.env.AZURE_AD_CLIENT_SECRET,
+        tenantId: process.env.AZURE_AD_TENANT_ID,
+        authorization: {
+          params: {
+            scope: "openid profile email offline_access"
+          }
+        }
+      })
+    ] : []),
   ],
   callbacks: {
     async jwt({ token, user, account }): Promise<JWT> {
