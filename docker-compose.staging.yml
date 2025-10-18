@@ -54,7 +54,7 @@ services:
       - ENVIRONMENT=staging
       - DEBUG=false
       - LOG_LEVEL=info
-      - CORS_ORIGINS=https://staging.yourdomain.com,http://localhost:3000
+      - CORS_ORIGINS=["http://localhost:8080","http://localhost:3000"]
     volumes:
       - ./backend/uploads-staging:/app/uploads
       - ./backend/logs:/app/logs
