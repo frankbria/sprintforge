@@ -79,6 +79,22 @@ afterAll(() => {
   console.error = originalError
 })
 
+// Mock ResizeObserver for Recharts
+global.ResizeObserver = class ResizeObserver {
+  constructor(callback) {
+    this.callback = callback;
+  }
+  observe() {
+    // Mock implementation
+  }
+  unobserve() {
+    // Mock implementation
+  }
+  disconnect() {
+    // Mock implementation
+  }
+};
+
 // Global test setup
 beforeEach(() => {
   // Clear all mocks before each test
