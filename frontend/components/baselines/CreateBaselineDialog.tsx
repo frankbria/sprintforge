@@ -79,7 +79,12 @@ export function CreateBaselineDialog({
 
   const onSubmit = (data: CreateBaselineFormData) => {
     setErrorMessage(null);
-    createMutation.mutate(data);
+    // Ensure description is undefined if empty
+    const payload = {
+      name: data.name,
+      description: data.description && data.description.trim() ? data.description : undefined,
+    };
+    createMutation.mutate(payload);
   };
 
   const handleClose = () => {
@@ -128,7 +133,7 @@ export function CreateBaselineDialog({
                 {...register('name')}
                 placeholder="e.g., Q4 2025 Baseline"
                 disabled={createMutation.isPending}
-                required
+                aria-required="true"
               />
               {errors.name && (
                 <p className="text-sm text-red-600">{errors.name.message}</p>

@@ -88,7 +88,7 @@ describe('BaselineList', () => {
         wrapper: createWrapper(),
       });
 
-      expect(screen.getByText(/loading/i)).toBeInTheDocument();
+      expect(screen.getByText('Loading baselines...')).toBeInTheDocument();
     });
 
     it('fetches and displays baselines on mount', async () => {
@@ -174,8 +174,9 @@ describe('BaselineList', () => {
       });
 
       await waitFor(() => {
-        // Should display formatted date
-        expect(screen.getByText(/Oct/)).toBeInTheDocument();
+        // Should display formatted dates for both baselines
+        expect(screen.getByText('Oct 1, 2025')).toBeInTheDocument();
+        expect(screen.getByText('Oct 15, 2025')).toBeInTheDocument();
       });
     });
 
