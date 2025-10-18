@@ -89,7 +89,7 @@ export default function TrendIndicator({
 
   return (
     <div className={cn('flex items-center gap-2', className)}>
-      <span className="text-2xl font-bold" aria-label={`Current value: ${formatValue(value, format)}`}>
+      <span className="text-2xl font-bold text-gray-900" aria-label={`Current value: ${formatValue(value, format)}`}>
         {formatValue(value, format)}
       </span>
 

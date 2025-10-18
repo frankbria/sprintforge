@@ -77,7 +77,7 @@ export default function ProgressTracking({ projectId }: ProgressTrackingProps) {
           <div className="bg-gray-50 p-6 rounded-lg">
             <div className="text-sm text-gray-800 mb-2">Overall Completion</div>
             <div className="flex items-center justify-between mb-2">
-              <div className="text-3xl font-bold">{data?.completion_pct.toFixed(1)}%</div>
+              <div className="text-3xl font-bold text-gray-900">{data?.completion_pct.toFixed(1)}%</div>
               <div className="text-sm text-gray-800">
                 {data?.tasks_completed} of {data?.tasks_total} tasks
               </div>
@@ -93,7 +93,7 @@ export default function ProgressTracking({ projectId }: ProgressTrackingProps) {
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-gray-50 p-4 rounded-lg">
               <div className="text-sm text-gray-800">On-Time Completion</div>
-              <div className="text-2xl font-bold">{data?.on_time_pct.toFixed(1)}%</div>
+              <div className="text-2xl font-bold text-gray-900">{data?.on_time_pct.toFixed(1)}%</div>
             </div>
             <div className="bg-gray-50 p-4 rounded-lg">
               <div className="text-sm text-gray-800">Delayed Tasks</div>
@@ -102,15 +102,15 @@ export default function ProgressTracking({ projectId }: ProgressTrackingProps) {
           </div>
 
           <div className="border-t pt-4">
-            <h4 className="font-semibold mb-3">Performance Metrics</h4>
+            <h4 className="font-semibold text-gray-900 mb-3">Performance Metrics</h4>
             <div className="space-y-3">
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-800">Burn Rate</span>
-                <span className="font-semibold">{data?.burn_rate.toFixed(2)} tasks/day</span>
+                <span className="font-semibold text-gray-900">{data?.burn_rate.toFixed(2)} tasks/day</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-800">Est. Completion Date</span>
-                <span className="font-semibold">
+                <span className="font-semibold text-gray-900">
                   {data?.estimated_completion_date ? new Date(data.estimated_completion_date).toLocaleDateString() : 'N/A'}
                 </span>
               </div>

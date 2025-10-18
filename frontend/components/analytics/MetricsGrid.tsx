@@ -53,7 +53,7 @@ export default function MetricsGrid({ metrics }: MetricsGridProps) {
             <span className="text-2xl">{metric.icon}</span>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{metric.value}</div>
+            <div className="text-2xl font-bold text-gray-900">{metric.value}</div>
           </CardContent>
         </Card>
       ))}

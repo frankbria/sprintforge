@@ -71,16 +71,16 @@ export default function SimulationResultsChart({ projectId }: SimulationResultsC
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-gray-50 p-4 rounded-lg">
               <div className="text-sm text-gray-800">Mean Duration</div>
-              <div className="text-2xl font-bold">{data?.mean_duration.toFixed(1)} days</div>
+              <div className="text-2xl font-bold text-gray-900">{data?.mean_duration.toFixed(1)} days</div>
             </div>
             <div className="bg-gray-50 p-4 rounded-lg">
               <div className="text-sm text-gray-800">Standard Deviation</div>
-              <div className="text-2xl font-bold">{data?.std_deviation.toFixed(1)} days</div>
+              <div className="text-2xl font-bold text-gray-900">{data?.std_deviation.toFixed(1)} days</div>
             </div>
           </div>
 
           <div className="border-t pt-4">
-            <h4 className="font-semibold mb-3">Percentiles</h4>
+            <h4 className="font-semibold text-gray-900 mb-3">Percentiles</h4>
             <div className="space-y-2">
               {[
                 { label: 'P10 (Best Case)', value: data?.percentiles.p10 },
@@ -91,14 +91,14 @@ export default function SimulationResultsChart({ projectId }: SimulationResultsC
               ].map(({ label, value }) => (
                 <div key={label} className="flex justify-between items-center">
                   <span className="text-sm text-gray-800">{label}</span>
-                  <span className="font-semibold">{value?.toFixed(1)} days</span>
+                  <span className="font-semibold text-gray-900">{value?.toFixed(1)} days</span>
                 </div>
               ))}
             </div>
           </div>
 
           <div className="border-t pt-4">
-            <h4 className="font-semibold mb-2">80% Confidence Range</h4>
+            <h4 className="font-semibold text-gray-900 mb-2">80% Confidence Range</h4>
             <div className="text-sm text-gray-800">
               {data?.confidence_80pct_range[0].toFixed(1)} - {data?.confidence_80pct_range[1].toFixed(1)} days
             </div>

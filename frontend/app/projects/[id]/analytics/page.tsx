@@ -178,15 +178,15 @@ export default function AnalyticsPage() {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-800">Duration</span>
-                    <span className="font-semibold">{data.critical_path_summary.total_duration} days</span>
+                    <span className="font-semibold text-gray-900">{data.critical_path_summary.total_duration} days</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-800">Critical Tasks</span>
-                    <span className="font-semibold">{data.critical_path_summary.critical_tasks_count}</span>
+                    <span className="font-semibold text-gray-900">{data.critical_path_summary.critical_tasks_count}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-800">Stability Score</span>
-                    <span className="font-semibold">{data.critical_path_summary.path_stability_score.toFixed(1)}/100</span>
+                    <span className="font-semibold text-gray-900">{data.critical_path_summary.path_stability_score.toFixed(1)}/100</span>
                   </div>
                 </div>
               </CardContent>
@@ -201,15 +201,15 @@ export default function AnalyticsPage() {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-800">Total Resources</span>
-                    <span className="font-semibold">{data.resource_summary.total_resources}</span>
+                    <span className="font-semibold text-gray-900">{data.resource_summary.total_resources}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-800">Allocated</span>
-                    <span className="font-semibold">{data.resource_summary.allocated_resources}</span>
+                    <span className="font-semibold text-gray-900">{data.resource_summary.allocated_resources}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-800">Utilization</span>
-                    <span className="font-semibold">{data.resource_summary.utilization_pct.toFixed(1)}%</span>
+                    <span className="font-semibold text-gray-900">{data.resource_summary.utilization_pct.toFixed(1)}%</span>
                   </div>
                 </div>
               </CardContent>
@@ -234,11 +234,11 @@ export default function AnalyticsPage() {
                   <div className="space-y-1 text-sm">
                     <div className="flex justify-between">
                       <span className="text-gray-800">P50</span>
-                      <span className="font-semibold">{data.simulation_summary.p50.toFixed(1)} days</span>
+                      <span className="font-semibold text-gray-900">{data.simulation_summary.p50.toFixed(1)} days</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-800">P90</span>
-                      <span className="font-semibold">{data.simulation_summary.p90.toFixed(1)} days</span>
+                      <span className="font-semibold text-gray-900">{data.simulation_summary.p90.toFixed(1)} days</span>
                     </div>
                   </div>
                 </div>

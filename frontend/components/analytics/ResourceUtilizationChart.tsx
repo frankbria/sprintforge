@@ -58,21 +58,21 @@ export default function ResourceUtilizationChart({ projectId }: ResourceUtilizat
           <div className="grid grid-cols-3 gap-4">
             <div className="bg-gray-50 p-4 rounded-lg">
               <div className="text-sm text-gray-800">Total Resources</div>
-              <div className="text-2xl font-bold">{data?.total_resources}</div>
+              <div className="text-2xl font-bold text-gray-900">{data?.total_resources}</div>
             </div>
             <div className="bg-gray-50 p-4 rounded-lg">
               <div className="text-sm text-gray-800">Allocated</div>
-              <div className="text-2xl font-bold">{data?.allocated_resources}</div>
+              <div className="text-2xl font-bold text-gray-900">{data?.allocated_resources}</div>
             </div>
             <div className="bg-gray-50 p-4 rounded-lg">
               <div className="text-sm text-gray-800">Utilization</div>
-              <div className="text-2xl font-bold">{data?.utilization_pct.toFixed(1)}%</div>
+              <div className="text-2xl font-bold text-gray-900">{data?.utilization_pct.toFixed(1)}%</div>
             </div>
           </div>
 
           {data?.over_allocated && data.over_allocated.length > 0 && (
             <div className="border-t pt-4">
-              <h4 className="font-semibold mb-2 text-red-600">Over-Allocated Resources ({data.over_allocated.length})</h4>
+              <h4 className="font-semibold text-gray-900 mb-2 text-red-600">Over-Allocated Resources ({data.over_allocated.length})</h4>
               <div className="space-y-2">
                 {data.over_allocated.map((resource) => (
                   <div key={resource.resource_id} className="bg-red-50 p-3 rounded">
@@ -88,7 +88,7 @@ export default function ResourceUtilizationChart({ projectId }: ResourceUtilizat
 
           {data?.under_utilized && data.under_utilized.length > 0 && (
             <div className="border-t pt-4">
-              <h4 className="font-semibold mb-2 text-yellow-600">Under-Utilized Resources ({data.under_utilized.length})</h4>
+              <h4 className="font-semibold text-gray-900 mb-2 text-yellow-600">Under-Utilized Resources ({data.under_utilized.length})</h4>
               <div className="space-y-2">
                 {data.under_utilized.map((resource) => (
                   <div key={resource.resource_id} className="bg-yellow-50 p-3 rounded">
