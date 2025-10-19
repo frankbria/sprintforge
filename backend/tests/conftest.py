@@ -4,11 +4,26 @@ import asyncio
 import pytest
 import pytest_asyncio
 import os
+import inspect
 from typing import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.pool import StaticPool
 from httpx import AsyncClient
+
+
+def pytest_collection_modifyitems(items):
+    """
+    Automatically mark async test functions with pytest.mark.asyncio.
+
+    This hook runs during test collection and adds the asyncio marker
+    to all async test functions, including those in test classes.
+    This is necessary because asyncio_mode = auto doesn't work reliably
+    with test class methods.
+    """
+    for item in items:
+        if inspect.iscoroutinefunction(item.obj):
+            item.add_marker(pytest.mark.asyncio)
 
 # Set test environment variables BEFORE any app imports
 os.environ['SECRET_KEY'] = 'test-secret-key-for-testing'
@@ -115,10 +130,34 @@ async def client(test_db_session: AsyncSession) -> AsyncGenerator[AsyncClient, N
     """
     from app.main import app
     from app.database.connection import get_db
+    from app.core import auth
+    from uuid import UUID
 
     # Override the database dependency to use test session
     async def override_get_db():
         yield test_db_session
+
+    # Override auth for testing - allow passing user ID directly as Bearer token
+    async def test_verify_token(token: str):
+        """
+        Test-only token verification that accepts UUIDs.
+
+        In tests, we pass user IDs as Bearer tokens for simplicity.
+        """
+        try:
+            # Try to parse as UUID (test mode)
+            user_id = UUID(token)
+            return {
+                "sub": str(user_id),
+                "email": "test@example.com"
+            }
+        except (ValueError, AttributeError):
+            # Not a UUID, use normal JWT validation
+            return await auth.verify_nextauth_jwt(token)
+
+    # Monkey-patch the verify function
+    original_verify = auth.verify_nextauth_jwt
+    auth.verify_nextauth_jwt = test_verify_token
 
     app.dependency_overrides[get_db] = override_get_db
 
@@ -142,8 +181,9 @@ async def client(test_db_session: AsyncSession) -> AsyncGenerator[AsyncClient, N
     ) as ac:
         yield ac
 
-    # Clean up override
+    # Clean up overrides
     app.dependency_overrides.clear()
+    auth.verify_nextauth_jwt = original_verify
 
 
 @pytest_asyncio.fixture
@@ -198,6 +238,21 @@ async def test_user_pro(test_db_session: AsyncSession):
     await test_db_session.refresh(user)
 
     return user
+
+
+@pytest.fixture
+def create_jwt_token():
+    """Create JWT tokens for testing authenticated endpoints."""
+    from app.core.auth import create_jwt_token as _create_jwt_token
+
+    def _create_token(user_id: str, email: str = "test@example.com"):
+        """Helper to create a JWT token for a given user."""
+        return _create_jwt_token({
+            "sub": str(user_id),
+            "email": email,
+        })
+
+    return _create_token
 
 
 @pytest_asyncio.fixture

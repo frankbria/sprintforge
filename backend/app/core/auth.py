@@ -13,8 +13,22 @@ from app.core.config import settings
 
 logger = structlog.get_logger(__name__)
 
+# Custom HTTPBearer that returns 401 instead of 403 for missing auth
+class HTTPBearerWith401(HTTPBearer):
+    """Custom HTTPBearer that returns 401 Unauthorized instead of 403 Forbidden."""
+
+    async def __call__(self, request: Request):
+        """Override to return 401 when authentication is missing."""
+        try:
+            return await super().__call__(request)
+        except HTTPException as e:
+            if e.status_code == 403:
+                # Convert 403 to 401 for missing/invalid authentication
+                raise JWTAuthError("Authentication required")
+            raise
+
 # Security scheme for API documentation
-security = HTTPBearer()
+security = HTTPBearerWith401()
 
 # NextAuth.js JWT configuration
 NEXTAUTH_SECRET = settings.secret_key

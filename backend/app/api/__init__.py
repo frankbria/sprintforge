@@ -32,6 +32,7 @@ api_router.include_router(baselines.router)
 
 # Include notification routes
 api_router.include_router(notifications.router)
+api_router.include_router(notifications.rules_router)
 
 # Include historical metrics routes
 api_router.include_router(historical_metrics.router)

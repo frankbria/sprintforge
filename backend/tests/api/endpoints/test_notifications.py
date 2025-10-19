@@ -8,8 +8,9 @@ These tests are written BEFORE implementation (RED phase) and should FAIL initia
 """
 
 import pytest
-from datetime import datetime
-from uuid import uuid4
+import pytest_asyncio
+from datetime import datetime, timezone
+from uuid import uuid4, UUID
 
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -125,7 +126,7 @@ class TestNotificationListEndpoint:
             title="Read",
             message="Read message",
             status=NotificationStatus.READ,
-            read_at=datetime.utcnow(),
+            read_at=datetime.now(timezone.utc),
         )
         test_db_session.add_all([notif1, notif2])
         await test_db_session.commit()
