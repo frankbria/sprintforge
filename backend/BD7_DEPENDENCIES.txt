@@ -1,0 +1,26 @@
+# BD-7 Historical Metrics & Trends - Required Dependencies
+
+# Statistical and Machine Learning Libraries
+scipy>=1.11.0              # Statistical functions, confidence intervals, t-distribution
+scikit-learn>=1.3.0        # Linear regression, model evaluation, R² scores
+numpy>=1.24.0              # Numerical operations, array handling
+
+# Installation Instructions:
+
+# Option 1: Using uv (Recommended - project uses uv)
+cd backend
+uv add scipy
+uv add scikit-learn
+uv add numpy
+
+# Option 2: Using pip (if uv not available)
+pip install scipy>=1.11.0 scikit-learn>=1.3.0 numpy>=1.24.0
+
+# Verification:
+python -c "import scipy, sklearn, numpy; print('All dependencies installed successfully')"
+
+# Usage in Implementation:
+# - scipy.stats: For confidence intervals, statistical distributions
+# - sklearn.linear_model.LinearRegression: For velocity forecasting
+# - sklearn.metrics.r2_score: For regression quality metrics
+# - numpy: For moving averages, array operations

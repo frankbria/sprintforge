@@ -15,6 +15,14 @@ from .notification import (
     NotificationStatus,
     NotificationChannel,
 )
+from .historical_metrics import (
+    HistoricalMetric,
+    SprintVelocity,
+    CompletionTrend,
+    ForecastData,
+    MetricType,
+    ForecastModelType,
+)
 
 __all__ = [
     "User",
@@ -31,4 +39,10 @@ __all__ = [
     "NotificationType",
     "NotificationStatus",
     "NotificationChannel",
+    "HistoricalMetric",
+    "SprintVelocity",
+    "CompletionTrend",
+    "ForecastData",
+    "MetricType",
+    "ForecastModelType",
 ]

@@ -59,7 +59,11 @@
       "mcp__morphllm-fast-apply__search_files",
       "mcp__morphllm-fast-apply__list_directory",
       "mcp__serena__get_current_config",
-      "Skill(superpowers:brainstorming)"
+      "Skill(superpowers:brainstorming)",
+      "mcp__serena__think_about_collected_information",
+      "mcp__serena__find_file",
+      "mcp__serena__get_symbols_overview",
+      "mcp__serena__search_for_pattern"
     ],
     "deny": [],
     "ask": []

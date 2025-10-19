@@ -15,6 +15,10 @@ openpyxl==3.1.2
 pandas==2.1.4
 numpy==1.26.2
 
+# Scientific Computing & Machine Learning
+scipy>=1.11.0
+scikit-learn>=1.3.0
+
 # Authentication & Security
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4

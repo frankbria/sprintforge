@@ -28,6 +28,12 @@ from app.models.notification import (
     NotificationLog,
     NotificationTemplate,
 )
+from app.models.historical_metrics import (
+    HistoricalMetric,
+    SprintVelocity,
+    CompletionTrend,
+    ForecastData,
+)
 
 
 @pytest.fixture(scope="session", autouse=True)
