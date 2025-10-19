@@ -1,40 +1,84 @@
 """Email service for sending notifications via SMTP."""
 
+import re
 import aiosmtplib
 import structlog
+from dataclasses import dataclass
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from jinja2 import Environment, FileSystemLoader, select_autoescape
-from pathlib import Path
-from typing import Optional, List
-
-from app.core.config import get_settings
+from jinja2 import Environment, Template
+from typing import Optional, List, Union
 
 logger = structlog.get_logger(__name__)
+
+
+class EmailSendError(Exception):
+    """Exception raised when email sending fails."""
+    pass
+
+
+@dataclass
+class EmailConfig:
+    """Configuration for email service."""
+
+    smtp_host: str
+    smtp_port: int
+    smtp_user: str
+    smtp_password: str
+    smtp_from_email: str
+    smtp_from_name: str = "SprintForge"
+    use_tls: bool = True
 
 
 class EmailService:
     """Service for sending emails using async SMTP."""
 
-    def __init__(self):
-        """Initialize email service with SMTP configuration."""
-        self.settings = get_settings()
+    # Email validation regex pattern
+    EMAIL_PATTERN = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
 
-        # Initialize Jinja2 environment for email templates
-        template_dir = Path(__file__).parent.parent / "templates" / "emails"
-        self.jinja_env = Environment(
-            loader=FileSystemLoader(str(template_dir)),
-            autoescape=select_autoescape(['html', 'xml']),
-            trim_blocks=True,
-            lstrip_blocks=True,
-        )
+    def __init__(self, config: EmailConfig):
+        """
+        Initialize email service with configuration.
+
+        Args:
+            config: EmailConfig instance with SMTP settings
+        """
+        self.config = config
+
+    def _validate_email(self, email: str) -> bool:
+        """
+        Validate email address format.
+
+        Args:
+            email: Email address to validate
+
+        Returns:
+            True if valid, False otherwise
+        """
+        return bool(self.EMAIL_PATTERN.match(email))
+
+    def _validate_emails(self, emails: Union[str, List[str]]) -> None:
+        """
+        Validate email address(es).
+
+        Args:
+            emails: Single email or list of emails
+
+        Raises:
+            ValueError: If any email is invalid
+        """
+        email_list = [emails] if isinstance(emails, str) else emails
+
+        for email in email_list:
+            if not self._validate_email(email):
+                raise ValueError(f"Invalid email address: {email}")
 
     async def send_email(
         self,
-        to_email: str,
+        to: Union[str, List[str]],
         subject: str,
         body_html: str,
-        body_text: str,
+        body_text: Optional[str] = None,
         from_email: Optional[str] = None,
         from_name: Optional[str] = None,
     ) -> bool:
@@ -42,142 +86,110 @@ class EmailService:
         Send an email via SMTP.
 
         Args:
-            to_email: Recipient email address
+            to: Recipient email address(es) - single string or list
             subject: Email subject line
             body_html: HTML version of email body
-            body_text: Plain text version of email body
-            from_email: Sender email (defaults to settings.smtp_from_email)
-            from_name: Sender name (defaults to settings.smtp_from_name)
+            body_text: Plain text version of email body (optional)
+            from_email: Sender email (defaults to config.smtp_from_email)
+            from_name: Sender name (defaults to config.smtp_from_name)
 
         Returns:
-            True if sent successfully, False otherwise
+            True if sent successfully
+
+        Raises:
+            ValueError: If email address is invalid
+            EmailSendError: If SMTP sending fails
         """
         try:
-            from_email = from_email or self.settings.smtp_from_email
-            from_name = from_name or self.settings.smtp_from_name
+            # Validate recipient email(s)
+            self._validate_emails(to)
+
+            # Normalize recipients to list
+            recipients = [to] if isinstance(to, str) else to
+
+            from_email = from_email or self.config.smtp_from_email
+            from_name = from_name or self.config.smtp_from_name
             from_address = f"{from_name} <{from_email}>"
 
             # Create message
             message = MIMEMultipart("alternative")
             message["Subject"] = subject
             message["From"] = from_address
-            message["To"] = to_email
+            message["To"] = ", ".join(recipients)
 
-            # Attach both plain text and HTML versions
-            part_text = MIMEText(body_text, "plain")
+            # Attach plain text version (if provided)
+            if body_text:
+                part_text = MIMEText(body_text, "plain")
+                message.attach(part_text)
+
+            # Attach HTML version
             part_html = MIMEText(body_html, "html")
-            message.attach(part_text)
             message.attach(part_html)
 
             # Send email via SMTP
             async with aiosmtplib.SMTP(
-                hostname=self.settings.smtp_host,
-                port=self.settings.smtp_port,
-                use_tls=self.settings.smtp_use_tls,
+                hostname=self.config.smtp_host,
+                port=self.config.smtp_port,
+                use_tls=self.config.use_tls,
             ) as smtp:
-                if self.settings.smtp_user and self.settings.smtp_password:
+                if self.config.smtp_user and self.config.smtp_password:
                     await smtp.login(
-                        self.settings.smtp_user,
-                        self.settings.smtp_password
+                        self.config.smtp_user,
+                        self.config.smtp_password
                     )
 
-                await smtp.send_message(message)
+                await smtp.sendmail(
+                    from_address,
+                    recipients,
+                    message.as_string()
+                )
 
             logger.info(
                 "email_sent",
-                to=to_email,
+                to=recipients,
                 subject=subject,
                 from_email=from_email
             )
             return True
 
+        except ValueError:
+            # Re-raise validation errors
+            raise
+
         except Exception as e:
             logger.error(
                 "email_send_failed",
-                to=to_email,
+                to=to,
                 subject=subject,
                 error=str(e),
                 exc_info=True
             )
-            return False
+            raise EmailSendError(f"Failed to send email: {str(e)}") from e
 
     def render_template(
         self,
-        template_name: str,
+        template_string: str,
         context: dict
-    ) -> tuple[str, str]:
+    ) -> str:
         """
-        Render email template with context.
+        Render email template string with context.
 
         Args:
-            template_name: Name of template file (e.g., 'sprint_complete.html')
+            template_string: Jinja2 template string
             context: Dictionary of template variables
 
         Returns:
-            Tuple of (html_body, text_body)
+            Rendered template string
         """
         try:
-            # Render HTML template
-            html_template = self.jinja_env.get_template(f"{template_name}.html")
-            html_body = html_template.render(**context)
-
-            # Render text template
-            text_template = self.jinja_env.get_template(f"{template_name}.txt")
-            text_body = text_template.render(**context)
-
-            return html_body, text_body
+            template = Template(template_string)
+            return template.render(**context)
 
         except Exception as e:
             logger.error(
                 "template_render_failed",
-                template=template_name,
                 error=str(e),
                 exc_info=True
             )
             # Return simple fallback
-            return f"<p>Notification from SprintForge</p>", "Notification from SprintForge"
-
-    async def send_templated_email(
-        self,
-        to_email: str,
-        subject: str,
-        template_name: str,
-        context: dict,
-        from_email: Optional[str] = None,
-        from_name: Optional[str] = None,
-    ) -> bool:
-        """
-        Send an email using a template.
-
-        Args:
-            to_email: Recipient email address
-            subject: Email subject line
-            template_name: Name of template file (without extension)
-            context: Dictionary of template variables
-            from_email: Sender email (optional)
-            from_name: Sender name (optional)
-
-        Returns:
-            True if sent successfully, False otherwise
-        """
-        html_body, text_body = self.render_template(template_name, context)
-        return await self.send_email(
-            to_email=to_email,
-            subject=subject,
-            body_html=html_body,
-            body_text=text_body,
-            from_email=from_email,
-            from_name=from_name,
-        )
-
-
-# Singleton instance
-_email_service: Optional[EmailService] = None
-
-
-def get_email_service() -> EmailService:
-    """Get singleton email service instance."""
-    global _email_service
-    if _email_service is None:
-        _email_service = EmailService()
-    return _email_service
+            return "Notification from SprintForge"

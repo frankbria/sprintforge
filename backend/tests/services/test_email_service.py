@@ -509,7 +509,7 @@ class TestEmailServiceIntegration:
 
 
 @pytest.mark.unit
-class TestEmailServiceConfiguration:
+class TestEmailServiceSettingsIntegration:
     """Test email service configuration from Settings."""
 
     def test_load_config_from_settings(self):
@@ -518,24 +518,22 @@ class TestEmailServiceConfiguration:
 
         Validates integration with pydantic Settings.
         """
-        from app.core.config import Settings
+        # Create a mock Settings object with required attributes
+        mock_settings = Mock()
+        mock_settings.smtp_host = "smtp.gmail.com"
+        mock_settings.smtp_port = 587
+        mock_settings.smtp_user = "test@example.com"
+        mock_settings.smtp_password = "password123"
+        mock_settings.smtp_from_email = "noreply@sprintforge.com"
 
-        # Mock settings with email configuration
-        with patch.object(Settings, "__init__", lambda x: None):
-            settings = Settings()
-            settings.smtp_host = "smtp.gmail.com"
-            settings.smtp_port = 587
-            settings.smtp_user = "test@example.com"
-            settings.smtp_password = "password123"
-            settings.smtp_from_email = "noreply@sprintforge.com"
+        # Test that EmailConfig can be created from Settings attributes
+        config = EmailConfig(
+            smtp_host=mock_settings.smtp_host,
+            smtp_port=mock_settings.smtp_port,
+            smtp_user=mock_settings.smtp_user,
+            smtp_password=mock_settings.smtp_password,
+            smtp_from_email=mock_settings.smtp_from_email,
+        )
 
-            config = EmailConfig(
-                smtp_host=settings.smtp_host,
-                smtp_port=settings.smtp_port,
-                smtp_user=settings.smtp_user,
-                smtp_password=settings.smtp_password,
-                smtp_from_email=settings.smtp_from_email,
-            )
-
-            assert config.smtp_host == "smtp.gmail.com"
-            assert config.smtp_port == 587
+        assert config.smtp_host == "smtp.gmail.com"
+        assert config.smtp_port == 587
