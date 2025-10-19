@@ -3,25 +3,25 @@
 import asyncio
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
-from typing import Dict, Any, AsyncGenerator, List
+from typing import Any, AsyncGenerator, Dict, List
 from uuid import UUID
 
 import structlog
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import get_settings
 from app.database.connection import get_session_factory
 from app.models.notification import (
     Notification,
-    NotificationRule,
-    NotificationLog,
-    NotificationTemplate,
     NotificationChannel,
+    NotificationLog,
+    NotificationRule,
+    NotificationTemplate,
 )
 from app.models.user import User
-from app.services.email_service import EmailService, EmailConfig
 from app.services.celery_app import celery_app
-from app.core.config import get_settings
+from app.services.email_service import EmailConfig, EmailService
 
 logger = structlog.get_logger(__name__)
 
@@ -64,17 +64,20 @@ async def send_notification_email(notification_id: str) -> bool:
 
             # Fetch notification (handle both sync and async mocks)
             import inspect
+
             try:
                 notification = notification_result.scalar_one()
                 if inspect.iscoroutine(notification):
                     notification = await notification
-            except:
+            except Exception:
                 notification = notification_result.scalar_one_or_none()
                 if inspect.iscoroutine(notification):
                     notification = await notification
 
             if not notification:
-                logger.warning("notification_not_found", notification_id=notification_id)
+                logger.warning(
+                    "notification_not_found", notification_id=notification_id
+                )
                 return False
 
             # Check for custom template
@@ -109,7 +112,7 @@ async def send_notification_email(notification_id: str) -> bool:
             email_service = EmailService(email_config)
 
             # Prepare email content
-            if template and hasattr(template, 'subject_template'):
+            if template and hasattr(template, "subject_template"):
                 # Use template with metadata context
                 context = notification.metadata or {}
                 subject = email_service.render_template(
@@ -150,7 +153,7 @@ async def send_notification_email(notification_id: str) -> bool:
                 "notification_email_sent",
                 notification_id=notification_id,
                 user_email=user.email,
-                success=success
+                success=success,
             )
 
             return success
@@ -160,7 +163,7 @@ async def send_notification_email(notification_id: str) -> bool:
             "send_notification_email_failed",
             notification_id=notification_id,
             error=str(e),
-            exc_info=True
+            exc_info=True,
         )
 
         # Try to create error log
@@ -175,7 +178,7 @@ async def send_notification_email(notification_id: str) -> bool:
                 )
                 db.add(log)
                 await db.commit()
-        except:
+        except Exception:
             pass  # Best effort logging
 
         return False
@@ -183,10 +186,14 @@ async def send_notification_email(notification_id: str) -> bool:
 
 # Add Celery-like attributes for test compatibility
 send_notification_email.max_retries = 3
-send_notification_email.delay = lambda notification_id: send_notification_email_task.delay(notification_id)
+send_notification_email.delay = (
+    lambda notification_id: send_notification_email_task.delay(notification_id)
+)
 
 
-async def process_notification_rules(event_type: str, event_data: Dict[str, Any]) -> int:
+async def process_notification_rules(
+    event_type: str, event_data: Dict[str, Any]
+) -> int:
     """
     Process notification rules for an event.
 
@@ -203,7 +210,7 @@ async def process_notification_rules(event_type: str, event_data: Dict[str, Any]
             result = await db.execute(
                 select(NotificationRule).where(
                     NotificationRule.event_type == event_type,
-                    NotificationRule.enabled == True,
+                    NotificationRule.enabled.is_(True),
                 )
             )
             rules = result.scalars().all()
@@ -221,9 +228,9 @@ async def process_notification_rules(event_type: str, event_data: Dict[str, Any]
                     notification = Notification(
                         user_id=rule.user_id,
                         type=event_type,
-                        title=event_data.get('title', f'Event: {event_type}'),
-                        message=event_data.get('message', 'New notification'),
-                        metadata=event_data.get('metadata', {}),
+                        title=event_data.get("title", f"Event: {event_type}"),
+                        message=event_data.get("message", "New notification"),
+                        metadata=event_data.get("metadata", {}),
                     )
                     db.add(notification)
                     await db.flush()
@@ -239,7 +246,7 @@ async def process_notification_rules(event_type: str, event_data: Dict[str, Any]
                 "notification_rules_processed",
                 event_type=event_type,
                 rules_matched=len(rules),
-                notifications_created=notifications_created
+                notifications_created=notifications_created,
             )
 
             return notifications_created
@@ -249,7 +256,7 @@ async def process_notification_rules(event_type: str, event_data: Dict[str, Any]
             "process_notification_rules_failed",
             event_type=event_type,
             error=str(e),
-            exc_info=True
+            exc_info=True,
         )
         raise
 
@@ -276,21 +283,21 @@ async def batch_send_notifications(notification_ids: List[str]) -> int:
             logger.error(
                 "batch_send_failed_for_notification",
                 notification_id=notification_id,
-                error=str(e)
+                error=str(e),
             )
             # Continue with other notifications
             continue
 
     logger.info(
-        "batch_send_notifications_completed",
-        total=len(notification_ids),
-        queued=queued
+        "batch_send_notifications_completed", total=len(notification_ids), queued=queued
     )
 
     return queued
 
 
-def _evaluate_rule_conditions(conditions: Dict[str, Any], event_data: Dict[str, Any]) -> bool:
+def _evaluate_rule_conditions(
+    conditions: Dict[str, Any], event_data: Dict[str, Any]
+) -> bool:
     """
     Evaluate if event data matches rule conditions.
 
@@ -302,16 +309,16 @@ def _evaluate_rule_conditions(conditions: Dict[str, Any], event_data: Dict[str, 
         True if conditions match, False otherwise
     """
     # Check project_ids condition
-    if 'project_ids' in conditions:
-        allowed_projects = conditions['project_ids']
-        event_project = event_data.get('project_id')
+    if "project_ids" in conditions:
+        allowed_projects = conditions["project_ids"]
+        event_project = event_data.get("project_id")
         if event_project not in allowed_projects:
             return False
 
     # Check min_completion condition
-    if 'min_completion' in conditions:
-        min_completion = conditions['min_completion']
-        event_completion = event_data.get('completion', 0)
+    if "min_completion" in conditions:
+        min_completion = conditions["min_completion"]
+        event_completion = event_data.get("completion", 0)
         if event_completion < min_completion:
             return False
 
@@ -341,14 +348,16 @@ def send_notification_email_task(self, notification_id: str) -> Dict[str, Any]:
             "send_notification_email_task_failed",
             notification_id=notification_id,
             error=str(exc),
-            exc_info=True
+            exc_info=True,
         )
         # Retry with exponential backoff
-        raise self.retry(exc=exc, countdown=60 * (2 ** self.request.retries))
+        raise self.retry(exc=exc, countdown=60 * (2**self.request.retries))
 
 
 @celery_app.task
-def process_notification_rules_task(event_type: str, event_data: Dict[str, Any]) -> Dict[str, Any]:
+def process_notification_rules_task(
+    event_type: str, event_data: Dict[str, Any]
+) -> Dict[str, Any]:
     """
     Celery task wrapper for process_notification_rules.
 
@@ -373,7 +382,7 @@ def process_notification_rules_task(event_type: str, event_data: Dict[str, Any])
             "process_notification_rules_task_failed",
             event_type=event_type,
             error=str(exc),
-            exc_info=True
+            exc_info=True,
         )
         raise
 
@@ -398,8 +407,6 @@ def batch_send_notifications_task(notification_ids: List[str]) -> Dict[str, Any]
         }
     except Exception as exc:
         logger.error(
-            "batch_send_notifications_task_failed",
-            error=str(exc),
-            exc_info=True
+            "batch_send_notifications_task_failed", error=str(exc), exc_info=True
         )
         raise

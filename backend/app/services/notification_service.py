@@ -1,20 +1,20 @@
 """Notification service for managing notifications and rules."""
 
-import structlog
 from datetime import datetime, timezone
-from typing import List, Optional, Dict, Any
+from typing import Any, Dict, List, Optional
 from uuid import UUID
 
-from sqlalchemy import select, and_, update, func
+import structlog
+from sqlalchemy import and_, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.notification import (
     Notification,
-    NotificationRule,
-    NotificationLog,
-    NotificationTemplate,
-    NotificationStatus,
     NotificationChannel,
+    NotificationLog,
+    NotificationRule,
+    NotificationStatus,
+    NotificationTemplate,
     NotificationType,
 )
 from app.models.user import User
@@ -54,16 +54,18 @@ class NotificationService:
             ValueError: If user does not exist
         """
         # Validate user exists
-        result = await self.db.execute(
-            select(User).where(User.id == user_id)
-        )
+        result = await self.db.execute(select(User).where(User.id == user_id))
         user = result.scalar_one_or_none()
         if not user:
             raise ValueError(f"User with id {user_id} does not exist")
 
         notification = Notification(
             user_id=user_id,
-            type=notification_type.value if isinstance(notification_type, NotificationType) else notification_type,
+            type=(
+                notification_type.value
+                if isinstance(notification_type, NotificationType)
+                else notification_type
+            ),
             title=title,
             message=message,
             meta_data=metadata,
@@ -78,7 +80,7 @@ class NotificationService:
             "notification_created",
             notification_id=notification.id,
             user_id=user_id,
-            type=notification.type
+            type=notification.type,
         )
 
         return notification
@@ -107,7 +109,9 @@ class NotificationService:
 
         # Check authorization
         if notification.user_id != user_id:
-            raise PermissionError(f"User {user_id} does not have permission to mark notification {notification_id} as read")
+            raise PermissionError(
+                f"User {user_id} does not have permission to mark notification {notification_id} as read"
+            )
 
         notification.status = NotificationStatus.READ.value
         notification.read_at = datetime.now(timezone.utc)
@@ -115,9 +119,7 @@ class NotificationService:
         await self.db.refresh(notification)
 
         logger.info(
-            "notification_marked_read",
-            notification_id=notification_id,
-            user_id=user_id
+            "notification_marked_read", notification_id=notification_id, user_id=user_id
         )
 
         return True
@@ -146,7 +148,9 @@ class NotificationService:
         if status is not None:
             query = query.where(Notification.status == status.value)
 
-        query = query.order_by(Notification.created_at.desc()).limit(limit).offset(offset)
+        query = (
+            query.order_by(Notification.created_at.desc()).limit(limit).offset(offset)
+        )
 
         result = await self.db.execute(query)
         notifications = result.scalars().all()
@@ -167,7 +171,7 @@ class NotificationService:
             select(func.count(Notification.id)).where(
                 and_(
                     Notification.user_id == user_id,
-                    Notification.status == NotificationStatus.UNREAD.value
+                    Notification.status == NotificationStatus.UNREAD.value,
                 )
             )
         )
@@ -189,23 +193,18 @@ class NotificationService:
             .where(
                 and_(
                     Notification.user_id == user_id,
-                    Notification.status == NotificationStatus.UNREAD.value
+                    Notification.status == NotificationStatus.UNREAD.value,
                 )
             )
             .values(
-                status=NotificationStatus.READ.value,
-                read_at=datetime.now(timezone.utc)
+                status=NotificationStatus.READ.value, read_at=datetime.now(timezone.utc)
             )
         )
         await self.db.commit()
 
         count = result.rowcount
 
-        logger.info(
-            "notifications_marked_all_read",
-            user_id=user_id,
-            count=count
-        )
+        logger.info("notifications_marked_all_read", user_id=user_id, count=count)
 
         return count
 
@@ -255,9 +254,7 @@ class NotificationService:
             await self.db.delete(notification)
             await self.db.commit()
             logger.info(
-                "notification_deleted",
-                notification_id=notification_id,
-                user_id=user_id
+                "notification_deleted", notification_id=notification_id, user_id=user_id
             )
             return True
 
@@ -290,13 +287,16 @@ class NotificationService:
 
         # Convert channels to list of strings
         channel_values = [
-            ch.value if isinstance(ch, NotificationChannel) else ch
-            for ch in channels
+            ch.value if isinstance(ch, NotificationChannel) else ch for ch in channels
         ]
 
         rule = NotificationRule(
             user_id=user_id,
-            event_type=event_type.value if isinstance(event_type, NotificationType) else event_type,
+            event_type=(
+                event_type.value
+                if isinstance(event_type, NotificationType)
+                else event_type
+            ),
             enabled=enabled,
             channels=channel_values,
             conditions=conditions or {},
@@ -310,7 +310,7 @@ class NotificationService:
             "notification_rule_created",
             rule_id=rule.id,
             user_id=user_id,
-            event_type=rule.event_type
+            event_type=rule.event_type,
         )
 
         return rule
@@ -379,11 +379,7 @@ class NotificationService:
             await self.db.commit()
             await self.db.refresh(rule)
 
-            logger.info(
-                "notification_rule_updated",
-                rule_id=rule_id,
-                user_id=user_id
-            )
+            logger.info("notification_rule_updated", rule_id=rule_id, user_id=user_id)
 
         return rule
 
@@ -411,11 +407,7 @@ class NotificationService:
         if rule:
             await self.db.delete(rule)
             await self.db.commit()
-            logger.info(
-                "notification_rule_deleted",
-                rule_id=rule_id,
-                user_id=user_id
-            )
+            logger.info("notification_rule_deleted", rule_id=rule_id, user_id=user_id)
             return True
 
         return False
@@ -436,14 +428,16 @@ class NotificationService:
             List of matching NotificationRule instances
         """
         # Convert event_type to string if it's an enum
-        event_type_str = event_type.value if isinstance(event_type, NotificationType) else event_type
+        event_type_str = (
+            event_type.value if isinstance(event_type, NotificationType) else event_type
+        )
 
         # Find all enabled rules for this event type
         result = await self.db.execute(
             select(NotificationRule).where(
                 and_(
                     NotificationRule.event_type == event_type_str,
-                    NotificationRule.enabled == True,
+                    NotificationRule.enabled.is_(True),
                 )
             )
         )
@@ -458,12 +452,14 @@ class NotificationService:
         logger.info(
             "notification_rules_evaluated",
             event_type=event_type_str,
-            rules_matched=len(matching_rules)
+            rules_matched=len(matching_rules),
         )
 
         return matching_rules
 
-    def _rule_matches_conditions(self, rule: NotificationRule, event_data: Dict[str, Any]) -> bool:
+    def _rule_matches_conditions(
+        self, rule: NotificationRule, event_data: Dict[str, Any]
+    ) -> bool:
         """
         Check if event data matches rule conditions.
 
@@ -511,7 +507,9 @@ class NotificationService:
         Returns:
             Created NotificationTemplate instance
         """
-        event_type_str = event_type.value if isinstance(event_type, NotificationType) else event_type
+        event_type_str = (
+            event_type.value if isinstance(event_type, NotificationType) else event_type
+        )
 
         template = NotificationTemplate(
             event_type=event_type_str,
@@ -527,12 +525,14 @@ class NotificationService:
         logger.info(
             "notification_template_created",
             template_id=template.id,
-            event_type=event_type_str
+            event_type=event_type_str,
         )
 
         return template
 
-    async def get_template(self, event_type: NotificationType) -> Optional[NotificationTemplate]:
+    async def get_template(
+        self, event_type: NotificationType
+    ) -> Optional[NotificationTemplate]:
         """
         Get a notification template by event type.
 
@@ -542,7 +542,9 @@ class NotificationService:
         Returns:
             NotificationTemplate or None if not found
         """
-        event_type_str = event_type.value if isinstance(event_type, NotificationType) else event_type
+        event_type_str = (
+            event_type.value if isinstance(event_type, NotificationType) else event_type
+        )
 
         result = await self.db.execute(
             select(NotificationTemplate).where(
@@ -586,7 +588,7 @@ class NotificationService:
             logger.info(
                 "notification_template_updated",
                 template_id=template.id,
-                event_type=template.event_type
+                event_type=template.event_type,
             )
 
         return template
@@ -611,7 +613,9 @@ class NotificationService:
         Returns:
             Created NotificationLog instance
         """
-        channel_str = channel.value if isinstance(channel, NotificationChannel) else channel
+        channel_str = (
+            channel.value if isinstance(channel, NotificationChannel) else channel
+        )
 
         log = NotificationLog(
             notification_id=notification_id,
@@ -630,7 +634,7 @@ class NotificationService:
             log_id=log.id,
             notification_id=notification_id,
             channel=channel_str,
-            status=status
+            status=status,
         )
 
         return log

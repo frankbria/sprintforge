@@ -1,23 +1,23 @@
 """Notification management endpoints."""
 
-from typing import Dict, Any, List
+from typing import Any, Dict, List
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
 import structlog
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.auth import require_auth
 from app.database.connection import get_database_session
-from app.services.notification_service import NotificationService
+from app.models.notification import NotificationChannel, NotificationType
 from app.schemas.notification import (
+    NotificationEventTrigger,
     NotificationResponse,
     NotificationRuleCreate,
-    NotificationRuleUpdate,
     NotificationRuleResponse,
-    NotificationEventTrigger,
+    NotificationRuleUpdate,
 )
-from app.models.notification import NotificationType, NotificationChannel
+from app.services.notification_service import NotificationService
 
 logger = structlog.get_logger(__name__)
 
@@ -48,6 +48,7 @@ async def list_notifications(
 
         # Convert status string to enum if provided
         from app.models.notification import NotificationStatus
+
         status_enum = None
         if status:
             if status.lower() == "unread":
@@ -161,7 +162,9 @@ async def mark_all_notifications_read(
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid user ID")
     except Exception as e:
-        logger.error("Error marking all notifications read", error=str(e), exc_info=True)
+        logger.error(
+            "Error marking all notifications read", error=str(e), exc_info=True
+        )
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
@@ -245,7 +248,9 @@ async def update_notification_rule(
         if not rule_exists:
             # Check if rule exists but belongs to another user
             from sqlalchemy import select
+
             from app.models.notification import NotificationRule
+
             result = await db.execute(
                 select(NotificationRule).where(NotificationRule.id == rule_id)
             )
@@ -254,7 +259,9 @@ async def update_notification_rule(
             if other_rule:
                 raise HTTPException(status_code=403, detail="Forbidden")
             else:
-                raise HTTPException(status_code=404, detail="Notification rule not found")
+                raise HTTPException(
+                    status_code=404, detail="Notification rule not found"
+                )
 
         rule = await service.update_rule(
             rule_id=rule_id,
@@ -296,7 +303,9 @@ async def delete_notification_rule(
         if not rule_exists:
             # Check if rule exists but belongs to another user
             from sqlalchemy import select
+
             from app.models.notification import NotificationRule
+
             result = await db.execute(
                 select(NotificationRule).where(NotificationRule.id == rule_id)
             )
@@ -305,7 +314,9 @@ async def delete_notification_rule(
             if other_rule:
                 raise HTTPException(status_code=403, detail="Forbidden")
             else:
-                raise HTTPException(status_code=404, detail="Notification rule not found")
+                raise HTTPException(
+                    status_code=404, detail="Notification rule not found"
+                )
 
         deleted = await service.delete_rule(
             rule_id=rule_id,

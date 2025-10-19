@@ -1,26 +1,28 @@
 """Notification system models for SprintForge."""
 
+import enum
 from datetime import datetime, timezone
 from typing import Optional
 from uuid import UUID, uuid4
-import enum
 
-from sqlalchemy import Boolean, String, Text, DateTime, ForeignKey, JSON, Enum as SQLEnum
+from sqlalchemy import Boolean, DateTime, ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.sql import func
 
-from app.database.types import UUID as DBUUIDType, JSONB
+from app.database.types import JSONB
+from app.database.types import UUID as DBUUIDType
 
 try:
     from app.database.connection import Base
 except ImportError:
     # For testing without database setup
     from sqlalchemy.orm import declarative_base
+
     Base = declarative_base()
 
 
 class NotificationType(str, enum.Enum):
     """Types of notifications in the system."""
+
     SPRINT_COMPLETE = "sprint_complete"
     PROJECT_SHARED = "project_shared"
     SYSTEM_ALERT = "system_alert"
@@ -28,12 +30,14 @@ class NotificationType(str, enum.Enum):
 
 class NotificationStatus(str, enum.Enum):
     """Status of a notification."""
+
     UNREAD = "unread"
     READ = "read"
 
 
 class NotificationChannel(str, enum.Enum):
     """Delivery channels for notifications."""
+
     EMAIL = "email"
     IN_APP = "in_app"
 
@@ -45,7 +49,10 @@ class Notification(Base):
 
     id: Mapped[UUID] = mapped_column(DBUUIDType, primary_key=True, default=uuid4)
     user_id: Mapped[UUID] = mapped_column(
-        DBUUIDType, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+        DBUUIDType,
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
     )
     type: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
     title: Mapped[str] = mapped_column(String(255), nullable=False)
@@ -54,48 +61,54 @@ class Notification(Base):
         String(20), default=NotificationStatus.UNREAD.value, nullable=False, index=True
     )
     meta_data: Mapped[Optional[dict]] = mapped_column("metadata", JSONB, nullable=True)
-    read_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    read_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
 
     # Timestamps
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
         nullable=False,
-        index=True
+        index=True,
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
         onupdate=lambda: datetime.now(timezone.utc),
-        nullable=False
+        nullable=False,
     )
 
     # Relationships
-    logs = relationship("NotificationLog", back_populates="notification", cascade="all, delete-orphan")
+    logs = relationship(
+        "NotificationLog", back_populates="notification", cascade="all, delete-orphan"
+    )
 
     def __init__(self, **kwargs):
         """Initialize notification, handling metadata parameter."""
         # Handle metadata -> meta_data mapping
-        if 'metadata' in kwargs:
-            kwargs['meta_data'] = kwargs.pop('metadata')
+        if "metadata" in kwargs:
+            kwargs["meta_data"] = kwargs.pop("metadata")
         super().__init__(**kwargs)
 
     def __getattribute__(self, name):
         """Override to handle metadata attribute access."""
-        if name == 'metadata':
+        if name == "metadata":
             # Avoid infinite recursion by using object.__getattribute__
-            return object.__getattribute__(self, 'meta_data')
+            return object.__getattribute__(self, "meta_data")
         return object.__getattribute__(self, name)
 
     def __setattr__(self, name, value):
         """Allow setting meta_data via metadata for backward compatibility."""
-        if name == 'metadata':
-            super().__setattr__('meta_data', value)
+        if name == "metadata":
+            super().__setattr__("meta_data", value)
         else:
             super().__setattr__(name, value)
 
     def __repr__(self) -> str:
-        return f"<Notification(id={self.id}, type='{self.type}', status='{self.status}')>"
+        return (
+            f"<Notification(id={self.id}, type='{self.type}', status='{self.status}')>"
+        )
 
 
 class NotificationRule(Base):
@@ -105,7 +118,10 @@ class NotificationRule(Base):
 
     id: Mapped[UUID] = mapped_column(DBUUIDType, primary_key=True, default=uuid4)
     user_id: Mapped[UUID] = mapped_column(
-        DBUUIDType, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+        DBUUIDType,
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
     )
     event_type: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
     enabled: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
@@ -118,13 +134,13 @@ class NotificationRule(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
-        nullable=False
+        nullable=False,
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
         onupdate=lambda: datetime.now(timezone.utc),
-        nullable=False
+        nullable=False,
     )
 
     def __repr__(self) -> str:
@@ -138,7 +154,10 @@ class NotificationLog(Base):
 
     id: Mapped[UUID] = mapped_column(DBUUIDType, primary_key=True, default=uuid4)
     notification_id: Mapped[UUID] = mapped_column(
-        DBUUIDType, ForeignKey("notifications.id", ondelete="CASCADE"), nullable=False, index=True
+        DBUUIDType,
+        ForeignKey("notifications.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
     )
     channel: Mapped[str] = mapped_column(String(20), nullable=False)
     status: Mapped[str] = mapped_column(String(20), nullable=False)
@@ -149,7 +168,7 @@ class NotificationLog(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
-        nullable=False
+        nullable=False,
     )
 
     # Relationships
@@ -165,7 +184,9 @@ class NotificationTemplate(Base):
     __tablename__ = "notification_templates"
 
     id: Mapped[UUID] = mapped_column(DBUUIDType, primary_key=True, default=uuid4)
-    event_type: Mapped[str] = mapped_column(String(50), unique=True, nullable=False, index=True)
+    event_type: Mapped[str] = mapped_column(
+        String(50), unique=True, nullable=False, index=True
+    )
     subject_template: Mapped[str] = mapped_column(String(255), nullable=False)
     body_template_html: Mapped[str] = mapped_column(Text, nullable=False)
     body_template_text: Mapped[str] = mapped_column(Text, nullable=False)
@@ -174,13 +195,13 @@ class NotificationTemplate(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
-        nullable=False
+        nullable=False,
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
         onupdate=lambda: datetime.now(timezone.utc),
-        nullable=False
+        nullable=False,
     )
 
     def __repr__(self) -> str:

@@ -1,19 +1,21 @@
 """Email service for sending notifications via SMTP."""
 
 import re
+from dataclasses import dataclass
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from typing import List, Optional, Union
+
 import aiosmtplib
 import structlog
-from dataclasses import dataclass
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from jinja2 import Environment, Template
-from typing import Optional, List, Union
+from jinja2 import Template
 
 logger = structlog.get_logger(__name__)
 
 
 class EmailSendError(Exception):
     """Exception raised when email sending fails."""
+
     pass
 
 
@@ -34,7 +36,7 @@ class EmailService:
     """Service for sending emails using async SMTP."""
 
     # Email validation regex pattern
-    EMAIL_PATTERN = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+    EMAIL_PATTERN = re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
 
     def __init__(self, config: EmailConfig):
         """
@@ -133,22 +135,12 @@ class EmailService:
                 use_tls=self.config.use_tls,
             ) as smtp:
                 if self.config.smtp_user and self.config.smtp_password:
-                    await smtp.login(
-                        self.config.smtp_user,
-                        self.config.smtp_password
-                    )
+                    await smtp.login(self.config.smtp_user, self.config.smtp_password)
 
-                await smtp.sendmail(
-                    from_address,
-                    recipients,
-                    message.as_string()
-                )
+                await smtp.sendmail(from_address, recipients, message.as_string())
 
             logger.info(
-                "email_sent",
-                to=recipients,
-                subject=subject,
-                from_email=from_email
+                "email_sent", to=recipients, subject=subject, from_email=from_email
             )
             return True
 
@@ -158,19 +150,11 @@ class EmailService:
 
         except Exception as e:
             logger.error(
-                "email_send_failed",
-                to=to,
-                subject=subject,
-                error=str(e),
-                exc_info=True
+                "email_send_failed", to=to, subject=subject, error=str(e), exc_info=True
             )
             raise EmailSendError(f"Failed to send email: {str(e)}") from e
 
-    def render_template(
-        self,
-        template_string: str,
-        context: dict
-    ) -> str:
+    def render_template(self, template_string: str, context: dict) -> str:
         """
         Render email template string with context.
 
@@ -186,10 +170,6 @@ class EmailService:
             return template.render(**context)
 
         except Exception as e:
-            logger.error(
-                "template_render_failed",
-                error=str(e),
-                exc_info=True
-            )
+            logger.error("template_render_failed", error=str(e), exc_info=True)
             # Return simple fallback
             return "Notification from SprintForge"
