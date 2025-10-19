@@ -29,6 +29,7 @@ from app.models.notification import (
 class TestNotificationListEndpoint:
     """Test GET /api/v1/notifications endpoint."""
 
+    @pytest.mark.asyncio
     async def test_get_notifications_success(
         self, client: AsyncClient, test_db_session: AsyncSession, test_user
     ):
@@ -60,6 +61,7 @@ class TestNotificationListEndpoint:
         assert len(data) >= 1
         assert data[0]["title"] == "Test Notification"
 
+    @pytest.mark.asyncio
     async def test_get_notifications_pagination(
         self, client: AsyncClient, test_db_session: AsyncSession, test_user
     ):
@@ -99,6 +101,7 @@ class TestNotificationListEndpoint:
         data = response.json()
         assert len(data) == 5
 
+    @pytest.mark.asyncio
     async def test_get_notifications_filter_unread(
         self, client: AsyncClient, test_db_session: AsyncSession, test_user
     ):
@@ -136,6 +139,7 @@ class TestNotificationListEndpoint:
         data = response.json()
         assert all(n["status"] == "unread" for n in data)
 
+    @pytest.mark.asyncio
     async def test_get_notifications_unauthorized(self, client: AsyncClient):
         """
         Test getting notifications without authentication.
@@ -146,6 +150,7 @@ class TestNotificationListEndpoint:
 
         assert response.status_code == 401
 
+    @pytest.mark.asyncio
     async def test_get_notifications_empty_list(
         self, client: AsyncClient, test_user
     ):
@@ -169,6 +174,7 @@ class TestNotificationListEndpoint:
 class TestNotificationMarkAsReadEndpoint:
     """Test POST /api/v1/notifications/{id}/read endpoint."""
 
+    @pytest.mark.asyncio
     async def test_mark_notification_as_read_success(
         self, client: AsyncClient, test_db_session: AsyncSession, test_user
     ):
@@ -198,6 +204,7 @@ class TestNotificationMarkAsReadEndpoint:
         assert data["status"] == "read"
         assert data["read_at"] is not None
 
+    @pytest.mark.asyncio
     async def test_mark_notification_not_found(
         self, client: AsyncClient, test_user
     ):
@@ -214,6 +221,7 @@ class TestNotificationMarkAsReadEndpoint:
 
         assert response.status_code == 404
 
+    @pytest.mark.asyncio
     async def test_mark_notification_wrong_user(
         self, client: AsyncClient, test_db_session: AsyncSession, test_user, test_user_pro
     ):
@@ -238,6 +246,7 @@ class TestNotificationMarkAsReadEndpoint:
 
         assert response.status_code == 403
 
+    @pytest.mark.asyncio
     async def test_mark_all_notifications_as_read(
         self, client: AsyncClient, test_db_session: AsyncSession, test_user
     ):
@@ -272,6 +281,7 @@ class TestNotificationMarkAsReadEndpoint:
 class TestNotificationRuleListEndpoint:
     """Test GET /api/v1/notification-rules endpoint."""
 
+    @pytest.mark.asyncio
     async def test_get_notification_rules(
         self, client: AsyncClient, test_db_session: AsyncSession, test_user
     ):
@@ -300,6 +310,7 @@ class TestNotificationRuleListEndpoint:
         assert isinstance(data, list)
         assert len(data) >= 1
 
+    @pytest.mark.asyncio
     async def test_get_notification_rules_empty(
         self, client: AsyncClient, test_user
     ):
@@ -323,6 +334,7 @@ class TestNotificationRuleListEndpoint:
 class TestNotificationRuleCreateEndpoint:
     """Test POST /api/v1/notification-rules endpoint."""
 
+    @pytest.mark.asyncio
     async def test_create_notification_rule_success(
         self, client: AsyncClient, test_user
     ):
@@ -352,6 +364,7 @@ class TestNotificationRuleCreateEndpoint:
         assert "email" in data["channels"]
         assert data["enabled"] is True
 
+    @pytest.mark.asyncio
     async def test_create_notification_rule_validation(
         self, client: AsyncClient, test_user
     ):
@@ -373,6 +386,7 @@ class TestNotificationRuleCreateEndpoint:
 
         assert response.status_code == 422  # Validation error
 
+    @pytest.mark.asyncio
     async def test_create_notification_rule_defaults(
         self, client: AsyncClient, test_user
     ):
@@ -402,6 +416,7 @@ class TestNotificationRuleCreateEndpoint:
 class TestNotificationRuleUpdateEndpoint:
     """Test PUT /api/v1/notification-rules/{id} endpoint."""
 
+    @pytest.mark.asyncio
     async def test_update_notification_rule_success(
         self, client: AsyncClient, test_db_session: AsyncSession, test_user
     ):
@@ -436,6 +451,7 @@ class TestNotificationRuleUpdateEndpoint:
         assert data["enabled"] is False
         assert data["channels"] == ["in_app"]
 
+    @pytest.mark.asyncio
     async def test_update_notification_rule_not_found(
         self, client: AsyncClient, test_user
     ):
@@ -455,6 +471,7 @@ class TestNotificationRuleUpdateEndpoint:
 
         assert response.status_code == 404
 
+    @pytest.mark.asyncio
     async def test_update_notification_rule_wrong_user(
         self, client: AsyncClient, test_db_session: AsyncSession, test_user, test_user_pro
     ):
@@ -488,6 +505,7 @@ class TestNotificationRuleUpdateEndpoint:
 class TestNotificationRuleDeleteEndpoint:
     """Test DELETE /api/v1/notification-rules/{id} endpoint."""
 
+    @pytest.mark.asyncio
     async def test_delete_notification_rule_success(
         self, client: AsyncClient, test_db_session: AsyncSession, test_user
     ):
@@ -513,6 +531,7 @@ class TestNotificationRuleDeleteEndpoint:
 
         assert response.status_code == 204
 
+    @pytest.mark.asyncio
     async def test_delete_notification_rule_not_found(
         self, client: AsyncClient, test_user
     ):
@@ -530,6 +549,7 @@ class TestNotificationRuleDeleteEndpoint:
 
         assert response.status_code == 404
 
+    @pytest.mark.asyncio
     async def test_delete_notification_rule_wrong_user(
         self, client: AsyncClient, test_db_session: AsyncSession, test_user, test_user_pro
     ):
@@ -560,6 +580,7 @@ class TestNotificationRuleDeleteEndpoint:
 class TestNotificationUnreadCountEndpoint:
     """Test GET /api/v1/notifications/unread-count endpoint."""
 
+    @pytest.mark.asyncio
     async def test_get_unread_count(
         self, client: AsyncClient, test_db_session: AsyncSession, test_user
     ):
@@ -589,6 +610,7 @@ class TestNotificationUnreadCountEndpoint:
         data = response.json()
         assert data["count"] == 3
 
+    @pytest.mark.asyncio
     async def test_get_unread_count_zero(
         self, client: AsyncClient, test_user
     ):
@@ -612,6 +634,7 @@ class TestNotificationUnreadCountEndpoint:
 class TestNotificationWebhookTrigger:
     """Test internal webhook/trigger endpoint for creating notifications."""
 
+    @pytest.mark.asyncio
     async def test_trigger_notification_event(
         self, client: AsyncClient, test_db_session: AsyncSession, test_user
     ):

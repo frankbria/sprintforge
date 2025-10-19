@@ -31,6 +31,7 @@ from app.models.notification import (
 class TestNotificationModel:
     """Test suite for Notification model."""
 
+    @pytest.mark.asyncio
     async def test_create_notification(self, test_db_session: AsyncSession, test_user):
         """
         Test creating a basic notification.
@@ -60,6 +61,7 @@ class TestNotificationModel:
         assert isinstance(notification.created_at, datetime)
         assert notification.read_at is None
 
+    @pytest.mark.asyncio
     async def test_notification_defaults(self, test_db_session: AsyncSession, test_user):
         """
         Test notification default values.
@@ -81,6 +83,7 @@ class TestNotificationModel:
         assert notification.created_at is not None
         assert notification.read_at is None
 
+    @pytest.mark.asyncio
     async def test_mark_notification_as_read(self, test_db_session: AsyncSession, test_user):
         """
         Test marking a notification as read.
@@ -109,6 +112,7 @@ class TestNotificationModel:
         assert notification.read_at is not None
         assert isinstance(notification.read_at, datetime)
 
+    @pytest.mark.asyncio
     async def test_notification_with_metadata(self, test_db_session: AsyncSession, test_user):
         """
         Test notification with metadata field.
@@ -138,6 +142,7 @@ class TestNotificationModel:
         assert notification.metadata["sprint_name"] == "24.Q1.1"
         assert notification.metadata["completion_percentage"] == 100
 
+    @pytest.mark.asyncio
     async def test_notification_user_relationship(self, test_db_session: AsyncSession, test_user):
         """
         Test notification relationship with user.
@@ -160,6 +165,7 @@ class TestNotificationModel:
         # If eager loading is configured, this should work:
         # assert notification.user.email == test_user.email
 
+    @pytest.mark.asyncio
     async def test_query_notifications_by_user(self, test_db_session: AsyncSession, test_user, test_user_pro):
         """
         Test querying notifications filtered by user.
@@ -192,6 +198,7 @@ class TestNotificationModel:
         assert len(user_notifications) == 1
         assert user_notifications[0].title == "User 1 Notification"
 
+    @pytest.mark.asyncio
     async def test_notification_ordering_by_created_at(self, test_db_session: AsyncSession, test_user):
         """
         Test notifications are ordered by created_at descending (newest first).
@@ -235,6 +242,7 @@ class TestNotificationModel:
 class TestNotificationRuleModel:
     """Test suite for NotificationRule model."""
 
+    @pytest.mark.asyncio
     async def test_create_notification_rule(self, test_db_session: AsyncSession, test_user):
         """
         Test creating a notification rule.
@@ -259,6 +267,7 @@ class TestNotificationRuleModel:
         assert NotificationChannel.EMAIL in rule.channels
         assert NotificationChannel.IN_APP in rule.channels
 
+    @pytest.mark.asyncio
     async def test_notification_rule_defaults(self, test_db_session: AsyncSession, test_user):
         """
         Test notification rule default values.
@@ -277,6 +286,7 @@ class TestNotificationRuleModel:
         assert rule.enabled is True
         assert rule.channels == [NotificationChannel.IN_APP]
 
+    @pytest.mark.asyncio
     async def test_notification_rule_with_conditions(self, test_db_session: AsyncSession, test_user):
         """
         Test notification rule with custom conditions.
@@ -305,6 +315,7 @@ class TestNotificationRuleModel:
         assert rule.conditions["min_completion_percentage"] == 80
         assert len(rule.conditions["project_ids"]) == 2
 
+    @pytest.mark.asyncio
     async def test_disable_notification_rule(self, test_db_session: AsyncSession, test_user):
         """
         Test disabling a notification rule.
@@ -328,6 +339,7 @@ class TestNotificationRuleModel:
 
         assert rule.enabled is False
 
+    @pytest.mark.asyncio
     async def test_query_enabled_rules_for_event(self, test_db_session: AsyncSession, test_user):
         """
         Test querying enabled rules for a specific event type.
@@ -372,6 +384,7 @@ class TestNotificationRuleModel:
 class TestNotificationLogModel:
     """Test suite for NotificationLog model."""
 
+    @pytest.mark.asyncio
     async def test_create_notification_log(self, test_db_session: AsyncSession, test_user):
         """
         Test creating a notification log entry.
@@ -406,6 +419,7 @@ class TestNotificationLogModel:
         assert log.sent_at is not None
         assert log.error_message is None
 
+    @pytest.mark.asyncio
     async def test_notification_log_with_error(self, test_db_session: AsyncSession, test_user):
         """
         Test logging a failed notification delivery.
@@ -437,6 +451,7 @@ class TestNotificationLogModel:
         assert log.status == "failed"
         assert log.error_message == "SMTP connection timeout"
 
+    @pytest.mark.asyncio
     async def test_notification_log_relationship(self, test_db_session: AsyncSession, test_user):
         """
         Test notification log relationship with notification.
@@ -471,6 +486,7 @@ class TestNotificationLogModel:
 class TestNotificationTemplateModel:
     """Test suite for NotificationTemplate model."""
 
+    @pytest.mark.asyncio
     async def test_create_notification_template(self, test_db_session: AsyncSession):
         """
         Test creating a notification template.
@@ -494,6 +510,7 @@ class TestNotificationTemplateModel:
         assert "{{ sprint_name }}" in template.body_template_html
         assert "{{ completion }}" in template.body_template_text
 
+    @pytest.mark.asyncio
     async def test_query_template_by_event_type(self, test_db_session: AsyncSession):
         """
         Test querying templates by event type.
@@ -527,6 +544,7 @@ class TestNotificationTemplateModel:
         assert template.event_type == NotificationType.SPRINT_COMPLETE
         assert template.subject_template == "Sprint Complete"
 
+    @pytest.mark.asyncio
     async def test_template_unique_event_type(self, test_db_session: AsyncSession):
         """
         Test that event_type is unique (only one template per event).
