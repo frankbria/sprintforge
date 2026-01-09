@@ -1,5 +1,7 @@
 # SprintForge
 
+[![Follow on X](https://img.shields.io/twitter/follow/FrankBria18044?style=social)](https://x.com/FrankBria18044)
+
 > **Open-source, macro-free project management system that generates sophisticated Excel spreadsheets with Gantt chart capabilities and probabilistic timeline predictions.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
