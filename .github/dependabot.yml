@@ -13,6 +13,10 @@ updates:
       semver-major-days: 14
       semver-minor-days: 7
       semver-patch-days: 7
+    groups:
+      security-updates:
+        applies-to: security-updates
+        patterns: ["*"]
 
   - package-ecosystem: "pip"
     directory: "/"
@@ -21,6 +25,10 @@ updates:
     open-pull-requests-limit: 0
     cooldown:
       default-days: 14
+    groups:
+      security-updates:
+        applies-to: security-updates
+        patterns: ["*"]
 
   - package-ecosystem: "pip"
     directory: "/backend"
@@ -29,6 +37,10 @@ updates:
     open-pull-requests-limit: 0
     cooldown:
       default-days: 14
+    groups:
+      security-updates:
+        applies-to: security-updates
+        patterns: ["*"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -40,6 +52,10 @@ updates:
       semver-major-days: 14
       semver-minor-days: 7
       semver-patch-days: 7
+    groups:
+      security-updates:
+        applies-to: security-updates
+        patterns: ["*"]
 
   - package-ecosystem: "docker"
     directory: "/backend"
@@ -48,6 +64,10 @@ updates:
     open-pull-requests-limit: 0
     cooldown:
       default-days: 14
+    groups:
+      security-updates:
+        applies-to: security-updates
+        patterns: ["*"]
 
   - package-ecosystem: "docker"
     directory: "/frontend"
@@ -56,3 +76,7 @@ updates:
     open-pull-requests-limit: 0
     cooldown:
       default-days: 14
+    groups:
+      security-updates:
+        applies-to: security-updates
+        patterns: ["*"]
